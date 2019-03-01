@@ -1,0 +1,7 @@
+C:\Users\Daria\source\repos\SV\SV\bin\Debug\SV.exe.config
+C:\Users\Daria\source\repos\SV\SV\bin\Debug\SV.exe
+C:\Users\Daria\source\repos\SV\SV\bin\Debug\SV.pdb
+C:\Users\Daria\source\repos\SV\SV\obj\Debug\SV.csprojAssemblyReference.cache
+C:\Users\Daria\source\repos\SV\SV\obj\Debug\SV.csproj.CoreCompileInputs.cache
+C:\Users\Daria\source\repos\SV\SV\obj\Debug\SV.exe
+C:\Users\Daria\source\repos\SV\SV\obj\Debug\SV.pdb
