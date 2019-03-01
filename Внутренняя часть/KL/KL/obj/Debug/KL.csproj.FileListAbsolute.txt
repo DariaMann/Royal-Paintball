@@ -1,7 +1,0 @@
-C:\Users\Daria\source\repos\KL\KL\bin\Debug\KL.exe.config
-C:\Users\Daria\source\repos\KL\KL\bin\Debug\KL.exe
-C:\Users\Daria\source\repos\KL\KL\bin\Debug\KL.pdb
-C:\Users\Daria\source\repos\KL\KL\obj\Debug\KL.csprojAssemblyReference.cache
-C:\Users\Daria\source\repos\KL\KL\obj\Debug\KL.csproj.CoreCompileInputs.cache
-C:\Users\Daria\source\repos\KL\KL\obj\Debug\KL.exe
-C:\Users\Daria\source\repos\KL\KL\obj\Debug\KL.pdb
