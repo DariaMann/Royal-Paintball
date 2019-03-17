@@ -14,25 +14,34 @@ public class Trigger : MonoBehaviour {
     public GameObject bullet;
     public GameObject player;
     Vector3 f;
-
+    private ClientTCP clientTCP = new ClientTCP();
     public List<GameObject> bul = new List<GameObject>();
+
+    public Color[] colors;
 
     private void Update()
     {
         DelTail();
 
     }
-    void Shoot(Vector3 MousePos)
-    {
-
-    }
-    void OnMouseDrag()
-    {
-        var mousePosition = Input.mousePosition;
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
-        f = mousePosition;
+    void OnMouseDown()
+    { 
+         player = GameObject.FindGameObjectWithTag("Weapon");
+        //if (player.name == "Pistol") { }
+        //if (player.name == "Shotgun") { }
+        //if (player.name == "Gun") { }
+        //if (player.name == "Bomb") { }
+      
+        //var mousePosition = Input.mousePosition;
+        //mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
+        //f = mousePosition;
+      //  Vector3 p = new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0) * Time.deltaTime * speed; 
         //player = GameObject.FindGameObjectWithTag("Player");
-        cur = GameObject.Instantiate(bullet, player.transform.position, bullet.transform.rotation) as GameObject;
+        cur = GameObject.Instantiate(bullet, player.transform.position,/*transform.Rotate(p)*/bullet.transform.rotation) as GameObject;//появление новой пули
+        int l = Random.Range(0, colors.Length );
+        //  Debug.Log(l);
+        clientTCP.shoot = true;
+        cur.GetComponent<Renderer>().material.color = colors[l];
         bul.Add(cur);
 
         //var look_dir = f - cur.transform.position;
@@ -45,7 +54,6 @@ public class Trigger : MonoBehaviour {
     }
     public void DelTail()
     {
-        
         for (int i = 1; i < bul.Count; i++)
         {
             if (bul[i].transform.position.x > 45f || bul[i].transform.position.x < -33f || bul[i].transform.position.y > 21f || bul[i].transform.position.y < -25f)

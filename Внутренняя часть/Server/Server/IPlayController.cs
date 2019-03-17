@@ -8,9 +8,9 @@ namespace Server
 {
     public interface IPlayController
     {
-        void MovePlayer(Position to);
-        void Shoot(Weapons weapon);
-        void Select(Weapons weapon);
+        void MovePlayer(int playerID, string side);
+        void Shoot(string  weapon, int playerID);
+        void SelectWeapon(string weapon, int playerID);
     }
     
 }

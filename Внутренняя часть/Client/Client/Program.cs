@@ -49,26 +49,24 @@ namespace TcpClientApp
     {
         private const int port = 904;
         private const string server = "127.0.0.1";
-      //  static Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         static void Main(string[] args)
         {
-            //try
-            //{
+
+            while (true)
+            {
                 TcpClient client = new TcpClient();
                 client.Connect(server, port);
-            //while (true)
-            //{
-            //    string message = Console.ReadLine();
-            //    byte[] buffer = Encoding.ASCII.GetBytes(message);
-            //    NetworkStream streams = client.GetStream();
-            //    streams.Write(buffer, 0, buffer.Length);
-            //    //socket.Send(buffer);
-            //}
 
+                //ОТПРАВКА СООБЩЕНИЯ НА СЕРВЕР
+                string message = Console.ReadLine();
+                byte[] buffer = Encoding.ASCII.GetBytes(message);
+                NetworkStream stream = client.GetStream();
+                stream.Write(buffer, 0, buffer.Length);
+
+                //ПОЛУЧЕНИЕ СООБЩЕНИЯ С СЕРВЕРА
                 byte[] data = new byte[256];
                 StringBuilder response = new StringBuilder();
-                NetworkStream stream = client.GetStream();
 
                 do
                 {
@@ -81,21 +79,8 @@ namespace TcpClientApp
 
                 // Закрываем потоки
                 stream.Close();
-                client.Close();
-
-                //}
-                //catch (SocketException e)
-                //{
-                //    Console.WriteLine("SocketException: {0}", e);
-                //}
-                //catch (Exception e)
-                //{
-                //    Console.WriteLine("Exception: {0}", e.Message);
-                //}
-
-                Console.WriteLine("Запрос завершен...");
-            //}
-            Console.Read();
+            }
+            
         }
     }
 }

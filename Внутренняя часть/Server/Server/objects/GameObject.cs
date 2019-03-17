@@ -11,7 +11,7 @@ namespace Server
     {
         public Color Color { get; set; }
         public Position Position { get; set; }
-        public Weapons Weapon { get; set; }
-
+        public int Lifes { get; set; }
+        public Rotation Rotation { get; set; }
     }
 }

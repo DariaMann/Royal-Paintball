@@ -9,6 +9,6 @@ namespace Server
 
     public enum Color
     {
-        WHITE, PINK, BLUE, GREEN
+        WHITE, PINK, BLUE, GREEN , BLACK
     }
 }

@@ -13,53 +13,63 @@ public class ClientTCP  {
     private bool connected;
     public static NetworkStream myStream;
     private byte[] asyncBuff;
+    public bool shoot = false;
 
 
-   // static Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+    // static Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     public void Connect()
     {
-        playerSocket = new TcpClient();
-        playerSocket.ReceiveBufferSize = 4096;//размер буфера приема
-        playerSocket.SendBufferSize = 4096;//размер буфера отправки
-        playerSocket.NoDelay = false;
-        asyncBuff = new byte[8192];
-        // playerSocket.BeginConnect("127.0.0.1", 904, new AsyncCallback(ConnectCallback), playerSocket);
-        playerSocket.Connect("127.0.0.1", 904);
-        connecting = true;
+        try
+        {
+            playerSocket = new TcpClient();
+            playerSocket.ReceiveBufferSize = 4096;//размер буфера приема
+            playerSocket.SendBufferSize = 4096;//размер буфера отправки
+            playerSocket.NoDelay = false;
+            asyncBuff = new byte[8192];
+          //   playerSocket.BeginConnect("127.0.0.1", 904, new AsyncCallback(ConnectCallback), playerSocket);
+            playerSocket.Connect("127.0.0.1", 904);
+            
+            connecting = true;
+        }
+        catch { };
         
     }
     public string GetPos ()
     {
-
-        byte[] data = new byte[256];
-        StringBuilder response = new StringBuilder();
-       // playerSocket.NoDelay = true;
-        myStream = playerSocket.GetStream();
-        do
-        {
-            int bytes = myStream.Read(data, 0, data.Length);
-            response.Append(Encoding.UTF8.GetString(data, 0, bytes));
-        }
-        while (myStream.DataAvailable); // пока данные есть в потоке
-
-        Console.WriteLine(response.ToString());
-
-        return response.ToString();
-
-    }
-    public void Message(int i)
-    {
         try
         {
-            //socket.Connect("127.0.0.1", 904);
-            string message = Convert.ToString(i);
-            byte[] buffer = Encoding.ASCII.GetBytes(message);
-            myStream.Write(buffer, 0, buffer.Length);
+            byte[] data = new byte[256];
+            StringBuilder response = new StringBuilder();
+            // playerSocket.NoDelay = true;
+            myStream = playerSocket.GetStream();
+            do
+            {
+                int bytes = myStream.Read(data, 0, data.Length);
+                response.Append(Encoding.UTF8.GetString(data, 0, bytes));
+            }
+            while (myStream.DataAvailable); // пока данные есть в потоке
+
+            Console.WriteLine(response.ToString());
+
+            return response.ToString();
         }
-        catch { }
-        //playerSocket.Send(buffer);
+        catch { return "0"; }
+
     }
-    public void Place(GameObject player)
+    //public void Message(int i)
+    //{
+    //    try
+    //    {
+    //        socket.Connect("127.0.0.1", 904);
+    //        string message = Convert.ToString(i);
+    //        byte[] buffer = Encoding.ASCII.GetBytes(message);
+    //        myStream.Write(buffer, 0, buffer.Length);
+    //    }
+    //    catch { }
+    //   // playerSocket.Send(buffer);
+    //}
+    public void Place(int id,GameObject player)//отправка позиции игрока на сервер
     {
         try
         {
@@ -67,12 +77,30 @@ public class ClientTCP  {
             float y = player.transform.position.y;
             float z = player.transform.position.z;
             //socket.Connect("127.0.0.1", 904);
-            string message = Convert.ToString(x + "," + y+","+z);
+            string message = Convert.ToString(id+": "+x + "," + y + "," + z);
             byte[] buffer = Encoding.ASCII.GetBytes(message);
             myStream.Write(buffer, 0, buffer.Length);
         }
         catch { }
         //playerSocket.Send(buffer);
+    }
+    public void Wound(int id, GameObject player,string nameGun,int life)//отправка 
+    {
+        string message = Convert.ToString(id)+": "+nameGun+","+life;
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+        myStream.Write(buffer, 0, buffer.Length);
+    }
+    public void Shoot(int id, GameObject player)//отправка 
+    {
+        string message = Convert.ToString(id) + ": SHOOT";
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+        myStream.Write(buffer, 0, buffer.Length);
+    }
+    public void Move(int id, GameObject player, string moveDirection)//отправка 
+    {
+        string message = Convert.ToString(id) + ": " + moveDirection;
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+        myStream.Write(buffer, 0, buffer.Length);
     }
     private void ConnectCallback(IAsyncResult ar)
     {
@@ -88,8 +116,8 @@ public class ClientTCP  {
             else
             {
                 playerSocket.NoDelay = true;
-               // myStream = playerSocket.GetStream();
-               // myStream.BeginRead(asyncBuff, 0, 8192, OnReceive, null);
+                myStream = playerSocket.GetStream();
+               myStream.BeginRead(asyncBuff, 0, 8192, OnReceive, null);
                 connected = true;
                 connecting = false;
                 Debug.Log("Успешное подключение к серверу");
@@ -102,7 +130,7 @@ public class ClientTCP  {
             Debug.Log("Невозможно подключится к серверу");
         }
     }
-    private void OnReceive(IAsyncResult ar)
+    private void OnReceive(IAsyncResult ar)//при получении
     {
         try
         {

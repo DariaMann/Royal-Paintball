@@ -12,3 +12,10 @@ C:\Users\Daria\Desktop\P\Внутренняя часть\Client\Client\obj\Debug
 C:\Users\Daria\Desktop\P\Внутренняя часть\Client\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
 C:\Users\Daria\Desktop\P\Внутренняя часть\Client\Client\obj\Debug\Client.exe
 C:\Users\Daria\Desktop\P\Внутренняя часть\Client\Client\obj\Debug\Client.pdb
+C:\Users\Daria\Desktop\Competiton\Внутренняя часть\Client\Client\bin\Debug\Client.exe.config
+C:\Users\Daria\Desktop\Competiton\Внутренняя часть\Client\Client\bin\Debug\Client.exe
+C:\Users\Daria\Desktop\Competiton\Внутренняя часть\Client\Client\bin\Debug\Client.pdb
+C:\Users\Daria\Desktop\Competiton\Внутренняя часть\Client\Client\obj\Debug\Client.csprojAssemblyReference.cache
+C:\Users\Daria\Desktop\Competiton\Внутренняя часть\Client\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
+C:\Users\Daria\Desktop\Competiton\Внутренняя часть\Client\Client\obj\Debug\Client.exe
+C:\Users\Daria\Desktop\Competiton\Внутренняя часть\Client\Client\obj\Debug\Client.pdb
