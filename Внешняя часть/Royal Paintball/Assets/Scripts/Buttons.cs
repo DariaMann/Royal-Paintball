@@ -14,4 +14,5 @@ public class Buttons : MonoBehaviour {
         //SceneManager.UnloadScene();
         Application.Quit();
     }
+   
 }

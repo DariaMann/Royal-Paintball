@@ -20,45 +20,20 @@ namespace Server//TcpListenerApp
 
         static public string First()
         {
-            //Position pos = new Position();
-            //Dictionary<string, string> player1 = new Dictionary<string, string>();
-            //string x = Convert.ToString(pos.X);//x игрока
-            //string y = Convert.ToString(pos.Y);//у игрока
-            //string z = Convert.ToString(pos.Z);//z игрока
-            //  Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), -90);
             Random rn = new Random(); // объявление переменной для генерации чисел
-            string id = Convert.ToString(rn.Next(0, 10000));
+            string id = "333";//Convert.ToString(rn.Next(0, 10000));
             ID = id;
-          //  string id = Convert.ToString(pl.ID);
-          //  player1.Add("id", id); player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);
-           
+         
             string serialized = JsonConvert.SerializeObject(id);
             return serialized;
         }
-         static public string PosPlayer(string Id)
+         static public string PlayerData(string Id)
         {
             Position pos = new Position();
-            //Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), -90);
-            //Data myCollection = new Data();
-            //myCollection.Asd = new ASD();
-
-            //myCollection.Asd= new ASD()
-            //{
-            //    X = Convert.ToString(pos.X),
-            //    Y = Convert.ToString(pos.Y),
-            //    Z = Convert.ToString(pos.Z),
-            //    Xw = Convert.ToString(pos.X + 0.75),
-            //    Yw = Convert.ToString(pos.Y),
-            //    Zw = Convert.ToString(pos.Z),
-            //    Xr = "-90",
-            //    Yr = "0",
-            //    Zr = "0",
-            //    IP = Convert.ToString(pl.ID),
-            //    Life = "30"
-            //};
-
-            //string serialized = JsonConvert.SerializeObject(myCollection);
-            //return serialized;
+            Bomb b = new Bomb();
+            Shotgun s = new Shotgun();
+            Gun g = new Gun();
+            Pistol p = new Pistol();
             Dictionary<string, string> player1 = new Dictionary<string, string>();
             string x = Convert.ToString(pos.X);//x игрока
             string y = Convert.ToString(pos.Y);//у игрока
@@ -71,40 +46,26 @@ namespace Server//TcpListenerApp
             double zz = Convert.ToDouble(pos.Z);
             double xxrot = Convert.ToDouble(xRot);
             Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), Convert.ToDouble(xRot) );
-            //string id = Convert.ToString(pl.ID);
             string id = Id;
             string life = Convert.ToString(pl.Lifes);
             string dir = pl.Direction;
             string shoot = pl.Shoot;
             string weapon = pl.Weapon;
-            player1.Add("id", id); player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z); player1.Add("rot_x", xRot);
-            player1.Add("rot_y", "0"); player1.Add("rot_z", "0"); player1.Add("posW_x", xW); player1.Add("posW_y", y); player1.Add("posW_z", z);
-            player1.Add("life", life); player1.Add("dir", dir); player1.Add("shoot", dir); player1.Add("weapon", dir);
-            //  string value = x + "," + y + "," + z + "," + xRot + "," + life;//передаваемое сообщение
+            string countBulP =Convert.ToString(p.CountBullets);
+            string countBulS = Convert.ToString(s.CountBullets);
+            string countBulG = Convert.ToString(g.CountBullets);
+            string countBulB = Convert.ToString(b.CountBullets);
+            player1.Add("id", id);//
+            player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);//позиция игрока
+            player1.Add("rot_x", xRot); player1.Add("rot_y", "0"); player1.Add("rot_z", "0");//вращение игрока
+            player1.Add("posW_x", xW); player1.Add("posW_y", y); player1.Add("posW_z", z);//позиция оружия игрока
+            player1.Add("life", life); player1.Add("dir", dir); player1.Add("shoot", shoot); player1.Add("weapon", weapon);//жизни,направление движения,стрельба,выбранное оружие игрока
+            player1.Add("bulP", countBulP); player1.Add("bulS", countBulS); player1.Add("bulG", countBulG); player1.Add("bulB", countBulB);//количество пуль оружий игрока
             if (!dasha.ContainsKey(id))
             dasha.Add(id, player1);
             string serialized = JsonConvert.SerializeObject(dasha);
             return serialized; 
-
-            //double x = Convert.ToDouble(pos.X);//x игрока
-            //double y = Convert.ToDouble(pos.Y);//у игрока
-            //double z = Constant.z;//z игрока
-            //double xW = x + 0.75;//х оружия
-            //double yW = y;//у оружия
-            //double xRot = -90;
-            //Player pl = new Player(x, y, z, xRot);
-            //int id = pl.ID;
-            //int life = pl.Lifes;
-            //string position = id + "," + x + "," + y + "," + z + "," + xRot + "," + life;//передаваемое сообщение
-            //return position;
-
         }
-      
-        public string Weapon(Weapons w)
-        {
-            return Convert.ToString(w.Index);
-        }
-
         const int port = 904; // порт для прослушивания подключений
       public static void count()
         {
@@ -112,125 +73,101 @@ namespace Server//TcpListenerApp
             GameController cont = new GameController(fds);
             while (true)
             {
-                //while (1 != 1)
-                //{
-                    if(dasha[ID]["dir"]!="N")
+                if (dasha.Count != 0)
                 {
-                    cont.MovePlayer(Convert.ToInt32(ID), dasha[ID]["dir"]);
+                    //        if (Convert.ToInt32(dasha[ID]["pos_x"]) >0)
+                    //        {
+                    //            Console.WriteLine("BIGGER THEN ZERO");
+                    //        }
+                    //        else { Console.WriteLine("SMALLER THEN ZERO"); }
+                    if (dasha[ID]["dir"] != "N")
+                    {
+                        cont.MovePlayer(Convert.ToInt32(ID), dasha[ID]["dir"]);
+                    }
+                    if (Convert.ToInt32(dasha[ID]["life"]) <= Convert.ToInt32("0"))
+                    {
+                        cont.FinishGame(Convert.ToInt32(ID));
+                    }
+                    if (dasha[ID]["shoot"] == "T")
+                    {
+                        cont.Shoot(dasha[ID]["weapon"], Convert.ToInt32(ID));
+                    }
                 }
-                if (Convert.ToInt32(dasha[ID]["life"]) <= Convert.ToInt32("0"))
-                {
-                    cont.FinishGame(Convert.ToInt32(ID));
-                }
-                if (dasha[ID]["shoot"] == "T")
-                {
-                    cont.Shoot(dasha[ID]["weapon"], Convert.ToInt32(ID));
-                }
-                // string a = "{ "action": "new_person", "weapon_list": [,,,,{{}},] ... }"
 
-                //if (dasha["action"] == "new_person")
-                //{
-                //    fds.add_player(new Player(dasha["id"], dasha["pos"]));
-                //    Player r = new Player(dasha["id"], dasha["pos"]);
 
-                //    answer = "";
-                //}
-
-                //if (dasha["action"] == "move")
-                //{
-                //    cont.MovePlayer(dasha["id"], dasha["pos"], dasha["side"]);
-
-                //   if ( res == false)
-                //        answer = dasha;
-                //    else 
-                //        answer = dasha + 1;
-                //}
-                //if(dasha!="")
-                // }
                 // Console.WriteLine(dasha);
                 // Console.WriteLine(PosPlayer(ID)); 
                 Thread.Sleep(300);
             }
         }
-        public static void SendMessage(string message, NetworkStream stream)
+        public static void SendMessage(string message, NetworkStream stream)// СООБЩЕНИЕ ДЛЯ ОТПРАВКИ КЛИЕНТУ
         {
-            // СООБЩЕНИЕ ДЛЯ ОТПРАВКИ КЛИЕНТУ
-            string response1; response1 = message;
-            //    var jsonData = JsonConvert.SerializeObject(response);
-            // Console.WriteLine(jsonData);
+            string response; response = message;
+            
             // преобразуем сообщение в массив байтов
-            byte[] data2 = Encoding.UTF8.GetBytes(response1);
+            byte[] data2 = Encoding.UTF8.GetBytes(response);
             stream.Write(data2, 0, data2.Length);
-            Console.WriteLine("Отправлено сообщение: {0}", response1);
+            Console.WriteLine("Отправлено сообщение: {0}", response);
         }
-        public static void ResievedMessage(string message, NetworkStream stream)
+        public static void ResievedMessage(NetworkStream stream, String data1,int i, Byte[] bytes)//ПОЛУЧЕНИЕ СООБЩЕНИЯ ОТ КЛИЕНТА
         {
+            //Преобразуйте байты данных в строку ASCII.
+            data1 = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+            Console.WriteLine("Сообщение: {0}", data1);
+            //dasha = data1;
 
+            // Обработка данных, отправленных клиентом.
+            data1 = data1.ToUpper();
+
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(data1);
+
+            // Отправить ответ.
+            stream.Write(msg, 0, msg.Length);
+              Console.WriteLine("Ответ: {0}", data1);
         }
         static void Main(string[] args)
         {
             TcpListener server = null;
             IPAddress localAddr = IPAddress.Parse("127.0.0.1");
-                server = new TcpListener(localAddr, port);
+            server = new TcpListener(localAddr, port);
 
                 // запуск слушателя
                 server.Start();
                 // Буфер для чтения данных
                 Byte[] bytes = new Byte[256];
                 String data1 = null;
-            // CONVERSATION
+            // диалог сервера с клиентами
             while (true)
             {
                 Console.WriteLine("Ожидание подключений... ");
-
+                
                 Thread myT3 = new Thread(count);
                 myT3.Start();
                 // получаем входящее подключение
                 TcpClient client = server.AcceptTcpClient();
-
-
-                NetworkStream stream = client.GetStream();
-
-                SendMessage(First(),stream);
-
-                // отправка сообщения
-            
-
+                
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
-                Thread t = new Thread(() => {
+
+               // SendMessage(First(),stream);
+                // отправка сообщения
+               First();//метод для получение id клиента
+               
+                Thread t = new Thread(() => {//поток клиента
                 
                 data1 = null;
 
                 // получаем сетевой поток для чтения и записи
-                
+                NetworkStream stream = client.GetStream();
 
                 int i;
-                    SendMessage(PosPlayer(ID), stream);
+                    SendMessage(PlayerData(ID), stream);
                   
-
                     //Цикл для получения всех данных, отправленных клиентом.
                     try
                     {
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
-
-
-                        //ПОЛУЧЕНИЕ СООБЩЕНИЯ ОТ КЛИЕНТА
-                        //Преобразуйте байты данных в строку ASCII.
-                        data1 = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                       // Console.WriteLine("Сообщение: {0}", data1);
-                       // dasha = data1;
-
-                        // Обработка данных, отправленных клиентом.
-                        data1 = data1.ToUpper();
-
-                        byte[] msg = System.Text.Encoding.ASCII.GetBytes(data1);
-
-                        // Отправить ответ.
-                        stream.Write(msg, 0, msg.Length);
-                     //   Console.WriteLine("Ответ: {0}", data1);
-
-
+                            ResievedMessage(stream, data1, i, bytes);
                     }
                     // закрываем поток
                     stream.Close();
@@ -238,7 +175,7 @@ namespace Server//TcpListenerApp
                 }
                 catch (Exception e)
                 {
-                       
+                        Console.WriteLine(e);
                 }
             });
                 t.Start();

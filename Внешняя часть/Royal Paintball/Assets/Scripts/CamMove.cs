@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+[Serializable]
+public class MyClass
+{
+    public int level;
+    public float timeElapsed;
+    public string playerName;
+}
 public class CamMove : MonoBehaviour {
 
      public GameObject player;
@@ -23,18 +30,21 @@ public class CamMove : MonoBehaviour {
     void Start()
     {
        // player = GameObject.Find("Player: 0");
-       offset = this.transform.position - player.transform.position;
+     //  offset = this.transform.position - player.transform.position;
     }
     void LateUpdate()
     {
         //player = GameObject.Find("Player: 0");
         //player = GameObject.FindGameObjectWithTag("Player");
-        player = GameObject.Find(Convert.ToString(net.my_ID));
-        this.transform.position = player.transform.position + offset;
+       // player = GameObject.Find(Convert.ToString(net.my_ID));
+       // this.transform.position = player.transform.position + offset;
     }
     private void Update()
     {
+        
+
         weapon = GameObject.FindGameObjectWithTag("Weapon");
+        
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             Vector3 v = weapon.transform.position;

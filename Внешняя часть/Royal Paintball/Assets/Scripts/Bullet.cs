@@ -51,12 +51,7 @@ public class Bullet : MonoBehaviour {
         }
         lastPos = transform.position;
 
-        //if (Input.GetKey(KeyCode.Z))
-        //{
-        //    Debug.Log("Z");
-        //    cur=GameObject.Instantiate(gameObject, Player.transform.position, Quaternion.identity) as GameObject;
-        //    count++;
-        //}
+       
 
     }
 }

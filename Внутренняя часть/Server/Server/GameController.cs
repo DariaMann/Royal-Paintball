@@ -72,16 +72,38 @@ namespace Server
         public void Shoot(string weapon, int playerID)
         {
             Player player;
+           
+
             player = field.Players[playerID];
-            Weapons weap;
-           // switch (weapon)
-            //{
-            //    case "pistol": weap.Shoot() ; break;
-            //    case "shotgun": player.Position.Y--; break;
-            //    case "gun": player.Position.X--; break;
-            //    case "bomb": player.Position.X++; break;
-            //}
-            
+            player.Lifes--;
+            switch (weapon)
+            {
+                case "Pistol":
+                    {
+                        Pistol p = new Pistol();
+                        p.Shoot();
+                        break;
+                    }
+                case "Shotgun":
+                    {
+                        Shotgun s = new Shotgun();
+                        s.Shoot();
+                        break;
+                    }
+                case "Gun":
+                    {
+                        Gun g = new Gun();
+                        g.Shoot();
+                        break;
+                    }
+                case "Bomb":
+                    {
+                       Bomb b = new Bomb();
+                        b.Shoot();
+                        break;
+                    }
+            }
+
         }
 
     }

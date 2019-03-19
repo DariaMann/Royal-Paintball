@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-//using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 
 public class NetworkManager : MonoBehaviour {
@@ -32,7 +32,8 @@ public class NetworkManager : MonoBehaviour {
         clientTCP.Connect();
 
         //InstantiatePlayer(FirstMessage(clientTCP.GetPos()),clientTCP.GetPos());
-        FirstMessage(clientTCP.GetPos());
+       InstantiatePlayer("333", clientTCP.GetPos());
+        //FirstMessage(clientTCP.GetPos());
     }
     public void Pos(string str)
     {
@@ -58,34 +59,31 @@ public class NetworkManager : MonoBehaviour {
         //         i = playerList[playerPref];
         //     }
         // }
-        string pl = playerPref.name;
-      //  Debug.Log(clientTCP.shoot);
-        clientTCP.Place(Convert.ToInt32(pl),playerPref);
-       
+        //string pl = playerPref.name;
+        //  Debug.Log(clientTCP.shoot);
+        //clientTCP.Pl(333);
+
         //if (clientTCP.shoot)
         //{
         //    clientTCP.Shoot(Convert.ToInt32(pl), playerPref);
         //    Debug.Log("SHOOT");
         //}
        
-        clientTCP.SendMessage(Convert.ToString(my_ID), clientTCP.GetPos(),Dir,life,ref shoot,weapon);
+     //  clientTCP.SendMessage(Convert.ToString(my_ID), clientTCP.GetPos(),Dir,life,ref shoot,weapon);
         // clientTCP.shoot = false;
     }
     public string FirstMessage(string str)//первое сообщение с моим ID
     {
         var jsonData1 = JsonUtility.FromJson<string>(str);
         string id = jsonData1;
-        //float x = Convert.ToSingle(jsonData1["pos_x"]);
-        //float y = Convert.ToSingle(jsonData1["pos_y"]);
-        //float z = Convert.ToSingle(jsonData1["pos_z"]);
         my_ID = Convert.ToInt32(id);
         return Convert.ToString(id);
     }
     public void InstantiatePlayer(string ID, string str)//Создание игрока
     {
-        //var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string,Dictionary<string, string> >> (str);
-        var jsonData1 = JsonUtility.FromJson<Dictionary<string, Dictionary<string, string>>>(str);
-        
+       // Debug.Log("STR: " + str);
+        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string,Dictionary<string, string> >> (str);
+       
         int id = Convert.ToInt32(jsonData1[ID]["id"]);
         float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
         float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
@@ -97,36 +95,38 @@ public class NetworkManager : MonoBehaviour {
         float posWy = Convert.ToSingle(jsonData1[ID]["posW_y"]);
         float posWz = Convert.ToSingle(jsonData1[ID]["posW_z"]);
         int life = Convert.ToInt32(jsonData1[ID]["life"]);
-        //Debug.Log(str);
-        //string[] words = str.Split(new char[] { ',' });
-        //int id = Convert.ToInt32(words[0]);
-        //float x = Convert.ToSingle(words[1]);
-        //float y = Convert.ToSingle(words[2]);
-        //float z = Convert.ToSingle(words[3]);
         Vector3 v = new Vector3(x, y, z);
-      //  float xRot = Convert.ToSingle(words[4]);
-       // int life = Convert.ToInt32(words[6]);
-        //float xW = Convert.ToSingle(words[3]);
-        //float yW = Convert.ToSingle(words[4]);
-        //   Vector3 v2 = new Vector3(x+Convert.ToSingle(0.6), y, z);
+        GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
+        temp.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x - 90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+        //  playerPref = temp;
 
-        //  GameObject temp2 = Instantiate(weaponPref, v2, Quaternion.identity);
-        //  GameObject temp3 = Instantiate(headPref, v, Quaternion.identity);
-        GameObject temp = Instantiate(playerPref,v, Quaternion.identity);
-        temp.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x -90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
-        playerPref = temp;
-
-        //me_name = Convert.ToString(id);
-
-        temp.name =/* "Player: " +*/ Convert.ToString(id);
+        temp.name = Convert.ToString(id);
         playerList.Add(id, temp);
         Lifes.text = Convert.ToString(life);
-       // MyIndex++;
+    }
+    public void InstantiateOther(string ID, Dictionary<string, Dictionary<string, string>> str)//Создание игрока
+    {
+        foreach(string s in str.Keys)
+        {
+            if (s!=ID)
+            {
+                float x = Convert.ToSingle(str[s]["pos_x"]);
+                float y = Convert.ToSingle(str[s]["pos_y"]);
+                float z = Convert.ToSingle(str[s]["pos_z"]);
+                Vector3 v = new Vector3(x, y, z);
+                GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
+                temp.name = Convert.ToString(s);
+                playerList.Add(Convert.ToInt32(s), temp);
+            }
+        }
     }
     public void MovePlayer(string ID, string str)//ответ сервера, смена позиции при W,S,A,D
     {
-        var jsonData1 = JsonUtility.FromJson<Dictionary<string, Dictionary<string, string>>>(str);
-
+        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
+        if (jsonData1.Count>1)
+        {
+            InstantiateOther(ID, jsonData1);
+        }
         int id = Convert.ToInt32(jsonData1[ID]["id"]);
         float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
         float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);

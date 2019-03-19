@@ -8,10 +8,8 @@ namespace Server
 {
     class Gun:Weapons
     {
-        public Gun(Color color)
+        public Gun()
         {
-            this.Color = color;
-            this.ColorBul = color;
             this.CountBullets = 30;
             this.Direction = 1;//направление мыши
             this.Power = 2;

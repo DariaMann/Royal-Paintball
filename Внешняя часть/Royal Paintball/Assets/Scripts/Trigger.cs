@@ -27,11 +27,7 @@ public class Trigger : MonoBehaviour {
     void OnMouseDown()
     { 
          player = GameObject.FindGameObjectWithTag("Weapon");
-        //if (player.name == "Pistol") { }
-        //if (player.name == "Shotgun") { }
-        //if (player.name == "Gun") { }
-        //if (player.name == "Bomb") { }
-      
+        
         //var mousePosition = Input.mousePosition;
         //mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
         //f = mousePosition;
@@ -39,8 +35,8 @@ public class Trigger : MonoBehaviour {
         //player = GameObject.FindGameObjectWithTag("Player");
         cur = GameObject.Instantiate(bullet, player.transform.position,/*transform.Rotate(p)*/bullet.transform.rotation) as GameObject;//появление новой пули
         int l = Random.Range(0, colors.Length );
-        //  Debug.Log(l);
-       net.shoot = "T";
+
+        net.shoot = "T";
         cur.GetComponent<Renderer>().material.color = colors[l];
         bul.Add(cur);
 

@@ -8,11 +8,9 @@ namespace Server
 {
     class Bomb:Weapons
     {
-        public Bomb(Color color)
+        public Bomb()
         {
-            this.Color = color;
-            this.ColorBul = color;
-            this.CountBullets = 1;
+            this.CountBullets = 4;
             this.Direction = 1;//направление мыши
             this.Power = 4;
             this.FlightTime = 2;
