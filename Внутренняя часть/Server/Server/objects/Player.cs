@@ -14,15 +14,21 @@ namespace Server
         public int Lifes { get; set; }
         public Rotation Rotation { get; set; }
         public int ID { get; set; }
+        public string Direction { get; set; }
+        public string Weapon { get; set; }
+        public string Shoot { get; set; }
 
         public Player(double x, double y, double z,double xR)//(Color color, int ID, Position pos, Rotation rot)
         {
             // this.Color = color;
             this.Lifes = 30;
+            this.Direction = "N";
             //   this.Rotation.X = xR;
             //this.Position.X = x;
             //this.Position.Y = y;
             //this.Position.Z = z;
+            this.Shoot = "F";
+            this.Weapon = "Pistol";
             this.Position = new Position();
             Random rn = new Random(); // объявление переменной для генерации чисел
             this.ID = rn.Next(0,10000);

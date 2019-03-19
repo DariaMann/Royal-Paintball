@@ -14,7 +14,7 @@ public class Trigger : MonoBehaviour {
     public GameObject bullet;
     public GameObject player;
     Vector3 f;
-    private ClientTCP clientTCP = new ClientTCP();
+    private NetworkManager net = new NetworkManager();
     public List<GameObject> bul = new List<GameObject>();
 
     public Color[] colors;
@@ -40,7 +40,7 @@ public class Trigger : MonoBehaviour {
         cur = GameObject.Instantiate(bullet, player.transform.position,/*transform.Rotate(p)*/bullet.transform.rotation) as GameObject;//появление новой пули
         int l = Random.Range(0, colors.Length );
         //  Debug.Log(l);
-        clientTCP.shoot = true;
+       net.shoot = "T";
         cur.GetComponent<Renderer>().material.color = colors[l];
         bul.Add(cur);
 

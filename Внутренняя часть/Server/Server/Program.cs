@@ -15,23 +15,27 @@ namespace Server//TcpListenerApp
       // static public Dictionary<string, string> dashas = new Dictionary<string, string>();
         static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
         static public string answer = "";
-      //  static public string list = [];
+        static public string ID = "";
+        //  static public string list = [];
 
-            static public string First()
+        static public string First()
         {
             //Position pos = new Position();
             //Dictionary<string, string> player1 = new Dictionary<string, string>();
             //string x = Convert.ToString(pos.X);//x игрока
             //string y = Convert.ToString(pos.Y);//у игрока
             //string z = Convert.ToString(pos.Z);//z игрока
-            Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), -90);
-            string id = Convert.ToString(pl.ID);
-            player1.Add("id", id); player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);
+            //  Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), -90);
+            Random rn = new Random(); // объявление переменной для генерации чисел
+            string id = Convert.ToString(rn.Next(0, 10000));
+            ID = id;
+          //  string id = Convert.ToString(pl.ID);
+          //  player1.Add("id", id); player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);
            
-            string serialized = JsonConvert.SerializeObject(dasha);
+            string serialized = JsonConvert.SerializeObject(id);
             return serialized;
         }
-         static public string PosPlayer()
+         static public string PosPlayer(string Id)
         {
             Position pos = new Position();
             //Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), -90);
@@ -67,15 +71,20 @@ namespace Server//TcpListenerApp
             double zz = Convert.ToDouble(pos.Z);
             double xxrot = Convert.ToDouble(xRot);
             Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), Convert.ToDouble(xRot) );
-            string id = Convert.ToString(pl.ID);
+            //string id = Convert.ToString(pl.ID);
+            string id = Id;
             string life = Convert.ToString(pl.Lifes);
+            string dir = pl.Direction;
+            string shoot = pl.Shoot;
+            string weapon = pl.Weapon;
             player1.Add("id", id); player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z); player1.Add("rot_x", xRot);
             player1.Add("rot_y", "0"); player1.Add("rot_z", "0"); player1.Add("posW_x", xW); player1.Add("posW_y", y); player1.Add("posW_z", z);
-            player1.Add("life", life);
-          //  string value = x + "," + y + "," + z + "," + xRot + "," + life;//передаваемое сообщение
+            player1.Add("life", life); player1.Add("dir", dir); player1.Add("shoot", dir); player1.Add("weapon", dir);
+            //  string value = x + "," + y + "," + z + "," + xRot + "," + life;//передаваемое сообщение
+            if (!dasha.ContainsKey(id))
             dasha.Add(id, player1);
             string serialized = JsonConvert.SerializeObject(dasha);
-            return serialized;
+            return serialized; 
 
             //double x = Convert.ToDouble(pos.X);//x игрока
             //double y = Convert.ToDouble(pos.Y);//у игрока
@@ -90,6 +99,7 @@ namespace Server//TcpListenerApp
             //return position;
 
         }
+      
         public string Weapon(Weapons w)
         {
             return Convert.ToString(w.Index);
@@ -102,7 +112,20 @@ namespace Server//TcpListenerApp
             GameController cont = new GameController(fds);
             while (true)
             {
-               
+                //while (1 != 1)
+                //{
+                    if(dasha[ID]["dir"]!="N")
+                {
+                    cont.MovePlayer(Convert.ToInt32(ID), dasha[ID]["dir"]);
+                }
+                if (Convert.ToInt32(dasha[ID]["life"]) <= Convert.ToInt32("0"))
+                {
+                    cont.FinishGame(Convert.ToInt32(ID));
+                }
+                if (dasha[ID]["shoot"] == "T")
+                {
+                    cont.Shoot(dasha[ID]["weapon"], Convert.ToInt32(ID));
+                }
                 // string a = "{ "action": "new_person", "weapon_list": [,,,,{{}},] ... }"
 
                 //if (dasha["action"] == "new_person")
@@ -123,9 +146,26 @@ namespace Server//TcpListenerApp
                 //        answer = dasha + 1;
                 //}
                 //if(dasha!="")
-                Console.WriteLine(dasha);
+                // }
+                // Console.WriteLine(dasha);
+                // Console.WriteLine(PosPlayer(ID)); 
                 Thread.Sleep(300);
             }
+        }
+        public static void SendMessage(string message, NetworkStream stream)
+        {
+            // СООБЩЕНИЕ ДЛЯ ОТПРАВКИ КЛИЕНТУ
+            string response1; response1 = message;
+            //    var jsonData = JsonConvert.SerializeObject(response);
+            // Console.WriteLine(jsonData);
+            // преобразуем сообщение в массив байтов
+            byte[] data2 = Encoding.UTF8.GetBytes(response1);
+            stream.Write(data2, 0, data2.Length);
+            Console.WriteLine("Отправлено сообщение: {0}", response1);
+        }
+        public static void ResievedMessage(string message, NetworkStream stream)
+        {
+
         }
         static void Main(string[] args)
         {
@@ -151,16 +191,10 @@ namespace Server//TcpListenerApp
 
                 NetworkStream stream = client.GetStream();
 
-                // СООБЩЕНИЕ ДЛЯ ОТПРАВКИ КЛИЕНТУ
-                string response1; response1 = First();
-                //    var jsonData = JsonConvert.SerializeObject(response);
-                // Console.WriteLine(jsonData);
-                // преобразуем сообщение в массив байтов
-                byte[] data2 = Encoding.UTF8.GetBytes(response1);
+                SendMessage(First(),stream);
 
                 // отправка сообщения
-                stream.Write(data2, 0, data2.Length);
-                Console.WriteLine("Отправлено сообщение: {0}", response1);
+            
 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
                 Thread t = new Thread(() => {
@@ -171,20 +205,12 @@ namespace Server//TcpListenerApp
                 
 
                 int i;
+                    SendMessage(PosPlayer(ID), stream);
+                  
 
-                //// СООБЩЕНИЕ ДЛЯ ОТПРАВКИ КЛИЕНТУ
-                //string response; response = PosPlayer();
-                ////    var jsonData = JsonConvert.SerializeObject(response);
-                //   // Console.WriteLine(jsonData);
-                //// преобразуем сообщение в массив байтов
-                //byte[] data = Encoding.UTF8.GetBytes(response);
-
-                //// отправка сообщения
-                //stream.Write(data, 0, data.Length);
-                //Console.WriteLine("Отправлено сообщение: {0}", response );
-
-                //Цикл для получения всех данных, отправленных клиентом.
-               try {
+                    //Цикл для получения всех данных, отправленных клиентом.
+                    try
+                    {
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
 

@@ -13,7 +13,7 @@ public class ClientTCP  {
     private bool connected;
     public static NetworkStream myStream;
     private byte[] asyncBuff;
-    public bool shoot = false;
+    //public bool shoot = false;
 
 
 
@@ -69,6 +69,20 @@ public class ClientTCP  {
     //    catch { }
     //   // playerSocket.Send(buffer);
     //}
+    public void SendMessage(string Id,string str, string Dir,string lifes,ref string shoot, string weapon)//отправка сообщения со всеми данными
+    {
+        var jsonData1 = JsonUtility.FromJson<Dictionary<string, Dictionary<string, string>>>(str);
+        //var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(jsonData1);
+        jsonData1[Id]["dir"] = Dir;
+        jsonData1[Id]["life"] = lifes;
+        jsonData1[Id]["shoot"] = shoot;
+        jsonData1[Id]["weapon"] = weapon;
+        string message = JsonUtility.ToJson(jsonData1);
+        //string message = JsonConvert.SerializeObject(jsonData1);
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+        myStream.Write(buffer, 0, buffer.Length);
+        shoot = "F";
+    }
     public void Place(int id,GameObject player)//отправка позиции игрока на сервер
     {
         try
