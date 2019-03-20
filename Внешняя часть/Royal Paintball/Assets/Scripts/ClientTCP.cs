@@ -52,7 +52,7 @@ public class ClientTCP  {
                 response.Append(Encoding.UTF8.GetString(data, 0, bytes));
             }
             while (myStream.DataAvailable); // пока данные есть в потоке
-        
+        Debug.Log("MES: "+response.ToString());
             //Message("333", response.ToString());
             return response.ToString();
             
@@ -107,6 +107,12 @@ public class ClientTCP  {
         myStream.Write(buffer, 0, buffer.Length);
         shoot = "F";
     }
+    public void SendMess()//отправка сообщения со всеми данными
+    {
+        string message = JsonConvert.SerializeObject("334");
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+        myStream.Write(buffer, 0, buffer.Length);
+    }
     //public void Place(int id,GameObject player)//отправка позиции игрока на сервер
     //{
     //    try
@@ -151,7 +157,7 @@ public class ClientTCP  {
     //    string message = Convert.ToString(id) + ": " + moveDirection;
     //    byte[] buffer = Encoding.ASCII.GetBytes(message);
     //    myStream.Write(buffer, 0, buffer.Length);
-   // }
+    // }
     private void ConnectCallback(IAsyncResult ar)
     {
         try

@@ -16,16 +16,32 @@ namespace Server//TcpListenerApp
         static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
         static public string answer = "";
         static public string ID = "";
-        //  static public string list = [];
+      
 
         static public string First()
         {
             Random rn = new Random(); // объявление переменной для генерации чисел
-            string id = "333";//Convert.ToString(rn.Next(0, 10000));
+            string id = Convert.ToString(rn.Next(0,1000));
             ID = id;
-         
+
             string serialized = JsonConvert.SerializeObject(id);
             return serialized;
+            //if (!dasha.ContainsKey("333"))
+            //{
+            //    Random rn = new Random(); // объявление переменной для генерации чисел
+            //    string id = "333";// Convert.ToString(rn.Next(333));
+            //    ID = id;
+
+            //    string serialized = JsonConvert.SerializeObject(id);
+            //    return serialized;
+            //}
+            //else
+            //{
+            //    string id = "334";// Convert.ToString(rn.Next(333));
+            //    ID = id;
+            //    string serialized = JsonConvert.SerializeObject(id);
+            //    return serialized;
+            //}
         }
          static public string PlayerData(string Id)
         {
@@ -75,11 +91,7 @@ namespace Server//TcpListenerApp
             {
                 if (dasha.Count != 0)
                 {
-                    //        if (Convert.ToInt32(dasha[ID]["pos_x"]) >0)
-                    //        {
-                    //            Console.WriteLine("BIGGER THEN ZERO");
-                    //        }
-                    //        else { Console.WriteLine("SMALLER THEN ZERO"); }
+                  
                     if (dasha[ID]["dir"] != "N")
                     {
                         cont.MovePlayer(Convert.ToInt32(ID), dasha[ID]["dir"]);
@@ -113,6 +125,8 @@ namespace Server//TcpListenerApp
         {
             //Преобразуйте байты данных в строку ASCII.
             data1 = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+            string message = JsonConvert.DeserializeObject<string>(data1);
+           
             Console.WriteLine("Сообщение: {0}", data1);
             //dasha = data1;
 
@@ -123,7 +137,7 @@ namespace Server//TcpListenerApp
 
             // Отправить ответ.
             stream.Write(msg, 0, msg.Length);
-              Console.WriteLine("Ответ: {0}", data1);
+            Console.WriteLine("Ответ: {0}", data1);
         }
         static void Main(string[] args)
         {
@@ -148,17 +162,18 @@ namespace Server//TcpListenerApp
                 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
 
-               // SendMessage(First(),stream);
+               
+                
                 // отправка сообщения
-               First();//метод для получение id клиента
+                //First();//метод для получение id клиента
                
                 Thread t = new Thread(() => {//поток клиента
                 
                 data1 = null;
 
                 // получаем сетевой поток для чтения и записи
-                NetworkStream stream = client.GetStream();
-
+                 NetworkStream stream = client.GetStream();
+                    SendMessage(First(),stream);
                 int i;
                     SendMessage(PlayerData(ID), stream);
                   
