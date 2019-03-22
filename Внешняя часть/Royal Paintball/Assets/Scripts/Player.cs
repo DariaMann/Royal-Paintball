@@ -46,6 +46,7 @@ public class Player : MonoBehaviour
                         //gameObject.transform.Rotate(Vector3.up * speedRotation);
                         gameObject.transform.position += gameObject.transform.right * Speed * Time.deltaTime;
                         M.Dir = "D";
+                        Debug.Log(M.Dir);
                     }
                     else
                     {

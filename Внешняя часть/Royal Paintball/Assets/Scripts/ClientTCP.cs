@@ -23,7 +23,7 @@ public class ClientTCP  {
     {
         try
         {
-           // Debug.Log(2);
+           Debug.Log("connect");
             playerSocket = new TcpClient();
             playerSocket.ReceiveBufferSize = 4096;//размер буфера приема
             playerSocket.SendBufferSize = 4096;//размер буфера отправки
@@ -39,12 +39,8 @@ public class ClientTCP  {
     }
     public string GetPos ()
     {
-        //try
-        //{
-           // Debug.Log(1);
             byte[] data = new byte[256];
             StringBuilder response = new StringBuilder();
-            // playerSocket.NoDelay = true;
             myStream = playerSocket.GetStream();
             do
             {
@@ -53,12 +49,8 @@ public class ClientTCP  {
             }
             while (myStream.DataAvailable); // пока данные есть в потоке
         Debug.Log("MES: "+response.ToString());
-            //Message("333", response.ToString());
             return response.ToString();
-            
-        //}
-        //catch { return "0"; }
-
+        
     }
     //public static void Message(string ID, string s)
     //{
@@ -94,23 +86,23 @@ public class ClientTCP  {
     //    catch { }
     //   // playerSocket.Send(buffer);
     //}
-    public void SendMessage(string Id,string str, string Dir,string lifes,ref string shoot, string weapon)//отправка сообщения со всеми данными
+    public void SendMessage(string str)//(string Id,string str, string Dir,string lifes,ref string shoot, string weapon)//отправка сообщения со всеми данными
     {
         var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-        jsonData1[Id]["dir"] = Dir;
-        jsonData1[Id]["life"] = lifes;
-        jsonData1[Id]["shoot"] = shoot;
-        jsonData1[Id]["weapon"] = weapon;
-        //string message = JsonUtility.ToJson(jsonData1);
+        //jsonData1[Id]["dir"] = Dir;
+        //jsonData1[Id]["life"] = lifes;
+        //jsonData1[Id]["shoot"] = shoot;
+        //jsonData1[Id]["weapon"] = weapon;
         string message = JsonConvert.SerializeObject(jsonData1);
         byte[] buffer = Encoding.ASCII.GetBytes(message);
         myStream.Write(buffer, 0, buffer.Length);
-        shoot = "F";
+       // shoot = "F";
     }
     public void SendMess()//отправка сообщения со всеми данными
     {
-        string message = JsonConvert.SerializeObject("334");
+        string message = JsonConvert.SerializeObject("Hi");
         byte[] buffer = Encoding.ASCII.GetBytes(message);
+        myStream = playerSocket.GetStream();
         myStream.Write(buffer, 0, buffer.Length);
     }
     //public void Place(int id,GameObject player)//отправка позиции игрока на сервер
