@@ -51,16 +51,15 @@ namespace Server
             // диалог сервера с клиентами
             while (true)
             {
-                
-                
-                //Thread myT3 = new Thread(count);
-                //myT3.Start();
-
                 // Получаем входящее подключение
                 TcpClient client = server.AcceptTcpClient();
                 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
                 ClientObject clientObject = new ClientObject(client);
+
+
+                //Thread myT3 = new Thread(clientObject.count());
+                //myT3.Start();
 
                 // создаем новый поток для обслуживания нового клиента
                 Thread clientThread = new Thread(new ThreadStart(clientObject.Process));

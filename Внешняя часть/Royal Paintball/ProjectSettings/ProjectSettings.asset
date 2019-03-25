@@ -618,7 +618,7 @@ PlayerSettings:
   cloudServicesEnabled:
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 3
   cloudProjectId: eacbdf1d-25ef-4d28-b337-edd8503d218a
   projectName: Royal Paintball
   organizationId: dariaman

@@ -86,70 +86,47 @@ public class ClientTCP  {
     //    catch { }
     //   // playerSocket.Send(buffer);
     //}
-    public void SendMessage(string str)//(string Id,string str, string Dir,string lifes,ref string shoot, string weapon)//отправка сообщения со всеми данными
+    //public void SendMessage/*(string str)//*/(string Id,string str, string Dir,string lifes,ref string shoot, string weapon)//отправка сообщения со всеми данными
+    //{
+    //    var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
+    //    Debug.Log("DIRR "+Dir);
+    //    //jsonData1[Id]["dir"] = Dir;
+    //    //jsonData1[Id]["life"] = lifes;
+    //    //jsonData1[Id]["shoot"] = shoot;
+    //    //jsonData1[Id]["weapon"] = weapon;
+    //    string message = JsonConvert.SerializeObject(jsonData1);
+    //    byte[] buffer = Encoding.ASCII.GetBytes(message);
+    //    myStream.Write(buffer, 0, buffer.Length);
+    //   // shoot = "F";
+    //}
+    //public void SendFirstMess()//отправка сообщения со всеми данными
+    //{
+    //    string message = JsonConvert.SerializeObject("Hi");
+    //    byte[] buffer = Encoding.ASCII.GetBytes(message);
+    //    myStream = playerSocket.GetStream();
+    //    myStream.Write(buffer, 0, buffer.Length);
+    //}
+    public void SendFirstMessage(Dictionary<string,string> clientData)//отправка сообщения со всеми данными
     {
-        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-        //jsonData1[Id]["dir"] = Dir;
-        //jsonData1[Id]["life"] = lifes;
-        //jsonData1[Id]["shoot"] = shoot;
-        //jsonData1[Id]["weapon"] = weapon;
-        string message = JsonConvert.SerializeObject(jsonData1);
-        byte[] buffer = Encoding.ASCII.GetBytes(message);
-        myStream.Write(buffer, 0, buffer.Length);
-       // shoot = "F";
-    }
-    public void SendMess()//отправка сообщения со всеми данными
-    {
-        string message = JsonConvert.SerializeObject("Hi");
+        string message = JsonConvert.SerializeObject(clientData);
         byte[] buffer = Encoding.ASCII.GetBytes(message);
         myStream = playerSocket.GetStream();
         myStream.Write(buffer, 0, buffer.Length);
     }
-    //public void Place(int id,GameObject player)//отправка позиции игрока на сервер
-    //{
-    //    try
-    //    {
-    //        float x = player.transform.position.x;
-    //        float y = player.transform.position.y;
-    //        float z = player.transform.position.z;
-    //        //socket.Connect("127.0.0.1", 904);
-    //        string message = Convert.ToString(id+": "+x + "," + y + "," + z);
-    //        byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //        myStream.Write(buffer, 0, buffer.Length);
-    //    }
-    //    catch { }
-    //    //playerSocket.Send(buffer);
-    //}
-    //public void Pl(int id)//отправка позиции игрока на сервер
-    //{
-    //    try
-    //    {
-    //        Debug.Log("SENT");
-    //        string message = Convert.ToString(id );
-    //        byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //        myStream.Write(buffer, 0, buffer.Length);
-    //    }
-    //    catch { }
-    //    //playerSocket.Send(buffer);
-    //}
-    //public void Wound(int id, GameObject player,string nameGun,int life)//отправка 
-    //{
-    //    string message = Convert.ToString(id)+": "+nameGun+","+life;
-    //    byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //    myStream.Write(buffer, 0, buffer.Length);
-    //}
-    //public void Shoot(int id, GameObject player)//отправка 
-    //{
-    //    string message = Convert.ToString(id) + ": SHOOT";
-    //    byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //    myStream.Write(buffer, 0, buffer.Length);
-    //}
-    //public void Move(int id, GameObject player, string moveDirection)//отправка 
-    //{
-    //    string message = Convert.ToString(id) + ": " + moveDirection;
-    //    byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //    myStream.Write(buffer, 0, buffer.Length);
-    // }
+    public void Send/*(string str)//*/(string Id, string str, /*, string Dir, string lifes, ref string shoot, string weapon,*/ Dictionary<string, string> clientData)//отправка сообщения со всеми данными
+    {
+        Debug.Log("STR SEND:" + str);
+        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
+        clientData = jsonData1[Id];
+        //jsonData1[Id]["dir"] = Dir;
+        //jsonData1[Id]["life"] = lifes;
+        //jsonData1[Id]["shoot"] = shoot;
+        //jsonData1[Id]["weapon"] = weapon;
+        string message = JsonConvert.SerializeObject(clientData);
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+        myStream.Write(buffer, 0, buffer.Length);
+        // shoot = "F";
+    }
     private void ConnectCallback(IAsyncResult ar)
     {
         try

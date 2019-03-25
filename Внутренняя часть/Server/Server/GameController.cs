@@ -52,17 +52,35 @@ namespace Server
         {
             field.Players.Remove(playerID);
         }
-        public void MovePlayer(int playerID, string side)
+        public Dictionary<string, Dictionary<string, string>> MovePlayer(int playerID, Dictionary<string, Dictionary<string, string>> str)
         {
             Player player;
             player = field.Players[playerID];
-            switch (side)
+            switch (str[Convert.ToString(playerID)]["dir"])
             {
-                case "W": player.Position.Y++; break;
-                case "S": player.Position.Y--; break;
-                case "A": player.Position.X--; break;
-                case "D": player.Position.X++; break;
+                case "W":
+                    {
+
+                        str[Convert.ToString(playerID)]["pos_y"] = Convert.ToString(player.Position.Y++);
+                        break;
+                    }
+                case "S":
+                    {
+                        str[Convert.ToString(playerID)]["pos_y"] = Convert.ToString(player.Position.Y--);
+                        break;
+                    }
+                case "A":
+                    {
+                        str[Convert.ToString(playerID)]["pos_x"] = Convert.ToString(player.Position.X--);
+                        break;
+                    }
+                case "D":
+                    {
+                        str[Convert.ToString(playerID)]["pos_x"] = Convert.ToString(player.Position.X++);
+                         break;
+                    }
             }
+            return str;
         
         }
         public void WeaponRotation(string mousPos, int playerID)
@@ -72,8 +90,6 @@ namespace Server
         public void Shoot(string weapon, int playerID)
         {
             Player player;
-           
-
             player = field.Players[playerID];
             player.Lifes--;
             switch (weapon)

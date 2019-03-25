@@ -20,8 +20,9 @@ public class NetworkManager : MonoBehaviour {
     public string life = "30";
     public string weapon = "Pistol";
     public string shoot = "F";
-    public bool IsItFirstMessage = true;
+    static public bool IsItFirstMessage = false;
     static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
+    static public Dictionary<string, string> clientData = new Dictionary<string, string>();
     public string mess;
 
     private void Awake()
@@ -30,37 +31,54 @@ public class NetworkManager : MonoBehaviour {
     }
 
     void Start () {
-        clientTCP.Connect();
-        clientTCP.SendMess();
-        mess = clientTCP.GetPos();
-        InstantiatePlayer(Convert.ToString(my_ID), mess);
-       // clientTCP.SendMess();
-        // clientTCP.SendMessage(clientTCP.GetPos());
+        clientTCP.Connect();//коннект с сервером                                     конект
+
+        clientData.Add("id", "-1"); clientData.Add("pos_x", ""); clientData.Add("pos_y", ""); clientData.Add("pos_z", "");//позиция игрока
+        clientData.Add("rot_x", ""); clientData.Add("rot_y", ""); clientData.Add("rot_z", "");//вращение игрока
+        clientData.Add("life", ""); clientData.Add("dir", ""); clientData.Add("shoot", ""); clientData.Add("weapon", "");
+
+        clientTCP.SendFirstMessage(clientData);//отправка первого сообщения серверу               отправляю сообщение
+     //   clientTCP.SendFirstMess();//отправка первого сообщения серверу               отправляю сообщение
+        mess = clientTCP.GetPos();//данные с сервера                                 принимаю сообщение с сервера
+        InstantiatePlayer(Convert.ToString(my_ID), mess);//создание меня             создаю себя
+        IsItFirstMessage = true;
     }
-   
+
     private void Update()
     {
         //  Debug.Log("YES");
         //clientTCP.SendMess();
-        //mess = clientTCP.GetPos();
-        // clientTCP.SendMessage(mess);
-      //  MoveOther(my_ID, mess);
-        if (dasha.Count > 1)
+        //mess = clientTCP.GetPos();//данные с сервера
+        if (IsItFirstMessage)
         {
-            InstantiateOther(my_ID, dasha);
+          //  clientTCP.SendMessage(my_ID,mess,Dir,life,ref shoot,weapon);//отправка данных серверу
+            clientTCP.Send(my_ID, mess,/* Dir, life, ref shoot, weapon,*/clientData);
+            mess = clientTCP.GetPos();//данные с сервера  
+            var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(mess);
+            dasha = jsonData1;
+            Debug.Log("SERVERMESS: "+mess);
+            //   MovePlayer(my_ID, mess);//мое движение
+            if (dasha.Count > 1)//для других играков
+            {
+             
+                InstantiateOther(my_ID, dasha);//создание других играков
+                 MoveOther(my_ID, mess);//движение других играков
+            }
         }
     }
     public void FirstMessage(string str)//первое сообщение с моим ID
     {
         var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-        
-            foreach (string s in jsonData1.Keys)
+        //clientData.Add("id", "-1"); clientData.Add("pos_x", ""); clientData.Add("pos_y", ""); clientData.Add("pos_z", "");//позиция игрока
+        //clientData.Add("rot_x", ""); clientData.Add("rot_y", ""); clientData.Add("rot_z", "");//вращение игрока
+        //clientData.Add("life", ""); clientData.Add("dir", ""); clientData.Add("shoot", ""); clientData.Add("weapon", "");
+        foreach (string s in jsonData1.Keys)
                 my_ID = s;
         
     }
     public void InstantiatePlayer(string ID, string str)//Создание игрока
     {
-        Debug.Log("STR: " + str);
+       // Debug.Log("STR: " + str);
         var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string,Dictionary<string, string> >> (str);
         dasha = jsonData1;
         foreach (string s in jsonData1.Keys)
@@ -76,9 +94,6 @@ public class NetworkManager : MonoBehaviour {
             float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
             float rotY = Convert.ToSingle(jsonData1[ID]["rot_y"]);
             float rotZ = Convert.ToSingle(jsonData1[ID]["rot_z"]);
-            float posWx = Convert.ToSingle(jsonData1[ID]["posW_x"]);
-            float posWy = Convert.ToSingle(jsonData1[ID]["posW_y"]);
-            float posWz = Convert.ToSingle(jsonData1[ID]["posW_z"]);
             int life = Convert.ToInt32(jsonData1[ID]["life"]);
             Vector3 v = new Vector3(x, y, z);
             GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
@@ -139,19 +154,17 @@ public class NetworkManager : MonoBehaviour {
         {
             InstantiateOther(ID, jsonData1);
         }
-        //int id = Convert.ToInt32(jsonData1[ID]["id"]);
-        //float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
-        //float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
-        //float z = Convert.ToSingle(jsonData1[ID]["pos_z"]);
-        //float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
-        //float rotY = Convert.ToSingle(jsonData1[ID]["rot_y"]);
-        //float rotZ = Convert.ToSingle(jsonData1[ID]["rot_z"]);
-        //float posWx = Convert.ToSingle(jsonData1[ID]["posW_x"]);
-        //float posWy = Convert.ToSingle(jsonData1[ID]["posW_y"]);
-        //float posWz = Convert.ToSingle(jsonData1[ID]["posW_z"]);
-        //Vector3 v = new Vector3(x, y, z);
-        //playerPref.transform.position = v;
-        //playerPref.transform.rotation = Quaternion.Euler(rotX,rotY,rotZ);
+        GameObject player = GameObject.Find(ID);
+        float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
+        float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
+        float z = Convert.ToSingle(jsonData1[ID]["pos_z"]);
+        float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
+        float rotY = Convert.ToSingle(jsonData1[ID]["rot_y"]);
+        float rotZ = Convert.ToSingle(jsonData1[ID]["rot_z"]);
+        Vector3 v = new Vector3(x, y, z);
+        player.transform.position = v;
+        player.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
+       
     }
       
 }
