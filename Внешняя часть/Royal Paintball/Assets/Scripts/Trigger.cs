@@ -25,20 +25,22 @@ public class Trigger : MonoBehaviour {
 
     }
     void OnMouseDown()
-    { 
-         player = GameObject.FindGameObjectWithTag("Weapon");
-        
+    {
+        //  player = GameObject.FindGameObjectWithTag("Weapon");
+
         //var mousePosition = Input.mousePosition;
         //mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
         //f = mousePosition;
-      //  Vector3 p = new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0) * Time.deltaTime * speed; 
+        //  Vector3 p = new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0) * Time.deltaTime * speed; 
         //player = GameObject.FindGameObjectWithTag("Player");
-        cur = GameObject.Instantiate(bullet, player.transform.position,/*transform.Rotate(p)*/bullet.transform.rotation) as GameObject;//появление новой пули
-        int l = Random.Range(0, colors.Length );
 
-        net.shoot = "T";
-        cur.GetComponent<Renderer>().material.color = colors[l];
-        bul.Add(cur);
+
+        //cur = GameObject.Instantiate(bullet, player.transform.position,/*transform.Rotate(p)*/bullet.transform.rotation) as GameObject;//появление новой пули
+        //int l = Random.Range(0, colors.Length );
+
+        //net.shoot = "T";
+        //cur.GetComponent<Renderer>().material.color = colors[l];
+        //bul.Add(cur);
 
         //var look_dir = f - cur.transform.position;
         //look_dir.y = 0;

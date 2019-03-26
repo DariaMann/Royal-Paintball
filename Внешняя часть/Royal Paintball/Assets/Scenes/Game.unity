@@ -175,6 +175,81 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &582072313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 582072314}
+  - component: {fileID: 582072316}
+  - component: {fileID: 582072315}
+  m_Layer: 5
+  m_Name: CountBull
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &582072314
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 582072313}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1990467820}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -14, y: 32.699997}
+  m_SizeDelta: {x: 74.29999, y: 65.5}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &582072315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 582072313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 41
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 45
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 0
+--- !u!222 &582072316
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 582072313}
+  m_CullTransparentMesh: 0
 --- !u!1 &596243887
 GameObject:
   m_ObjectHideFlags: 0
@@ -249,7 +324,7 @@ Transform:
   m_LocalScale: {x: 17.954346, y: 10.000434, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &753509704
 GameObject:
@@ -672,10 +747,10 @@ RectTransform:
   m_Father: {fileID: 1990467820}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 319.3, y: 187.07}
-  m_SizeDelta: {x: 120.2, y: 49.855}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -80.70001, y: -37.929993}
+  m_SizeDelta: {x: 120.20001, y: 49.85501}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1881997191
 MonoBehaviour:
@@ -804,6 +879,7 @@ RectTransform:
   m_Children:
   - {fileID: 1881997190}
   - {fileID: 753509705}
+  - {fileID: 582072314}
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -849,7 +925,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4877335812796084, guid: e0083757fe5420f478711a7d20ff2943, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e0083757fe5420f478711a7d20ff2943, type: 2}
@@ -945,10 +1021,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1227879332991428, guid: bd407619f5dce724bb0a9e768d30e2bb, type: 2}
-  gun: {fileID: 1768196200222138, guid: 3f09cdc7bf43f874fa093056af1afc62, type: 2}
-  shotgun: {fileID: 1700715487831334, guid: ce7eb5aec97cd8d458d7d3eb28130550, type: 2}
-  bomb: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}
-  pistol: {fileID: 1610737920709112, guid: bd407619f5dce724bb0a9e768d30e2bb, type: 2}
 --- !u!114 &2025280856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1032,15 +1104,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3c493b069eeee34c9acb7d4c61a429d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPref: {fileID: 1227879332991428, guid: bd407619f5dce724bb0a9e768d30e2bb, type: 2}
-  headPref: {fileID: 1644991866766992, guid: bd407619f5dce724bb0a9e768d30e2bb, type: 2}
-  weaponPref: {fileID: 1768196200222138, guid: 3f09cdc7bf43f874fa093056af1afc62, type: 2}
+  playerPref: {fileID: 1602182378777958, guid: c900a15741d6e0b4394d73bf97870285, type: 2}
+  weaponPref: {fileID: 1416977375067964, guid: 8959abdb369a21b4f842946e26c5dbee, type: 2}
+  bulletPref: {fileID: 1642230437627086, guid: 70667bb69298c0644bc54d31d6e0dba0, type: 2}
+  cur: {fileID: 0}
   Lifes: {fileID: 1881997191}
+  CountBul: {fileID: 582072315}
   my_ID: 0
   Dir: N
   life: 30
   weapon: Pistol
   shoot: F
+  mess: 
+  gun: {fileID: 1768196200222138, guid: 3f09cdc7bf43f874fa093056af1afc62, type: 2}
+  shotgun: {fileID: 1700715487831334, guid: ce7eb5aec97cd8d458d7d3eb28130550, type: 2}
+  bomb: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}
+  pistol: {fileID: 1610737920709112, guid: bd407619f5dce724bb0a9e768d30e2bb, type: 2}
 --- !u!4 &2129279430
 Transform:
   m_ObjectHideFlags: 0

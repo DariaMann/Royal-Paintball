@@ -25,7 +25,7 @@ namespace Server
             string id = Convert.ToString(rn.Next(0, 1000));
             ID = id;
         }
-        static public string PlayerData(string Id)
+         public string PlayerData()
         {
             // string serialized = JsonConvert.SerializeObject(First());
             First();
@@ -38,13 +38,15 @@ namespace Server
             string x = Convert.ToString(pos.X);//x игрока
             string y = Convert.ToString(pos.Y);//у игрока
             string z = Convert.ToString(pos.Z);//z игрока
+            string xW = Convert.ToString(Convert.ToSingle(x) + 0.7);
             string xRot = "-90";//вращение игрока по х
             Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), Convert.ToDouble(xRot));
-            string id = Id;
+            string id = ID;
             string life = Convert.ToString(pl.Lifes);
             string dir = pl.Direction;//направление, куда движется игрок
             string shoot = pl.Shoot;
             string weapon = pl.Weapon;
+            string wound = "false";
             string countBulP = Convert.ToString(p.CountBullets);//количество пуль пистолета
             string countBulS = Convert.ToString(s.CountBullets);//количество пуль дробовика
             string countBulG = Convert.ToString(g.CountBullets);//количество пуль автомата
@@ -52,31 +54,60 @@ namespace Server
             player1.Add("id", id);//
             player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);//позиция игрока
             player1.Add("rot_x", xRot); player1.Add("rot_y", "0"); player1.Add("rot_z", "0");//вращение игрока
+            player1.Add("pos_xW", xW); player1.Add("pos_yW", y); player1.Add("pos_zW", z);
             player1.Add("life", life); player1.Add("dir", dir); player1.Add("shoot", shoot); player1.Add("weapon", weapon);//жизни,направление движения,стрельба,выбранное оружие игрока
-          //  player1.Add("bulP", countBulP); player1.Add("bulS", countBulS); player1.Add("bulG", countBulG); player1.Add("bulB", countBulB);//количество пуль оружий игрока
+            player1.Add("wound", wound);
+            player1.Add("bulP", countBulP); player1.Add("bulS", countBulS); player1.Add("bulG", countBulG); player1.Add("bulB", countBulB);//количество пуль оружий игрока
             if (!dasha.ContainsKey(id))
                 dasha.Add(id, player1);
+            f = new Field();
+            f.Players.Add(id, player1);
             string serialized = JsonConvert.SerializeObject(dasha);
             return serialized;
         }
-        public void count(string str)
+        public Dictionary<string, Dictionary<string, string>> count(Dictionary<string,string> dic)
         {
              f = new Field();
              cont = new GameController(f);
-            var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-            if(!(jsonData1[ID]["dir"]=="N"))//движение игрока
+            ID = dic["id"];
+            dasha[ID] = dic;
+            if (!(dic["dir"]=="N"))//движение игрока
             {
-                dasha = cont.MovePlayer(Convert.ToInt32(ID), jsonData1);
+               
+                dasha = cont.MovePlayer(ID, dasha);
             }
-            //if (Convert.ToInt32(jsonData1[ID]["life"]) <= 0)
-            //{
-            //    cont.FinishGame(Convert.ToInt32(ID));
-            //}
-            //if (jsonData1[ID]["shoot"] == "T")
-            //{
-            //    cont.Shoot(jsonData1[ID]["weapon"], Convert.ToInt32(ID));
-            //}
+            if (Convert.ToInt32(dic["life"]) <= 0)
+            {
+                cont.FinishGame(ID);
+            }
+            if (dic["shoot"] == "T")
+            {
+                dasha = cont.Shoot(dasha, ID);
+            }
+            switch(dic["weapon"])
+            {
+                case "Pistol":
+                    {
+                        break;
+                    }
+                case "Shotgun":
+                    {
+                        break;
+                    }
+                case "Gun":
+                    {
+                        break;
+                    }
+                case "Bomb":
+                    {
+                        break;
+                    }
+            }
+            if (dic["wound"]=="true")//ранение
+            {
 
+            }
+            return dasha;
         }
         public void Process()
         {
@@ -100,29 +131,27 @@ namespace Server
                     string message = builder.ToString();
 
                     Console.WriteLine("Клиент: " + message);
-
-                    //string mes = "Hi";
-                    //var jsonData1 = JsonConvert.SerializeObject(mes);
+                
                     var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string,string>>(message);
-                    //   if (message == jsonData1)
+                    
                     if (jsonData1["id"] == "-1")
                     // отправляем обратно сообщение 
                     {
-                        message = PlayerData(ID);
+                        message = PlayerData();
                         Console.WriteLine("Сервер: " + message);
                         data = Encoding.UTF8.GetBytes(message);
                         stream.Write(data, 0, data.Length);
                     }
                     else
                     {
-                        //   count(message);
-                        var mess = JsonConvert.SerializeObject(dasha);
+                        
+                        var mess = JsonConvert.SerializeObject(count(jsonData1));
                         Console.WriteLine("Сервер: " + mess);
                         data = Encoding.UTF8.GetBytes(mess);
                         stream.Write(data, 0, data.Length);
                     }
                 }
-            }
+        }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);

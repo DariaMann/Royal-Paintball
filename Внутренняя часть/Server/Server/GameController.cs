@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class GameController: IPlayController
+    public class GameController//: IPlayController
     {
         private Field field;
 
@@ -14,23 +14,23 @@ namespace Server
         {
             this.field = field;
         }
-        public void SelectWeapon(string weapon,int playerID)
-        {
-            Player player;
-            player = field.Players[playerID];
-            //this.field.SelectedWeapons = weapon;
-            //this.field.OnFieldChanged();
-        }
-        public void Wound(Weapons weapon, int playerID)//выстрел
-        {
-            Player player;
-            player = field.Players[playerID];
-            player.Lifes -= weapon.TakenLives;
-            if (player.Lifes<=0)
-            {
-                FinishGame(playerID);
-            }
-        }
+        //public void SelectWeapon(string weapon,string playerID)
+        //{
+        //    Player player;
+        //    player = field.Players[playerID];
+        //    //this.field.SelectedWeapons = weapon;
+        //    //this.field.OnFieldChanged();
+        //}
+        //public void Wound(Weapons weapon, string playerID)//выстрел
+        //{
+        //    Player player;
+        //    player = field.Players[playerID];
+        //    player.Lifes -= weapon.TakenLives;
+        //    if (player.Lifes<=0)
+        //    {
+        //        FinishGame(playerID);
+        //    }
+        //}
         public void NewPlayer(int playerID,Position position,Rotation rotation,Color color)
         {
             //Random rn = new Random();
@@ -48,77 +48,84 @@ namespace Server
          //   Player player = new Player(color,playerID,position,rotation);
             //field.Players.Add(playerID,player);
         }
-        public void FinishGame(int playerID)
+        public void FinishGame(string playerID)
         {
             field.Players.Remove(playerID);
         }
-        public Dictionary<string, Dictionary<string, string>> MovePlayer(int playerID, Dictionary<string, Dictionary<string, string>> str)
+        public Dictionary<string, Dictionary<string, string>> MovePlayer(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
-            Player player;
-            player = field.Players[playerID];
-            switch (str[Convert.ToString(playerID)]["dir"])
+            //Player player;
+            //player = field.Players[playerID];
+            switch (dasha[playerID]["dir"])
             {
                 case "W":
                     {
-
-                        str[Convert.ToString(playerID)]["pos_y"] = Convert.ToString(player.Position.Y++);
+                        float y = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_y"]);
+                        string Y = Convert.ToString(y + 0.2);
+                        dasha[Convert.ToString(playerID)]["pos_y"] = Y;//Convert.ToString(player.Position.Y++);
+                        //Console.WriteLine("y=" + y);
+                        //Console.WriteLine("Y=" + Y);
+                        //Console.WriteLine(Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_y"]));
                         break;
                     }
                 case "S":
                     {
-                        str[Convert.ToString(playerID)]["pos_y"] = Convert.ToString(player.Position.Y--);
+                        float y = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_y"]);
+                        dasha[Convert.ToString(playerID)]["pos_y"] = Convert.ToString(y - 0.2); //Convert.ToString(player.Position.Y--);
                         break;
                     }
                 case "A":
                     {
-                        str[Convert.ToString(playerID)]["pos_x"] = Convert.ToString(player.Position.X--);
+                        float x = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_x"]);
+                        dasha[Convert.ToString(playerID)]["pos_x"] = Convert.ToString(x - 0.2);//Convert.ToString(player.Position.X--);
                         break;
                     }
                 case "D":
                     {
-                        str[Convert.ToString(playerID)]["pos_x"] = Convert.ToString(player.Position.X++);
-                         break;
+                        float x = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_x"]);
+                        dasha[Convert.ToString(playerID)]["pos_x"] = Convert.ToString(x+0.2); //Convert.ToString(player.Position.X++);
+                        break;
                     }
             }
-            return str;
+            return dasha;
         
         }
         public void WeaponRotation(string mousPos, int playerID)
         {
 
         }
-        public void Shoot(string weapon, int playerID)
+        public Dictionary<string, Dictionary<string, string>> Shoot(Dictionary<string, Dictionary<string, string>> dasha, string playerID)
         {
-            Player player;
-            player = field.Players[playerID];
-            player.Lifes--;
-            switch (weapon)
+            switch (dasha[playerID]["weapon"])
             {
                 case "Pistol":
                     {
-                        Pistol p = new Pistol();
-                        p.Shoot();
+                        //Pistol p = new Pistol();
+                        //p.Shoot();
+                        int bul = Convert.ToInt32(dasha[playerID]["bulP"]);
+                        dasha[playerID]["bulP"] = Convert.ToString(--bul);
                         break;
                     }
                 case "Shotgun":
                     {
-                        Shotgun s = new Shotgun();
-                        s.Shoot();
+                        int bul = Convert.ToInt32(dasha[playerID]["bulS"]);
+                        dasha[playerID]["bulS"] = Convert.ToString(--bul);
                         break;
                     }
                 case "Gun":
                     {
-                        Gun g = new Gun();
-                        g.Shoot();
+                        int bul = Convert.ToInt32(dasha[playerID]["bulG"]);
+                        dasha[playerID]["bulG"] = Convert.ToString(--bul);
                         break;
                     }
                 case "Bomb":
                     {
-                       Bomb b = new Bomb();
-                        b.Shoot();
+                        int bul = Convert.ToInt32(dasha[playerID]["bulB"]);
+                        dasha[playerID]["bulB"] = Convert.ToString(--bul);
                         break;
                     }
             }
+            return dasha;
 
         }
 

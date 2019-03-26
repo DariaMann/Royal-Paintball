@@ -10,7 +10,7 @@ namespace Server
     {
         public Color color { get; set; }
         //public IList<Player> Players { get; set; }
-       public Dictionary<int, Player> Players { get; set; }
+       public Dictionary<string, Dictionary<string, string>> Players { get; set; }
         public Weapons SelectedWeapons { get; set; }
 
         public delegate void FieldChanged();
@@ -18,7 +18,7 @@ namespace Server
 
         public Field()
         {
-             this.Players =  new Dictionary<int, Player>();
+             this.Players =  new Dictionary<string, Dictionary<string, string>>();
             this.SelectedWeapons = null;
         }
       

@@ -30,14 +30,14 @@ public class ClientTCP  {
             playerSocket.NoDelay = false;
             asyncBuff = new byte[8192];
           //   playerSocket.BeginConnect("127.0.0.1", 904, new AsyncCallback(ConnectCallback), playerSocket);
-            playerSocket.Connect("127.0.0.1", 904);
-            
+            playerSocket.Connect("https://6b0a95cb.ngrok.io", 904);
+
             connecting = true;
         }
         catch { };
         
     }
-    public string GetPos ()
+    public string GetPos ()//получение данных с сервера
     {
             byte[] data = new byte[256];
             StringBuilder response = new StringBuilder();
@@ -48,7 +48,7 @@ public class ClientTCP  {
                 response.Append(Encoding.UTF8.GetString(data, 0, bytes));
             }
             while (myStream.DataAvailable); // пока данные есть в потоке
-        Debug.Log("MES: "+response.ToString());
+      //  Debug.Log("MES: "+response.ToString());
             return response.ToString();
         
     }
@@ -113,19 +113,21 @@ public class ClientTCP  {
         myStream = playerSocket.GetStream();
         myStream.Write(buffer, 0, buffer.Length);
     }
-    public void Send/*(string str)//*/(string Id, string str, /*, string Dir, string lifes, ref string shoot, string weapon,*/ Dictionary<string, string> clientData)//отправка сообщения со всеми данными
+    public void Send(string Id, string str, string Dir, string lifes, string shoot, string weapon, Dictionary<string, string> clientData)//отправка сообщения со всеми данными
     {
-        Debug.Log("STR SEND:" + str);
         var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-        clientData = jsonData1[Id];
-        //jsonData1[Id]["dir"] = Dir;
+        
+        jsonData1[Id]["dir"] = Dir;
+       
         //jsonData1[Id]["life"] = lifes;
-        //jsonData1[Id]["shoot"] = shoot;
-        //jsonData1[Id]["weapon"] = weapon;
+        jsonData1[Id]["shoot"] = shoot;
+       
+        jsonData1[Id]["weapon"] = weapon;
+        clientData = jsonData1[Id];
         string message = JsonConvert.SerializeObject(clientData);
         byte[] buffer = Encoding.ASCII.GetBytes(message);
         myStream.Write(buffer, 0, buffer.Length);
-        // shoot = "F";
+       
     }
     private void ConnectCallback(IAsyncResult ar)
     {

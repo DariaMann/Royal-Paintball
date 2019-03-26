@@ -11,9 +11,9 @@ namespace Server
         public Position()
         {
             Random rn = new Random(); // объявление переменной для генерации чисел
-            this.X = rn.Next(-2, 5);
-            this.Y = rn.Next(-2, 5);
-            this.Z = -2.77;
+            this.X = rn.Next(-2, 5); //rn.Next(-8, 8);
+            this.Y = rn.Next(-2, 5);//rn.Next(-4, 4);
+            this.Z = -2.77;//-1;
         }
 
         public double X { get; set; }
