@@ -21,7 +21,7 @@ namespace Server
         public abstract void Shoot();// метод стрельбы
         public int Index { get; set; }//индекс оружия
         public int TakenLives { get; set; }//количество отнятых жизней за попадание
-
+        public int CountMagazine { get; set; }
 
     }
   

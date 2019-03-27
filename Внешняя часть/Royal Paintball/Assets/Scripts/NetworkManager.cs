@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using Newtonsoft.Json;
-
+using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviour {
 
@@ -22,9 +22,11 @@ public class NetworkManager : MonoBehaviour {
 
     public string Dir = "N";
     
-    public string life = "30";
     public string weapon = "Pistol";
     public string shoot = "F";
+    public string wound = "F";
+    public string liftItem = "F";
+    public string reload = "F";
     static public bool IsItFirstMessage = false;
     static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
     static public Dictionary<string, string> clientData = new Dictionary<string, string>();
@@ -33,10 +35,16 @@ public class NetworkManager : MonoBehaviour {
     public GameObject shotgun;
     public GameObject bomb;
     public GameObject pistol;
+    public bool TheEnd=false;
+
 
     private void Awake()
     {
-        DontDestroyOnLoad(this);
+        if (GameObject.FindGameObjectsWithTag("NetworkManager").Length == 1 )
+            DontDestroyOnLoad(this);
+        else
+            Destroy(this);
+       
     }
 
     void Start () {
@@ -56,141 +64,160 @@ public class NetworkManager : MonoBehaviour {
     {
         if (IsItFirstMessage)
         {
-                clientTCP.Send(my_ID, mess, Dir, life,  shoot, weapon, clientData);
+                clientTCP.Send(my_ID, mess, Dir, shoot, weapon, wound,liftItem, reload, clientData);
                 mess = clientTCP.GetPos();//данные с сервера  
                 var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(mess);
                 dasha = jsonData1;
-                Actoin();//метод отслеживающий нажатие клавишь 
-                MovePlayer(my_ID, mess);//мое движение
-                if (dasha.Count > 1)//для других играков
+                if (dasha.Count != 0)
                 {
-                    InstantiateOther(my_ID, dasha);//создание других играков
-                    InstantiateBulletOther();//стрельба других играков
-                    MoveOther(my_ID, mess);//движение других играков
-                }
+                    Actoin();//метод отслеживающий нажатие клавишь 
+                    MovePlayer(my_ID, mess);//мое движение
+                    if (dasha.Count > 1)//для других играков
+                    {
+                        InstantiateOther(my_ID, dasha);//создание других играков
+                        InstantiateBulletOther();//стрельба других играков
+                        MoveOther(my_ID, mess);//движение других играков
+                    }
+                
+            }
         }
     }
     public void Actoin()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-        {
-            Dir = "W";
-        }
-        else
-        {
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
-
-                Dir = "S";
+                Dir = "W";
             }
             else
             {
-                if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+                if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
                 {
-                    Dir = "A";
+
+                    Dir = "S";
                 }
                 else
                 {
-                    if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+                    if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
                     {
-                        Dir = "D";
+                        Dir = "A";
                     }
                     else
                     {
-                        Dir = "N";
+                        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+                        {
+                            Dir = "D";
+                        }
+                        else
+                        {
+                            Dir = "N";
+                        }
                     }
                 }
             }
-        }
-        if (Input.GetKey(KeyCode.F))//поднятие предметов
-        {
-           
-        }
-        if (Input.GetKey(KeyCode.R))//перезарядка оружия
-        {
-
-        }
-        weaponPref = GameObject.FindGameObjectWithTag("Weapon");
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            Vector3 v = weaponPref.transform.position;
-            Destroy(weaponPref);
-            weaponPref = Instantiate(pistol, v, Quaternion.identity);
-            weapon = "Pistol";
-            CountBul.text = dasha[my_ID]["bulP"];
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Vector3 v = weaponPref.transform.position;
-            Destroy(weaponPref);
-            weaponPref = Instantiate(shotgun, v, Quaternion.identity);
-            weapon = "Shotgun";
-            CountBul.text = dasha[my_ID]["bulS"];
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            Vector3 v = weaponPref.transform.position;
-            Destroy(weaponPref);
-            weaponPref = Instantiate(gun, v, Quaternion.identity);
-            weapon = "Gun";
-            CountBul.text = dasha[my_ID]["bulG"];
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            Vector3 v = weaponPref.transform.position;
-            Destroy(weaponPref);
-            weaponPref = Instantiate(bomb, v, Quaternion.identity);
-            weapon = "Bomb";
-            Debug.Log("ID: " + my_ID);
-            Debug.Log(dasha[my_ID]["bulB"]);
-            CountBul.text = dasha[my_ID]["bulB"];
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        { 
-           
-            //InstantiateBullet();
-            switch (dasha[my_ID]["weapon"])
+            if (Input.GetKey(KeyCode.F))//поднятие предметов
             {
-                case "Pistol":
-                    {
-                        if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
-                        { InstantiateBullet(); Debug.Log("PisB: " + Convert.ToInt32(dasha[my_ID]["bulP"])); shoot = "T"; }
-                        break;
-                    }
-                case "Shotgun":
-                    {
-                        if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
-                        { InstantiateBullet(); shoot = "T"; }
-                        break;
-                    }
-                case "Gun":
-                    {
-                        if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
-                        { InstantiateBullet(); shoot = "T"; }
-                        break;
-                    }
-                case "Bomb":
-                    {
-                        if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
-                        { InstantiateBullet(); shoot = "T"; }
-                        break;
-                    }
+            liftItem = "T";
             }
+            if (Input.GetKey(KeyCode.R))//перезарядка оружия
+            {
+            reload = "T";
+            }
+            weaponPref = GameObject.FindGameObjectWithTag("Weapon");
 
-            Debug.Log("SHOOT: " + shoot);
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                Vector3 v = weaponPref.transform.position;
+                Destroy(weaponPref);
+                weaponPref = Instantiate(pistol, v, Quaternion.identity);
+                weapon = "Pistol";
+            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
+            CountBul.text = dasha[my_ID]["bulP"];
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                Vector3 v = weaponPref.transform.position;
+                Destroy(weaponPref);
+                weaponPref = Instantiate(shotgun, v, Quaternion.identity);
+                weapon = "Shotgun";
+                weaponPref.transform.parent = GameObject.Find(my_ID).transform;
+                CountBul.text = dasha[my_ID]["bulS"];
+                
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                Vector3 v = weaponPref.transform.position;
+                Destroy(weaponPref);
+                weaponPref = Instantiate(gun, v, Quaternion.identity);
+                weapon = "Gun";
+            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
+            CountBul.text = dasha[my_ID]["bulG"];
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                Vector3 v = weaponPref.transform.position;
+                Destroy(weaponPref);
+                weaponPref = Instantiate(bomb, v, Quaternion.identity);
+                weapon = "Bomb";
+            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
+            CountBul.text = dasha[my_ID]["bulB"];
+            }
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                switch (dasha[my_ID]["weapon"])
+                {
+                    case "Pistol":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
+                    case "Shotgun":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
+                    case "Gun":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
+                    case "Bomb":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
+                }
+
+                Debug.Log("SHOOT: " + shoot);
+            }
+            else
+            {
+                shoot = "F";
+            }
+            switch (weapon)//обновление количества пуль
+            {
+                case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; break; }
+                case "Shotgun": { CountBul.text = dasha[my_ID]["bulS"]; break; }
+                case "Gun": { CountBul.text = dasha[my_ID]["bulG"]; break; }
+                case "Bomb": { CountBul.text = dasha[my_ID]["bulB"]; break; }
+            }
+        if (Input.GetKey(KeyCode.Z))//попадание в меня
+        {
+            if (Convert.ToInt32(dasha[my_ID]["life"]) > 0)
+            {
+                wound = "T";
+                Lifes.text = dasha[my_ID]["life"];
+            }
         }
         else
         {
-            shoot = "F";
+            wound = "F";
         }
-        switch(dasha[my_ID]["weapon"])
-        {
-            case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; break; }
-            case "Shotgun": { CountBul.text = dasha[my_ID]["bulS"]; break; }
-            case "Gun": { CountBul.text = dasha[my_ID]["bulG"]; break; }
-            case "Bomb": { CountBul.text = dasha[my_ID]["bulB"]; break; }
-        }
+        
 
     } 
     public void InstantiateBullet()
@@ -318,7 +345,7 @@ public class NetworkManager : MonoBehaviour {
         player.transform.position = v;
         player.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
 
-        GameObject weapon = GameObject.Find(ID+":"+dasha[ID]["weapon"]);
+        //GameObject weapon = GameObject.Find(ID+":"+dasha[ID]["weapon"]);
 
 
     }

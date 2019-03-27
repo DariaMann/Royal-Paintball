@@ -18,6 +18,7 @@ namespace Server
             this.InityalCountBul = 5;
             this.Index = 4;
             this.TakenLives = 5;
+            this.CountMagazine = 0;
         }
         public override void Shoot()
         {

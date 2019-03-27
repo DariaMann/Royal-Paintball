@@ -21,16 +21,74 @@ namespace Server
         //    //this.field.SelectedWeapons = weapon;
         //    //this.field.OnFieldChanged();
         //}
-        //public void Wound(Weapons weapon, string playerID)//выстрел
-        //{
-        //    Player player;
-        //    player = field.Players[playerID];
-        //    player.Lifes -= weapon.TakenLives;
-        //    if (player.Lifes<=0)
-        //    {
-        //        FinishGame(playerID);
-        //    }
-        //}
+        public Dictionary<string, Dictionary<string, string>> Wound(string playerID, Dictionary<string, Dictionary<string, string>> dasha)//выстрел
+        {
+           
+           
+            if (Convert.ToInt32(dasha[playerID]["life"]) > 0)
+            {
+                dasha[playerID]["life"]= Convert.ToString(Convert.ToInt32(dasha[playerID]["life"]) - 1);
+            }
+            else
+            {
+                if (Convert.ToInt32(dasha[playerID]["life"]) == 0)
+                {
+                    dasha = FinishGame(playerID, dasha);
+                }
+            }
+            return dasha;
+        }
+        public Dictionary<string, Dictionary<string, string>> LiftItem(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
+        {
+            return dasha;
+        }
+        public Dictionary<string, Dictionary<string, string>> Reload(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
+        {
+            switch(dasha[playerID]["weapon"])
+            {
+                case "Pistol":
+                    {
+                        if(Convert.ToInt32(dasha[playerID]["magazineP"])!=0)
+                        {
+                            if (Convert.ToInt32(dasha[playerID]["magazineP"]) >= 12)
+                            {
+                                if (Convert.ToInt32(dasha[playerID]["bulP"]) == 0)
+                                { dasha[playerID]["bulP"] = Convert.ToString(Convert.ToInt32(dasha[playerID]["magazineP"]) - 12); }
+                                else
+                                {
+                                    int i = Convert.ToInt32(dasha[playerID]["bulP"]);
+                                    dasha[playerID]["bulP"] = dasha[playerID]["magazineP"];
+                                    dasha[playerID]["magazineP"] = Convert.ToString( Convert.ToInt32(dasha[playerID]["magazineP"]) + Convert.ToInt32(dasha[playerID]["bulP"]));
+                                }
+                            }
+                            else
+                            {
+                                dasha[playerID]["bulP"] = dasha[playerID]["magazineP"];
+                            }
+                        }
+                        break;
+                    }
+                case "Shotgun":
+                    {
+                        if (Convert.ToInt32(dasha[playerID]["magazineS"]) != 0)
+                        { }
+                        break;
+                    }
+                case "Gun":
+                    {
+                        if (Convert.ToInt32(dasha[playerID]["magazineG"]) != 0)
+                        { }
+                        break;
+                    }
+                case "Bomb":
+                    {
+                        if (Convert.ToInt32(dasha[playerID]["magazineB"]) != 0)
+                        { }
+                        break;
+                    }
+            }
+            return dasha;
+        }
         public void NewPlayer(int playerID,Position position,Rotation rotation,Color color)
         {
             //Random rn = new Random();
@@ -48,9 +106,11 @@ namespace Server
          //   Player player = new Player(color,playerID,position,rotation);
             //field.Players.Add(playerID,player);
         }
-        public void FinishGame(string playerID)
+        public Dictionary<string, Dictionary<string, string>> FinishGame(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
-            field.Players.Remove(playerID);
+            //  field.Players.Remove(playerID);
+            dasha.Remove(playerID);
+            return dasha;
         }
         public Dictionary<string, Dictionary<string, string>> MovePlayer(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {

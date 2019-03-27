@@ -30,7 +30,7 @@ public class ClientTCP  {
             playerSocket.NoDelay = false;
             asyncBuff = new byte[8192];
           //   playerSocket.BeginConnect("127.0.0.1", 904, new AsyncCallback(ConnectCallback), playerSocket);
-            playerSocket.Connect("https://6b0a95cb.ngrok.io", 904);
+            playerSocket.Connect("127.0.0.1", 904);
 
             connecting = true;
         }
@@ -52,60 +52,7 @@ public class ClientTCP  {
             return response.ToString();
         
     }
-    //public static void Message(string ID, string s)
-    //{
-    //    var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(s);
-    //    Debug.Log("ID: "+ID);
-    //    Debug.Log("s: "+s);
-    //    Debug.Log("jsonData1: " + jsonData1);
-    //    Debug.Log("jsonData1zzzzzzz: " + jsonData1.Count);
-    //    Debug.Log("jsonData1: " + jsonData1[ID]);
-
-    //    int id = Convert.ToInt32(jsonData1[ID]["id"]);
-    //    float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
-    //    float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
-    //    float z = Convert.ToSingle(jsonData1[ID]["pos_z"]);
-    //    float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
-    //    float roty = Convert.ToSingle(jsonData1[ID]["rot_y"]);
-    //    float rotz = Convert.ToSingle(jsonData1[ID]["rot_z"]);
-    //    float posWx = Convert.ToSingle(jsonData1[ID]["posW_x"]);
-    //    float posWy = Convert.ToSingle(jsonData1[ID]["posW_y"]);
-    //    float posWz = Convert.ToSingle(jsonData1[ID]["posW_z"]);
-    //    int life = Convert.ToInt32(jsonData1[ID]["life"]);
-    //    Debug.Log(id + "," + x + "," + y + "," + z + "," + rotX + "," + roty + "," + rotz + "," + posWx + "," + posWy + "," + posWz + "," + life);
-    //}
-    //public void Message(int i)
-    //{
-    //    try
-    //    {
-    //        socket.Connect("127.0.0.1", 904);
-    //        string message = Convert.ToString(i);
-    //        byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //        myStream.Write(buffer, 0, buffer.Length);
-    //    }
-    //    catch { }
-    //   // playerSocket.Send(buffer);
-    //}
-    //public void SendMessage/*(string str)//*/(string Id,string str, string Dir,string lifes,ref string shoot, string weapon)//отправка сообщения со всеми данными
-    //{
-    //    var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-    //    Debug.Log("DIRR "+Dir);
-    //    //jsonData1[Id]["dir"] = Dir;
-    //    //jsonData1[Id]["life"] = lifes;
-    //    //jsonData1[Id]["shoot"] = shoot;
-    //    //jsonData1[Id]["weapon"] = weapon;
-    //    string message = JsonConvert.SerializeObject(jsonData1);
-    //    byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //    myStream.Write(buffer, 0, buffer.Length);
-    //   // shoot = "F";
-    //}
-    //public void SendFirstMess()//отправка сообщения со всеми данными
-    //{
-    //    string message = JsonConvert.SerializeObject("Hi");
-    //    byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //    myStream = playerSocket.GetStream();
-    //    myStream.Write(buffer, 0, buffer.Length);
-    //}
+    
     public void SendFirstMessage(Dictionary<string,string> clientData)//отправка сообщения со всеми данными
     {
         string message = JsonConvert.SerializeObject(clientData);
@@ -113,16 +60,22 @@ public class ClientTCP  {
         myStream = playerSocket.GetStream();
         myStream.Write(buffer, 0, buffer.Length);
     }
-    public void Send(string Id, string str, string Dir, string lifes, string shoot, string weapon, Dictionary<string, string> clientData)//отправка сообщения со всеми данными
+    public void Send(string Id, string dasha, string Dir, string shoot, string weapon, string wound,string liftItem,string reload, Dictionary<string, string> clientData)//отправка сообщения со всеми данными
     {
-        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
+        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(dasha);
         
         jsonData1[Id]["dir"] = Dir;
        
-        //jsonData1[Id]["life"] = lifes;
         jsonData1[Id]["shoot"] = shoot;
        
         jsonData1[Id]["weapon"] = weapon;
+
+        jsonData1[Id]["wound"] = wound;
+
+        jsonData1[Id]["liftItem"] = liftItem;
+
+        jsonData1[Id]["reload"] = reload;
+
         clientData = jsonData1[Id];
         string message = JsonConvert.SerializeObject(clientData);
         byte[] buffer = Encoding.ASCII.GetBytes(message);

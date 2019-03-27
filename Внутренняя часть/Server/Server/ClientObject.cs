@@ -46,11 +46,20 @@ namespace Server
             string dir = pl.Direction;//направление, куда движется игрок
             string shoot = pl.Shoot;
             string weapon = pl.Weapon;
-            string wound = "false";
+            string wound = "F";
             string countBulP = Convert.ToString(p.CountBullets);//количество пуль пистолета
             string countBulS = Convert.ToString(s.CountBullets);//количество пуль дробовика
             string countBulG = Convert.ToString(g.CountBullets);//количество пуль автомата
             string countBulB = Convert.ToString(b.CountBullets);//количество бомб
+
+            string magazineP = Convert.ToString(p.CountMagazine);//количество пуль пистолета
+            string magazineS = Convert.ToString(s.CountMagazine);//количество пуль дробовика
+            string magazineG = Convert.ToString(g.CountMagazine);//количество пуль автомата
+            string magazineB = Convert.ToString(b.CountMagazine);//количество бомб
+
+            string liftItem = "F";
+            string reload = "F";
+
             player1.Add("id", id);//
             player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);//позиция игрока
             player1.Add("rot_x", xRot); player1.Add("rot_y", "0"); player1.Add("rot_z", "0");//вращение игрока
@@ -58,6 +67,8 @@ namespace Server
             player1.Add("life", life); player1.Add("dir", dir); player1.Add("shoot", shoot); player1.Add("weapon", weapon);//жизни,направление движения,стрельба,выбранное оружие игрока
             player1.Add("wound", wound);
             player1.Add("bulP", countBulP); player1.Add("bulS", countBulS); player1.Add("bulG", countBulG); player1.Add("bulB", countBulB);//количество пуль оружий игрока
+            player1.Add("magazineP", magazineP); player1.Add("magazineS", magazineS); player1.Add("magazineG", magazineG); player1.Add("magazineB", magazineB);//магазины
+            player1.Add("liftItem", liftItem); player1.Add("reload", reload);//поднятие вещей, перезарядка оружия
             if (!dasha.ContainsKey(id))
                 dasha.Add(id, player1);
             f = new Field();
@@ -73,39 +84,25 @@ namespace Server
             dasha[ID] = dic;
             if (!(dic["dir"]=="N"))//движение игрока
             {
-               
                 dasha = cont.MovePlayer(ID, dasha);
             }
-            if (Convert.ToInt32(dic["life"]) <= 0)
-            {
-                cont.FinishGame(ID);
-            }
-            if (dic["shoot"] == "T")
+           
+            if (dic["shoot"] == "T")//выстрел
             {
                 dasha = cont.Shoot(dasha, ID);
             }
-            switch(dic["weapon"])
+           
+            if (dic["wound"]=="T")//ранение/смерть
             {
-                case "Pistol":
-                    {
-                        break;
-                    }
-                case "Shotgun":
-                    {
-                        break;
-                    }
-                case "Gun":
-                    {
-                        break;
-                    }
-                case "Bomb":
-                    {
-                        break;
-                    }
+                dasha = cont.Wound(ID, dasha);
             }
-            if (dic["wound"]=="true")//ранение
+            if (dic["liftItem"] == "T")//поднятие вещей
             {
-
+                dasha = cont.LiftItem(ID, dasha);
+            }
+            if (dic["reload"] == "T")//перезарядка
+            {
+                dasha = cont.Reload(ID, dasha);
             }
             return dasha;
         }

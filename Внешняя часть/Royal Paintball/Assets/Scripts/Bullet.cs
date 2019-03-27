@@ -40,14 +40,7 @@ public class Bullet : MonoBehaviour {
             Destroy(d, 10);
             Destroy(gameObject);
             Debug.Log(hit.transform.name);
-            if (hit.transform == GameObject.FindGameObjectWithTag("Player"))
-                {
-                Debug.Log("LOSE");
-            }
-            if (hit.transform.name == "Pistol")//(hit.transform == GameObject.FindGameObjectWithTag("Weapon"))
-            {
-                Debug.Log("LOSE1");
-            }
+            
         }
         lastPos = transform.position;
 
