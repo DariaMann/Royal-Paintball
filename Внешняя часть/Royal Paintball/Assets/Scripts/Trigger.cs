@@ -7,7 +7,7 @@ public class Trigger : MonoBehaviour {
 
     //[SerializeField]
     //Transform figure;
-    float speed = 10f;
+    float speed = 50f;
     //Button But;
 
     public GameObject cur;
@@ -19,27 +19,40 @@ public class Trigger : MonoBehaviour {
 
     public Color[] colors;
 
+
+
+
+
+    private float curTimeout;
+
     private void Update()
     {
         DelTail();
-
+       
     }
     void OnMouseDown()
     {
-        //  player = GameObject.FindGameObjectWithTag("Weapon");
+        player = GameObject.FindGameObjectWithTag("Weapon");
 
-        //var mousePosition = Input.mousePosition;
-        //mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
-        //f = mousePosition;
-        //  Vector3 p = new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0) * Time.deltaTime * speed; 
+        var mousePosition = Input.mousePosition;
+        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
+                                                                       //f = mousePosition;
+        Vector3 p = new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0) * Time.deltaTime * speed;
         //player = GameObject.FindGameObjectWithTag("Player");
 
+        float x = player.transform.position.x + 0.8f;
+        float y = player.transform.position.y;
+        float z = player.transform.position.z;
+        Vector3 v = new Vector3(x, y, z);
+        Vector3 mp = new Vector3(mousePosition.x, mousePosition.y, -2.77f);
+      //  cur = GameObject.Instantiate(bullet, v, Quaternion.LookRotation(mp)) as GameObject;
+        cur = GameObject.Instantiate(bullet, v, bullet.transform.rotation) as GameObject;//появление новой пули
+        int l = Random.Range(0, colors.Length);
+        cur.GetComponent<Renderer>().material.color = colors[l];
 
-        //cur = GameObject.Instantiate(bullet, player.transform.position,/*transform.Rotate(p)*/bullet.transform.rotation) as GameObject;//появление новой пули
-        //int l = Random.Range(0, colors.Length );
 
-        //net.shoot = "T";
-        //cur.GetComponent<Renderer>().material.color = colors[l];
+
+
         //bul.Add(cur);
 
         //var look_dir = f - cur.transform.position;
@@ -50,6 +63,7 @@ public class Trigger : MonoBehaviour {
         // cur.transform.rotation.y = new Quaternion(this.transform.rotation.x + 20, this.transform.rotation.y, this.transform.rotation.z, this.transform.rotation.w);
         //cur.GetComponent<Bullet>().SetTarget(f);
     }
+
     public void DelTail()
     {
         for (int i = 1; i < bul.Count; i++)

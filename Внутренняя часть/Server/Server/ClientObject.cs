@@ -14,10 +14,11 @@ namespace Server
         public TcpClient client;
         public Field f;
         public GameController cont;
-
-        public ClientObject(TcpClient tcpClient)
+        
+        public ClientObject(TcpClient tcpClient, Field field)
         {
-            client = tcpClient;
+            this.f = field;
+            this.client = tcpClient;
         }
         static public void First()
         {
@@ -40,8 +41,9 @@ namespace Server
             string z = Convert.ToString(pos.Z);//z игрока
             string xW = Convert.ToString(Convert.ToSingle(x) + 0.7);
             string xRot = "-90";//вращение игрока по х
-            Player pl = new Player(Convert.ToDouble(pos.X), Convert.ToDouble(pos.Y), Convert.ToDouble(pos.Z), Convert.ToDouble(xRot));
             string id = ID;
+            Player pl = new Player(Convert.ToInt32(id),Convert.ToSingle(pos.X), Convert.ToSingle(pos.Y), Convert.ToSingle(pos.Z), Convert.ToSingle(xRot));
+            
             string life = Convert.ToString(pl.Lifes);
             string dir = pl.Direction;//направление, куда движется игрок
             string shoot = pl.Shoot;
@@ -59,6 +61,15 @@ namespace Server
 
             string liftItem = "F";
             string reload = "F";
+            string countMag = "0";
+
+            string startPosX = "N";
+            string startPosY = "N";
+            string startPosZ = "N";
+
+            string endPosX = "N";
+            string endPosY = "N";
+            string endPosZ = "N";
 
             player1.Add("id", id);//
             player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);//позиция игрока
@@ -68,28 +79,33 @@ namespace Server
             player1.Add("wound", wound);
             player1.Add("bulP", countBulP); player1.Add("bulS", countBulS); player1.Add("bulG", countBulG); player1.Add("bulB", countBulB);//количество пуль оружий игрока
             player1.Add("magazineP", magazineP); player1.Add("magazineS", magazineS); player1.Add("magazineG", magazineG); player1.Add("magazineB", magazineB);//магазины
-            player1.Add("liftItem", liftItem); player1.Add("reload", reload);//поднятие вещей, перезарядка оружия
+            player1.Add("liftItem", liftItem); player1.Add("reload", reload); player1.Add("countMag", countMag); //поднятие вещей, перезарядка оружия,количество выпавших магазинов
+            player1.Add("startX", startPosX); player1.Add("startY", startPosY); player1.Add("startZ", startPosZ);
+            player1.Add("endX", endPosX); player1.Add("endY", endPosY); player1.Add("endZ", endPosZ);
             if (!dasha.ContainsKey(id))
                 dasha.Add(id, player1);
-            f = new Field();
-            f.Players.Add(id, player1);
+           
+            f.Players.Add(id, pl);
             string serialized = JsonConvert.SerializeObject(dasha);
             return serialized;
         }
         public Dictionary<string, Dictionary<string, string>> count(Dictionary<string,string> dic)
         {
-             f = new Field();
              cont = new GameController(f);
             ID = dic["id"];
             dasha[ID] = dic;
             if (!(dic["dir"]=="N"))//движение игрока
             {
-                dasha = cont.MovePlayer(ID, dasha);
+                dasha = cont.MovePlayerr(ID, dasha,f);
+            }
+            if(!(dic["startX"] == "N"))//позиция клика мыши
+            {
+
             }
            
             if (dic["shoot"] == "T")//выстрел
             {
-                dasha = cont.Shoot(dasha, ID);
+                dasha = cont.Shoott(dasha, ID,f);
             }
            
             if (dic["wound"]=="T")//ранение/смерть
@@ -109,8 +125,8 @@ namespace Server
         public void Process()
         {
             NetworkStream stream = null;
-            try
-            {
+            //try
+            //{
                 stream = client.GetStream();
                 byte[] data = new byte[256]; // буфер для получаемых данных
                 while (true)
@@ -149,17 +165,17 @@ namespace Server
                     }
                 }
         }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                if (stream != null)
-                    stream.Close();
-                if (client != null)
-                    client.Close();
-            }
-        }
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
+            //finally
+            //{
+            //    if (stream != null)
+            //        stream.Close();
+            //    if (client != null)
+            //        client.Close();
+            //}
+     //   }
     }
 }

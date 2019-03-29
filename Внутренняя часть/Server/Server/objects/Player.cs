@@ -16,17 +16,22 @@ namespace Server
         public int ID { get; set; }
         public string Direction { get; set; }
         public string Weapon { get; set; }
+        public Weapons Weap{ get; set; }
         public string Shoot { get; set; }
+        public float[] Pos { get; set; }
 
-        public Player( double x, double y, double z,double xR)
+        public Player( int id, float x, float y, float z, float xR)
         {
+            Pistol p = new Pistol();
+            this.Weap = p;
             this.Lifes = 30;
             this.Direction = "N";
             this.Shoot = "F";
             this.Weapon = "Pistol";
             this.Position = new Position();
-            Random rn = new Random(); // объявление переменной для генерации чисел
-            this.ID = rn.Next(0,10000);
+            Pos = new float[3] {x,y,z};
+          //  Random rn = new Random(); // объявление переменной для генерации чисел
+            this.ID = id;
         }
     
     }

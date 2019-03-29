@@ -10,6 +10,12 @@ namespace Server
     {
         private Field field;
 
+        Pistol p = new Pistol();
+        Shotgun s = new Shotgun();
+        Gun g = new Gun();
+        Bomb b = new Bomb();
+
+
         public GameController(Field field)
         {
             this.field = field;
@@ -89,23 +95,7 @@ namespace Server
             }
             return dasha;
         }
-        public void NewPlayer(int playerID,Position position,Rotation rotation,Color color)
-        {
-            //Random rn = new Random();
-            //playerID = rn.Next(10, 99);
-            //foreach (int c in field.Players.Keys)
-            //{
-            //    // if(field.Players.Keys==playerID)
-            //    if (c == playerID)
-            //    {
-            //        playerID = rn.Next(10, 99);
-            //    }
-
-            //}
-          //  playerID = ;
-         //   Player player = new Player(color,playerID,position,rotation);
-            //field.Players.Add(playerID,player);
-        }
+       
         public Dictionary<string, Dictionary<string, string>> FinishGame(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
             //  field.Players.Remove(playerID);
@@ -156,6 +146,7 @@ namespace Server
         }
         public Dictionary<string, Dictionary<string, string>> Shoot(Dictionary<string, Dictionary<string, string>> dasha, string playerID)
         {
+
             switch (dasha[playerID]["weapon"])
             {
                 case "Pistol":
@@ -189,5 +180,63 @@ namespace Server
 
         }
 
+
+
+        
+        public Dictionary<string, Dictionary<string, string>> Shoott(Dictionary<string, Dictionary<string, string>> dasha, string playerID,Field f)
+        {
+
+           Bullet bull = new Bullet(Convert.ToSingle(dasha[playerID]["startX"]), Convert.ToSingle(dasha[playerID]["startY"]), Convert.ToSingle(dasha[playerID]["startZ"]), Convert.ToSingle(dasha[playerID]["endX"]), Convert.ToSingle(dasha[playerID]["endY"]), Convert.ToSingle(dasha[playerID]["endZ"]), dasha[playerID]["weapon"], Convert.ToInt32(playerID));
+
+            //  f.Bullets.Add(playerID, bull); 
+            f.Bull.Add(bull);
+            int bul = f.Players[playerID].Weap.CountBullets--;//-1 пуля в оружии 
+            switch (dasha[playerID]["weapon"])
+            {
+                case "Pistol":{ dasha[playerID]["bulP"] = Convert.ToString(--bul);  break; }
+                case "Shotgun":{ dasha[playerID]["bulP"] = Convert.ToString(--bul); break;}
+                case "Gun":{dasha[playerID]["bulP"] = Convert.ToString(--bul); break; }
+                case "Bomb":{ dasha[playerID]["bulP"] = Convert.ToString(--bul); break;}
+            }
+            return dasha;
+        }
+        public Dictionary<string, Dictionary<string, string>> BulFlight(Dictionary<string, Dictionary<string, string>> dasha, string playerID)
+        {
+            return dasha;
+        }
+        public Dictionary<string, Dictionary<string, string>> MovePlayerr(string playerID, Dictionary<string, Dictionary<string, string>> dasha, Field f)
+        {
+            Player player;
+            player = f.Players[playerID];
+            switch (dasha[playerID]["dir"])
+            {
+                case "W":
+                    {
+                        player.Pos[1] = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_y"])+0.2f;
+                        dasha[playerID]["pos_y"] = Convert.ToString(player.Pos[1]);
+                        break;
+                    }
+                case "S":
+                    {
+                        player.Pos[1] = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_y"]) - 0.2f;
+                        dasha[playerID]["pos_y"] = Convert.ToString(player.Pos[1]);
+                        break;
+                    }
+                case "A":
+                    {
+                        player.Pos[0] = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_x"]) - 0.2f;
+                        dasha[playerID]["pos_x"] = Convert.ToString(player.Pos[0]);
+                        break;
+                    }
+                case "D":
+                    {
+                        player.Pos[0] = Convert.ToSingle(dasha[Convert.ToString(playerID)]["pos_x"]) + 0.2f;
+                        dasha[playerID]["pos_x"] = Convert.ToString(player.Pos[0]);
+                        break;
+                    }
+            }
+            return dasha;
+
+        }
     }
 }

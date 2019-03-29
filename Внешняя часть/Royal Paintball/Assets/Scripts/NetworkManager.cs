@@ -18,6 +18,7 @@ public class NetworkManager : MonoBehaviour {
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
     public Text Lifes;
     public Text CountBul;
+    public Text Magazine;
     public string my_ID = "111";
 
     public string Dir = "N";
@@ -35,6 +36,21 @@ public class NetworkManager : MonoBehaviour {
     public GameObject shotgun;
     public GameObject bomb;
     public GameObject pistol;
+
+    public GameObject magazineP;
+    public GameObject magazineS;
+    public GameObject magazineG;
+    public GameObject magazineB;
+    List<GameObject> countMag = new List<GameObject>();
+
+    public string mousePosX = "N";
+    public string mousePosY = "N";
+    public string mousePosZ = "N";
+
+    public string[] startPos = new string[3] {"N","N","N"};
+    public string[] endPos = new string[3] { "N", "N", "N" };
+
+
     public bool TheEnd=false;
 
 
@@ -50,13 +66,17 @@ public class NetworkManager : MonoBehaviour {
     void Start () {
         clientTCP.Connect();//коннект с сервером                                     конект
 
-        clientData.Add("id", "-1"); clientData.Add("pos_x", ""); clientData.Add("pos_y", ""); clientData.Add("pos_z", "");//позиция игрока
-        clientData.Add("rot_x", ""); clientData.Add("rot_y", ""); clientData.Add("rot_z", "");//вращение игрока
-        clientData.Add("life", ""); clientData.Add("dir", ""); clientData.Add("shoot", ""); clientData.Add("weapon", "");
+        clientData.Add("id", "-1"); //clientData.Add("pos_x", ""); clientData.Add("pos_y", ""); clientData.Add("pos_z", "");//позиция игрока
+        //clientData.Add("rot_x", ""); clientData.Add("rot_y", ""); clientData.Add("rot_z", "");//вращение игрока
+        //clientData.Add("life", ""); clientData.Add("dir", ""); clientData.Add("shoot", ""); clientData.Add("weapon", "");
+        //clientData.Add("mousePosX", ""); 
 
         clientTCP.SendFirstMessage(clientData);//отправка первого сообщения серверу               отправляю сообщение
         mess = clientTCP.GetPos();//данные с сервера                                 принимаю сообщение с сервера
         InstantiatePlayer(Convert.ToString(my_ID), mess);//создание меня             создаю себя
+
+        startPos = new string[3] { "N", "N", "N" };
+        endPos = new string[3] { "N", "N", "N" };
         IsItFirstMessage = true;
     }
 
@@ -64,7 +84,7 @@ public class NetworkManager : MonoBehaviour {
     {
         if (IsItFirstMessage)
         {
-                clientTCP.Send(my_ID, mess, Dir, shoot, weapon, wound,liftItem, reload, clientData);
+          clientTCP.Send(my_ID, mess, Dir, shoot, weapon, wound,liftItem, reload, clientData,startPos,endPos);
                 mess = clientTCP.GetPos();//данные с сервера  
                 var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(mess);
                 dasha = jsonData1;
@@ -82,40 +102,44 @@ public class NetworkManager : MonoBehaviour {
             }
         }
     }
-    public void Actoin()
+    public void KeyMoveDown()
     {
-        
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        {
+            Dir = "W";
+        }
+        else
+        {
+            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
             {
-                Dir = "W";
+
+                Dir = "S";
             }
             else
             {
-                if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+                if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
                 {
-
-                    Dir = "S";
+                    Dir = "A";
                 }
                 else
                 {
-                    if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+                    if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
                     {
-                        Dir = "A";
+                        Dir = "D";
                     }
                     else
                     {
-                        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-                        {
-                            Dir = "D";
-                        }
-                        else
-                        {
-                            Dir = "N";
-                        }
+                        Dir = "N";
                     }
                 }
             }
-            if (Input.GetKey(KeyCode.F))//поднятие предметов
+        }
+
+    }
+    public void Actoin()
+    {
+        KeyMoveDown();
+        if (Input.GetKey(KeyCode.F))//поднятие предметов
             {
             liftItem = "T";
             }
@@ -123,46 +147,24 @@ public class NetworkManager : MonoBehaviour {
             {
             reload = "T";
             }
-            weaponPref = GameObject.FindGameObjectWithTag("Weapon");
-
+            
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                Vector3 v = weaponPref.transform.position;
-                Destroy(weaponPref);
-                weaponPref = Instantiate(pistol, v, Quaternion.identity);
-                weapon = "Pistol";
-            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
-            CountBul.text = dasha[my_ID]["bulP"];
+            InstantiateWeapon(pistol, dasha[my_ID]["bulP"],"Pistol");
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                Vector3 v = weaponPref.transform.position;
-                Destroy(weaponPref);
-                weaponPref = Instantiate(shotgun, v, Quaternion.identity);
-                weapon = "Shotgun";
-                weaponPref.transform.parent = GameObject.Find(my_ID).transform;
-                CountBul.text = dasha[my_ID]["bulS"];
-                
+            InstantiateWeapon(shotgun, dasha[my_ID]["bulS"],"Shotgun");
             }
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                Vector3 v = weaponPref.transform.position;
-                Destroy(weaponPref);
-                weaponPref = Instantiate(gun, v, Quaternion.identity);
-                weapon = "Gun";
-            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
-            CountBul.text = dasha[my_ID]["bulG"];
+            InstantiateWeapon(gun, dasha[my_ID]["bulG"],"Gun");
             }
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
-                Vector3 v = weaponPref.transform.position;
-                Destroy(weaponPref);
-                weaponPref = Instantiate(bomb, v, Quaternion.identity);
-                weapon = "Bomb";
-            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
-            CountBul.text = dasha[my_ID]["bulB"];
+            InstantiateWeapon(bomb, dasha[my_ID]["bulB"],"Bomb");
             }
-            if (Input.GetKeyDown(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.Q))//выстрел
             {
                 switch (dasha[my_ID]["weapon"])
                 {
@@ -190,9 +192,18 @@ public class NetworkManager : MonoBehaviour {
                             { InstantiateBullet(); shoot = "T"; }
                             break;
                         }
-                }
 
-                Debug.Log("SHOOT: " + shoot);
+                }
+            var mousePosition = Input.mousePosition;
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
+
+            mousePosX = Convert.ToString(mousePosition.x);
+            mousePosY = Convert.ToString(mousePosition.y);
+            mousePosZ = Convert.ToString(mousePosition.z);
+
+            Debug.Log("SHOOT: " + shoot);
+
+
             }
             else
             {
@@ -200,14 +211,14 @@ public class NetworkManager : MonoBehaviour {
             }
             switch (weapon)//обновление количества пуль
             {
-                case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; break; }
-                case "Shotgun": { CountBul.text = dasha[my_ID]["bulS"]; break; }
-                case "Gun": { CountBul.text = dasha[my_ID]["bulG"]; break; }
-                case "Bomb": { CountBul.text = dasha[my_ID]["bulB"]; break; }
+                case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; Magazine.text = dasha[my_ID]["magazineP"]; break; }
+                case "Shotgun": { CountBul.text = dasha[my_ID]["bulS"]; Magazine.text = dasha[my_ID]["magazineS"]; break; }
+                case "Gun": { CountBul.text = dasha[my_ID]["bulG"]; Magazine.text = dasha[my_ID]["magazineG"]; break; }
+                case "Bomb": { CountBul.text = dasha[my_ID]["bulB"]; Magazine.text = dasha[my_ID]["magazineB"]; break; }
             }
         if (Input.GetKey(KeyCode.Z))//попадание в меня
         {
-            if (Convert.ToInt32(dasha[my_ID]["life"]) > 0)
+            if (Convert.ToInt32(dasha[my_ID]["life"]) >= 0)
             {
                 wound = "T";
                 Lifes.text = dasha[my_ID]["life"];
@@ -217,14 +228,97 @@ public class NetworkManager : MonoBehaviour {
         {
             wound = "F";
         }
-        
+        if(dasha[my_ID]["life"]=="0")
+        {
+            InstantiateMagazine();
+                
+
+        }
 
     } 
+    public void InstantiateWeapon(GameObject weap,string countBul, string nameWeap)
+    {
+            weaponPref = GameObject.FindGameObjectWithTag("Weapon");
+        
+            Vector3 v = weaponPref.transform.position;
+            Destroy(weaponPref);
+            weaponPref = Instantiate(weap, v, Quaternion.identity);
+            weapon = nameWeap;
+            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
+        CountBul.text = countBul;//dasha[my_ID]["bulP"];
+
+
+    }
     public void InstantiateBullet()
     {
-        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"])+0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]), Convert.ToSingle(dasha[my_ID]["pos_z"]));
-        cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
-          
+        
+            Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]), Convert.ToSingle(dasha[my_ID]["pos_z"]));
+       // Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+
+        var pos = Input.mousePosition;
+        pos = Camera.main.ScreenToWorldPoint(pos);
+
+        startPos = new string[3] { Convert.ToString(pos.x), Convert.ToString(pos.y) , Convert.ToString(pos.z) };
+        endPos = new string[3] { Convert.ToString(v.x), Convert.ToString(v.y), Convert.ToString(v.z) };
+
+        cur = GameObject.Instantiate(bulletPref, v, Quaternion.LookRotation(pos)/* bulletPref.transform.rotation*/) as GameObject;
+
+    
+    }
+    public void InstantiateMagazine()
+    {
+        switch(dasha[my_ID]["weapon"])
+        {
+            case "Pistol":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
+                    {
+                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]), Convert.ToSingle(dasha[my_ID]["pos_y"]) + 1F, Convert.ToSingle(dasha[my_ID]["pos_z"]));
+                        GameObject mag = GameObject.Instantiate(magazineP, v, bulletPref.transform.rotation) as GameObject;
+                        mag.name = dasha[my_ID]["bulP"];
+                        countMag.Add(mag);
+                    }
+                    break;
+                }
+            case "Shotgun":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
+                    {
+                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]), Convert.ToSingle(dasha[my_ID]["pos_y"]) - 1F, Convert.ToSingle(dasha[my_ID]["pos_z"]));
+                        GameObject mag = GameObject.Instantiate(magazineS, v, bulletPref.transform.rotation) as GameObject;
+                        mag.name = dasha[my_ID]["bulS"];
+                        countMag.Add(mag);
+                    }
+                    break;
+                }
+            case "Gun":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
+                    {
+                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 1F, Convert.ToSingle(dasha[my_ID]["pos_y"]), Convert.ToSingle(dasha[my_ID]["pos_z"]));
+                        GameObject mag = GameObject.Instantiate(magazineG, v, bulletPref.transform.rotation) as GameObject;
+                        mag.name = dasha[my_ID]["bulG"];
+                        countMag.Add(mag);
+                    }
+                    break;
+                }
+            case "Bomb":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
+                    {
+                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]) - 1F, Convert.ToSingle(dasha[my_ID]["pos_y"]) + 1F, Convert.ToSingle(dasha[my_ID]["pos_z"]));
+                        GameObject mag = GameObject.Instantiate(magazineB, v, bulletPref.transform.rotation) as GameObject;
+                        mag.name = dasha[my_ID]["bulB"];
+                        countMag.Add(mag);
+                    }
+                    break;
+                }
+        }
+       
+    }
+    public void InstantiateMagazineOther()
+    {
+
     }
     public void InstantiateBulletOther()  
     {

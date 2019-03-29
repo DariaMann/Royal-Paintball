@@ -60,7 +60,7 @@ public class ClientTCP  {
         myStream = playerSocket.GetStream();
         myStream.Write(buffer, 0, buffer.Length);
     }
-    public void Send(string Id, string dasha, string Dir, string shoot, string weapon, string wound,string liftItem,string reload, Dictionary<string, string> clientData)//отправка сообщения со всеми данными
+    public void Send(string Id, string dasha, string Dir, string shoot, string weapon, string wound,string liftItem,string reload, Dictionary<string, string> clientData,string[] startPos, string[] endPos)//отправка сообщения со всеми данными
     {
         var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(dasha);
         
@@ -75,6 +75,14 @@ public class ClientTCP  {
         jsonData1[Id]["liftItem"] = liftItem;
 
         jsonData1[Id]["reload"] = reload;
+        Debug.Log(startPos.Length);
+        jsonData1[Id]["startX"] = startPos[0];
+        jsonData1[Id]["startY"] = startPos[1];
+        jsonData1[Id]["startZ"] = startPos[2];
+
+        jsonData1[Id]["endX"] = endPos[0];
+        jsonData1[Id]["endY"] = endPos[1];
+        jsonData1[Id]["endZ"] = endPos[2];
 
         clientData = jsonData1[Id];
         string message = JsonConvert.SerializeObject(clientData);

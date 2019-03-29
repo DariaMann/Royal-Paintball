@@ -55,7 +55,10 @@ namespace Server
                 TcpClient client = server.AcceptTcpClient();
                 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
-                ClientObject clientObject = new ClientObject(client);
+                Field f = new Field();
+
+                ClientObject clientObject = new ClientObject(client,f);
+               
 
 
                 //Thread myT3 = new Thread(clientObject.count());
