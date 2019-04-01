@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
-
+using System.Threading;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -14,7 +14,17 @@ namespace Server
         public TcpClient client;
         public Field f;
         public GameController cont;
-        
+        //static public TimerCallback tm = new TimerCallback(Count);
+        //// создаем таймер
+        //static public Timer timer = new Timer(tm, num, 0, 2000);
+        //public static void Count(object obj)
+        //{
+        //    int x = (int)obj;
+        //    for (int i = 1; i < 9; i++, x++)
+        //    {
+        //        Console.WriteLine("{0}", x * i);
+        //    }
+        //}
         public ClientObject(TcpClient tcpClient, Field field)
         {
             this.f = field;
@@ -42,22 +52,22 @@ namespace Server
             string xW = Convert.ToString(Convert.ToSingle(x) + 0.7);
             string xRot = "-90";//вращение игрока по х
             string id = ID;
-            Player pl = new Player(Convert.ToInt32(id),Convert.ToSingle(pos.X), Convert.ToSingle(pos.Y), Convert.ToSingle(pos.Z), Convert.ToSingle(xRot));
+            Player pl = new Player(Convert.ToInt32(id),Convert.ToSingle(pos.X), Convert.ToSingle(pos.Y), Convert.ToSingle(pos.Z), Convert.ToSingle(xRot),f.SelectedWeapons);
             
             string life = Convert.ToString(pl.Lifes);
             string dir = pl.Direction;//направление, куда движется игрок
             string shoot = pl.Shoot;
             string weapon = pl.Weapon;
             string wound = "F";
-            string countBulP = Convert.ToString(p.CountBullets);//количество пуль пистолета
-            string countBulS = Convert.ToString(s.CountBullets);//количество пуль дробовика
-            string countBulG = Convert.ToString(g.CountBullets);//количество пуль автомата
-            string countBulB = Convert.ToString(b.CountBullets);//количество бомб
+            string countBulP = Convert.ToString(f.P.CountBullets);//количество пуль пистолета
+            string countBulS = Convert.ToString(f.S.CountBullets);//количество пуль дробовика
+            string countBulG = Convert.ToString(f.G.CountBullets);//количество пуль автомата
+            string countBulB = Convert.ToString(f.B.CountBullets);//количество бомб
 
-            string magazineP = Convert.ToString(p.CountMagazine);//количество пуль пистолета
-            string magazineS = Convert.ToString(s.CountMagazine);//количество пуль дробовика
-            string magazineG = Convert.ToString(g.CountMagazine);//количество пуль автомата
-            string magazineB = Convert.ToString(b.CountMagazine);//количество бомб
+            string magazineP = Convert.ToString(f.P.CountMagazine);//количество пуль пистолета
+            string magazineS = Convert.ToString(f.S.CountMagazine);//количество пуль дробовика
+            string magazineG = Convert.ToString(f.G.CountMagazine);//количество пуль автомата
+            string magazineB = Convert.ToString(f.B.CountMagazine);//количество бомб
 
             string liftItem = "F";
             string reload = "F";
@@ -71,6 +81,8 @@ namespace Server
             string endPosY = "N";
             string endPosZ = "N";
 
+            string timer = Convert.ToString(f.timer);
+
             player1.Add("id", id);//
             player1.Add("pos_x", x); player1.Add("pos_y", y); player1.Add("pos_z", z);//позиция игрока
             player1.Add("rot_x", xRot); player1.Add("rot_y", "0"); player1.Add("rot_z", "0");//вращение игрока
@@ -82,6 +94,7 @@ namespace Server
             player1.Add("liftItem", liftItem); player1.Add("reload", reload); player1.Add("countMag", countMag); //поднятие вещей, перезарядка оружия,количество выпавших магазинов
             player1.Add("startX", startPosX); player1.Add("startY", startPosY); player1.Add("startZ", startPosZ);
             player1.Add("endX", endPosX); player1.Add("endY", endPosY); player1.Add("endZ", endPosZ);
+            player1.Add("timer", timer);
             if (!dasha.ContainsKey(id))
                 dasha.Add(id, player1);
            
@@ -98,11 +111,6 @@ namespace Server
             {
                 dasha = cont.MovePlayerr(ID, dasha,f);
             }
-            if(!(dic["startX"] == "N"))//позиция клика мыши
-            {
-
-            }
-           
             if (dic["shoot"] == "T")//выстрел
             {
                 dasha = cont.Shoott(dasha, ID,f);
@@ -110,16 +118,19 @@ namespace Server
            
             if (dic["wound"]=="T")//ранение/смерть
             {
-                dasha = cont.Wound(ID, dasha);
+                dasha = cont.Woundd(ID, dasha,f);
             }
             if (dic["liftItem"] == "T")//поднятие вещей
             {
                 dasha = cont.LiftItem(ID, dasha);
             }
+            dasha = cont.ChangeWeapon(ID, dasha, f);
             if (dic["reload"] == "T")//перезарядка
             {
-                dasha = cont.Reload(ID, dasha);
+                dasha = cont.Reload(ID, dasha,f);
             }
+           
+           
             return dasha;
         }
         public void Process()

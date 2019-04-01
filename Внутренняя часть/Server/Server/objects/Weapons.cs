@@ -22,6 +22,7 @@ namespace Server
         public int Index { get; set; }//индекс оружия
         public int TakenLives { get; set; }//количество отнятых жизней за попадание
         public int CountMagazine { get; set; }
+        public int MaxCountMag { get; set; }
 
     }
   

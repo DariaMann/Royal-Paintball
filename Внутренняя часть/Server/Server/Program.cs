@@ -47,7 +47,8 @@ namespace Server
                 // запуск слушателя
                 server.Start();
             Console.WriteLine("Ожидание подключений... ");
-                
+            // устанавливаем метод обратного вызова
+            Field f = new Field();
             // диалог сервера с клиентами
             while (true)
             {
@@ -55,7 +56,7 @@ namespace Server
                 TcpClient client = server.AcceptTcpClient();
                 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
-                Field f = new Field();
+               
 
                 ClientObject clientObject = new ClientObject(client,f);
                
@@ -70,6 +71,7 @@ namespace Server
                 
             }
         }
+        
         
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    class Bomb:Weapons
+    public class Bomb:Weapons
     {
         public Bomb()
         {
@@ -18,7 +18,8 @@ namespace Server
             this.InityalCountBul = 5;
             this.Index = 4;
             this.TakenLives = 5;
-            this.CountMagazine = 0;
+            this.CountMagazine = 3;
+            this.MaxCountMag = 4;
         }
         public override void Shoot()
         {

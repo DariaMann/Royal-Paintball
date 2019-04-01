@@ -19,6 +19,7 @@ public class NetworkManager : MonoBehaviour {
     public Text Lifes;
     public Text CountBul;
     public Text Magazine;
+    public Text Timer;
     public string my_ID = "111";
 
     public string Dir = "N";
@@ -147,8 +148,12 @@ public class NetworkManager : MonoBehaviour {
             {
             reload = "T";
             }
-            
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+        else
+        {
+            reload = "F";
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
             {
             InstantiateWeapon(pistol, dasha[my_ID]["bulP"],"Pistol");
             }
@@ -232,10 +237,55 @@ public class NetworkManager : MonoBehaviour {
         {
             InstantiateMagazine();
                 
+        }
+        Timer.text = dasha[my_ID]["timer"];
+
+    }
+    private void OnMouseUp()
+    {
+        shoot = "F";
+    }
+    void OnMouseDown()
+    {
+        switch (dasha[my_ID]["weapon"])
+        {
+            case "Pistol":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
+                    { InstantiateBullet(); shoot = "T"; }
+                    break;
+                }
+            case "Shotgun":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
+                    { InstantiateBullet(); shoot = "T"; }
+                    break;
+                }
+            case "Gun":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
+                    { InstantiateBullet(); shoot = "T"; }
+                    break;
+                }
+            case "Bomb":
+                {
+                    if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
+                    { InstantiateBullet(); shoot = "T"; }
+                    break;
+                }
 
         }
+        var mousePosition = Input.mousePosition;
+        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
 
-    } 
+        mousePosX = Convert.ToString(mousePosition.x);
+        mousePosY = Convert.ToString(mousePosition.y);
+        mousePosZ = Convert.ToString(mousePosition.z);
+
+        Debug.Log("SHOOT: " + shoot);
+
+
+    }
     public void InstantiateWeapon(GameObject weap,string countBul, string nameWeap)
     {
             weaponPref = GameObject.FindGameObjectWithTag("Weapon");

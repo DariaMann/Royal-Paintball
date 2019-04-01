@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    class Gun:Weapons
+    public class Gun:Weapons
     {
         public Gun()
         {
@@ -19,6 +19,7 @@ namespace Server
             this.Index = 3;
             this.TakenLives = 3;
             this.CountMagazine = 0;
+            this.MaxCountMag = 30;
         }
         public override void Shoot()
         {

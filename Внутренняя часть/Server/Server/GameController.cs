@@ -10,23 +10,12 @@ namespace Server
     {
         private Field field;
 
-        Pistol p = new Pistol();
-        Shotgun s = new Shotgun();
-        Gun g = new Gun();
-        Bomb b = new Bomb();
-
 
         public GameController(Field field)
         {
             this.field = field;
         }
-        //public void SelectWeapon(string weapon,string playerID)
-        //{
-        //    Player player;
-        //    player = field.Players[playerID];
-        //    //this.field.SelectedWeapons = weapon;
-        //    //this.field.OnFieldChanged();
-        //}
+        
         public Dictionary<string, Dictionary<string, string>> Wound(string playerID, Dictionary<string, Dictionary<string, string>> dasha)//выстрел
         {
            
@@ -46,59 +35,126 @@ namespace Server
         }
         public Dictionary<string, Dictionary<string, string>> LiftItem(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
+
             return dasha;
         }
-        public Dictionary<string, Dictionary<string, string>> Reload(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
+
+
+
+
+
+        public Dictionary<string, Dictionary<string, string>> Woundd(string playerID, Dictionary<string, Dictionary<string, string>> dasha,Field f)//выстрел
         {
-            switch(dasha[playerID]["weapon"])
+            if (f.Players[playerID].Lifes > 0)
             {
-                case "Pistol":
+                f.Players[playerID].Lifes -= 1;
+                dasha[playerID]["life"] = Convert.ToString(f.Players[playerID].Lifes);
+            }
+            else
+            {
+                if (Convert.ToInt32(dasha[playerID]["life"]) == 0)
+                {
+                    dasha = FinishGame(playerID, dasha);
+                }
+            }
+            return dasha;
+        }
+        public Dictionary<string, Dictionary<string, string>> ChangeWeapon(string playerID, Dictionary<string, Dictionary<string, string>> dasha, Field f)
+        {
+            switch (dasha[playerID]["weapon"])
+            {
+                case "Pistol": { f.SelectedWeapons = f.P; break; }
+                case "Shotgun": { f.SelectedWeapons = f.S; break; }
+                case "Gun": { f.SelectedWeapons = f.G; break; }
+                case "Bomb": { f.SelectedWeapons = f.B; break; }
+            }
+            f.Players[playerID].Weap = f.SelectedWeapons;
+            return dasha;
+        }
+        public Dictionary<string, Dictionary<string, string>> Reload(string playerID, Dictionary<string, Dictionary<string, string>> dasha, Field f)
+        {
+            string bul = "";
+            string mag ="";
+            if (f.Players[playerID].Weap.CountMagazine != 0)
+            {
+
+                if (f.Players[playerID].Weap.CountBullets == 0)
+                {
+                    if (f.Players[playerID].Weap.CountMagazine == f.Players[playerID].Weap.MaxCountMag)
                     {
-                        if(Convert.ToInt32(dasha[playerID]["magazineP"])!=0)
+                        /*dasha[playerID]["bulP"]*/ bul= Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine));
+                       /* dasha[playerID]["magazineP"]*/mag = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine) - f.Players[playerID].Weap.MaxCountMag);
+                        f.Players[playerID].Weap.CountBullets = f.Players[playerID].Weap.CountMagazine;
+                        f.Players[playerID].Weap.CountMagazine = f.Players[playerID].Weap.CountMagazine - f.Players[playerID].Weap.MaxCountMag;
+                    }
+                    else
+                    {
+                        if (f.Players[playerID].Weap.CountMagazine > f.Players[playerID].Weap.MaxCountMag)
                         {
-                            if (Convert.ToInt32(dasha[playerID]["magazineP"]) >= 12)
+                            bul= Convert.ToString( f.Players[playerID].Weap.MaxCountMag);
+                           mag = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine) - f.Players[playerID].Weap.MaxCountMag);
+                            f.Players[playerID].Weap.CountBullets = f.Players[playerID].Weap.MaxCountMag;
+                            f.Players[playerID].Weap.CountMagazine = f.Players[playerID].Weap.CountMagazine - f.Players[playerID].Weap.MaxCountMag;
+                        }
+                        else
+                        {
+                            if (f.Players[playerID].Weap.CountMagazine < f.Players[playerID].Weap.MaxCountMag)
                             {
-                                if (Convert.ToInt32(dasha[playerID]["bulP"]) == 0)
-                                { dasha[playerID]["bulP"] = Convert.ToString(Convert.ToInt32(dasha[playerID]["magazineP"]) - 12); }
-                                else
-                                {
-                                    int i = Convert.ToInt32(dasha[playerID]["bulP"]);
-                                    dasha[playerID]["bulP"] = dasha[playerID]["magazineP"];
-                                    dasha[playerID]["magazineP"] = Convert.ToString( Convert.ToInt32(dasha[playerID]["magazineP"]) + Convert.ToInt32(dasha[playerID]["bulP"]));
-                                }
-                            }
-                            else
-                            {
-                                dasha[playerID]["bulP"] = dasha[playerID]["magazineP"];
+                                bul = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine));
+                               mag = "0";
+                                f.Players[playerID].Weap.CountBullets = f.Players[playerID].Weap.CountMagazine;
+                                f.Players[playerID].Weap.CountMagazine = 0;
                             }
                         }
-                        break;
                     }
-                case "Shotgun":
-                    {
-                        if (Convert.ToInt32(dasha[playerID]["magazineS"]) != 0)
-                        { }
-                        break;
-                    }
-                case "Gun":
-                    {
-                        if (Convert.ToInt32(dasha[playerID]["magazineG"]) != 0)
-                        { }
-                        break;
-                    }
-                case "Bomb":
-                    {
-                        if (Convert.ToInt32(dasha[playerID]["magazineB"]) != 0)
-                        { }
-                        break;
-                    }
+                }
             }
+            if (bul != "" && mag != "")
+            {
+                switch (dasha[playerID]["weapon"])
+                {
+                    case "Pistol":
+                        {
+                            dasha[playerID]["bulP"] = bul;
+                            dasha[playerID]["magazineP"] = mag;
+                            break;
+                        }
+                    case "Shotgun":
+                        {
+                            dasha[playerID]["bulS"] = bul;
+                            dasha[playerID]["magazineS"] = mag;
+                            break;
+                        }
+                    case "Gun":
+                        {
+                            dasha[playerID]["bulG"] = bul;
+                            dasha[playerID]["magazineG"] = mag;
+                            break;
+                        }
+                    case "Bomb":
+                        {
+                            dasha[playerID]["bulB"] = bul;
+                            dasha[playerID]["magazineB"] = mag;
+                            break;
+                        }
+                }
+            }
+
             return dasha;
         }
        
         public Dictionary<string, Dictionary<string, string>> FinishGame(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
-            //  field.Players.Remove(playerID);
+            int bulP; int bulS; int bulG; int bulB;
+            if (field.P.CountBullets!=0)
+            {
+                bulP = field.P.CountBullets;
+                if(field.P.CountMagazine!=0)
+                {
+                    bulP += field.P.CountMagazine;
+                }
+            }
+            field.Players.Remove(playerID);
             dasha.Remove(playerID);
             return dasha;
         }
@@ -190,13 +246,41 @@ namespace Server
 
             //  f.Bullets.Add(playerID, bull); 
             f.Bull.Add(bull);
-            int bul = f.Players[playerID].Weap.CountBullets--;//-1 пуля в оружии 
+            //int bul = f.Players[playerID].Weap.CountBullets--;//-1 пуля в оружии 
             switch (dasha[playerID]["weapon"])
             {
-                case "Pistol":{ dasha[playerID]["bulP"] = Convert.ToString(--bul);  break; }
-                case "Shotgun":{ dasha[playerID]["bulP"] = Convert.ToString(--bul); break;}
-                case "Gun":{dasha[playerID]["bulP"] = Convert.ToString(--bul); break; }
-                case "Bomb":{ dasha[playerID]["bulP"] = Convert.ToString(--bul); break;}
+                case "Pistol":
+                    {
+                        f.SelectedWeapons = f.P;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulP"] = Convert.ToString(--bul);
+                        break;
+                    }
+                case "Shotgun":
+                    {
+                        f.SelectedWeapons = f.S;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulS"] = Convert.ToString(--bul);
+                        break;
+                    }
+                case "Gun":
+                    {
+                        f.SelectedWeapons = f.G;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulG"] = Convert.ToString(--bul);
+                        break;
+                    }
+                case "Bomb":
+                    {
+                        f.SelectedWeapons = f.B;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulB"] = Convert.ToString(--bul);
+                        break;
+                    }
             }
             return dasha;
         }
