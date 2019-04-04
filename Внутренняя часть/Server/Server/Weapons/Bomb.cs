@@ -20,6 +20,7 @@ namespace Server
             this.TakenLives = 5;
             this.CountMagazine = 3;
             this.MaxCountMag = 4;
+            
         }
         public override void Shoot()
         {

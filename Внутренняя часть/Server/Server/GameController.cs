@@ -16,26 +16,45 @@ namespace Server
             this.field = field;
         }
         
-        public Dictionary<string, Dictionary<string, string>> Wound(string playerID, Dictionary<string, Dictionary<string, string>> dasha)//выстрел
-        {
-           
-           
-            if (Convert.ToInt32(dasha[playerID]["life"]) > 0)
-            {
-                dasha[playerID]["life"]= Convert.ToString(Convert.ToInt32(dasha[playerID]["life"]) - 1);
-            }
-            else
-            {
-                if (Convert.ToInt32(dasha[playerID]["life"]) == 0)
-                {
-                    dasha = FinishGame(playerID, dasha);
-                }
-            }
-            return dasha;
-        }
+       
         public Dictionary<string, Dictionary<string, string>> LiftItem(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
+            if (field.Items.Count != 0)
+            {
+                for (int i = 0; i < field.Items.Count; i++) {
+                    field.Players[playerID].Weap.CountMagazine += field.Items[i].Count;
+                    
+                    
+                    switch (field.Items[i].Name)
+                    {
+                        case "Pistol":
+                            {
+                                dasha[playerID]["magazineP"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
+                        case "Shotgun":
+                            {
+                                dasha[playerID]["magazineS"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
+                        case "Gun":
+                            {
+                                dasha[playerID]["magazineG"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
+                        case "Bomb":
+                            {
+                                dasha[playerID]["magazineB"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
 
+
+                    }
+                    field.Items.Remove(field.Items[i]);
+
+                }
+
+                } 
             return dasha;
         }
 
@@ -82,8 +101,10 @@ namespace Server
                 {
                     if (f.Players[playerID].Weap.CountMagazine == f.Players[playerID].Weap.MaxCountMag)
                     {
-                        /*dasha[playerID]["bulP"]*/ bul= Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine));
-                       /* dasha[playerID]["magazineP"]*/mag = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine) - f.Players[playerID].Weap.MaxCountMag);
+                        /*dasha[playerID]["bulP"]*/
+                        bul = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine));
+                        /* dasha[playerID]["magazineP"]*/
+                        mag = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine) - f.Players[playerID].Weap.MaxCountMag);
                         f.Players[playerID].Weap.CountBullets = f.Players[playerID].Weap.CountMagazine;
                         f.Players[playerID].Weap.CountMagazine = f.Players[playerID].Weap.CountMagazine - f.Players[playerID].Weap.MaxCountMag;
                     }
@@ -91,8 +112,8 @@ namespace Server
                     {
                         if (f.Players[playerID].Weap.CountMagazine > f.Players[playerID].Weap.MaxCountMag)
                         {
-                            bul= Convert.ToString( f.Players[playerID].Weap.MaxCountMag);
-                           mag = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine) - f.Players[playerID].Weap.MaxCountMag);
+                            bul = Convert.ToString(f.Players[playerID].Weap.MaxCountMag);
+                            mag = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine) - f.Players[playerID].Weap.MaxCountMag);
                             f.Players[playerID].Weap.CountBullets = f.Players[playerID].Weap.MaxCountMag;
                             f.Players[playerID].Weap.CountMagazine = f.Players[playerID].Weap.CountMagazine - f.Players[playerID].Weap.MaxCountMag;
                         }
@@ -101,12 +122,25 @@ namespace Server
                             if (f.Players[playerID].Weap.CountMagazine < f.Players[playerID].Weap.MaxCountMag)
                             {
                                 bul = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine));
-                               mag = "0";
+                                mag = "0";
                                 f.Players[playerID].Weap.CountBullets = f.Players[playerID].Weap.CountMagazine;
                                 f.Players[playerID].Weap.CountMagazine = 0;
                             }
                         }
                     }
+                }
+
+                else
+                {
+                    //if (f.Players[playerID].Weap.CountMagazine == f.Players[playerID].Weap.MaxCountMag)
+                    ////while (bul != Convert.ToString(f.Players[playerID].Weap.MaxCountMag) || f.Players[playerID].Weap.CountMagazine == 0)
+                    ////{
+                    ////    f.Players[playerID].Weap.CountBullets += 1;
+                    ////    f.Players[playerID].Weap.CountMagazine -= 1;
+                    ////}
+                    //bul = Convert.ToString(f.Players[playerID].Weap.CountMagazine);
+                    //mag = Convert.ToString(f.Players[playerID].Weap.CountBullets);
+
                 }
             }
             if (bul != "" && mag != "")
@@ -145,16 +179,47 @@ namespace Server
        
         public Dictionary<string, Dictionary<string, string>> FinishGame(string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
-            int bulP; int bulS; int bulG; int bulB;
-            if (field.P.CountBullets!=0)
+            int bulP=0; int bulS=0; int bulG=0; int bulB=0;
+            Item I;
+            if (field.P.CountBullets!=0|| field.P.CountMagazine != 0)
             {
-                bulP = field.P.CountBullets;
-                if(field.P.CountMagazine!=0)
-                {
-                    bulP += field.P.CountMagazine;
-                }
+                bulP += field.P.CountBullets;
+                bulP += field.P.CountMagazine;
+                I= new Item("Pistol", bulP);
+                field.Items.Add(I);
             }
+            if (field.S.CountBullets != 0|| field.S.CountMagazine != 0)
+            {
+                bulS += field.S.CountBullets;
+                bulS += field.S.CountMagazine;
+                I = new Item("Shotgun", bulS);
+                field.Items.Add(I);
+            }
+            if (field.G.CountBullets != 0|| field.G.CountMagazine != 0)
+            {
+                bulG += field.G.CountBullets;
+                bulG += field.G.CountMagazine;
+                I = new Item("Gun", bulG);
+                field.Items.Add(I);
+
+            }
+           
+            if (field.B.CountBullets != 0|| field.B.CountMagazine != 0)
+            {
+                bulB += field.B.CountBullets;
+                bulB += field.B.CountMagazine;
+                I = new Item("Bomb", bulB);
+                field.Items.Add(I);
+
+            }
+
+            //Dictionary<string, string> delPlayer = new Dictionary<string, string>();
+            //delPlayer.Add("bulP", Convert.ToString(bulP));
+            //delPlayer.Add("bulS", Convert.ToString(bulS));
+            //delPlayer.Add("bulG", Convert.ToString(bulG));
+            //delPlayer.Add("bulB", Convert.ToString(bulB));
             field.Players.Remove(playerID);
+           // dasha[playerID] = delPlayer;
             dasha.Remove(playerID);
             return dasha;
         }
@@ -286,6 +351,20 @@ namespace Server
         }
         public Dictionary<string, Dictionary<string, string>> BulFlight(Dictionary<string, Dictionary<string, string>> dasha, string playerID)
         {
+            for (int i = 0; i < field.Bull.Count; i++)
+            {
+                float xS = field.Bull[i].StartPos[0];
+                float yS = field.Bull[i].StartPos[1];
+                float zS = field.Bull[i].StartPos[2];
+                float xE = field.Bull[i].EndPos[0];
+                float yE = field.Bull[i].EndPos[1];
+                float zE = field.Bull[i].EndPos[2];
+                float a = xE - xS;
+                float b = yE - yS;
+                float c = a * a + b * b;
+                c = Convert.ToSingle(Math.Sqrt(c));//гепотинуза по которой полетит пуля
+
+            }
             return dasha;
         }
         public Dictionary<string, Dictionary<string, string>> MovePlayerr(string playerID, Dictionary<string, Dictionary<string, string>> dasha, Field f)

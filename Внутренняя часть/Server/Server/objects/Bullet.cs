@@ -26,8 +26,6 @@ namespace Server
             EndPos[1] = endY;
             EndPos[2] = endZ;
             this.ID = id;
-
-
         }
     }
 }

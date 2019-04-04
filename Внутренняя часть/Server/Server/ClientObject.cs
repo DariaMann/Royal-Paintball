@@ -115,6 +115,8 @@ namespace Server
             {
                 dasha = cont.Shoott(dasha, ID,f);
             }
+            //if(f.Bull.Contains())
+            //dasha = cont.BulFlight(dasha,ID);
            
             if (dic["wound"]=="T")//ранение/смерть
             {

@@ -63,13 +63,10 @@
     <Compile Include="Assets\Scripts\Bullet.cs" />
     <Compile Include="Assets\Scripts\Buttons.cs" />
     <Compile Include="Assets\Scripts\CamMove.cs" />
-    <Compile Include="Assets\Scripts\ClientHandlrData.cs" />
     <Compile Include="Assets\Scripts\ClientTCP.cs" />
     <Compile Include="Assets\Scripts\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\PlayerKeyboardController.cs" />
-    <Compile Include="Assets\Scripts\Trigger.cs" />
-    <Compile Include="Assets\Scripts\Walls.cs" />
     <Compile Include="Assets\Scripts\Weapon.cs" />
     <Compile Include="Assets\walls.cs" />
     <None Include="Assets\read me.txt" />

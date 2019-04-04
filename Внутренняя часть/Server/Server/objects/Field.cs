@@ -12,7 +12,8 @@ namespace Server
         public Color color { get; set; }
         //public IList<Player> Players { get; set; }
         public Dictionary<string, Player> Players { get; set; }
-        public List<Bullet> Bull = new List<Bullet>();
+        public List<Bullet> Bull { get; set; }
+        public List<Item> Items { get; set; }
         public Dictionary<string, Bullet> Bullets { get; set; }
         public Weapons SelectedWeapons { get; set; }
         public List<int> Magazines = new List<int>();
@@ -27,6 +28,7 @@ namespace Server
         public Field()
         {
             this.Magazines = new List<int>();
+            this.Items = new List<Item>();
             this.Bull = new List<Bullet>();
              this.Players =  new Dictionary<string, Player>();
             this.Bullets = new Dictionary<string, Bullet>();
