@@ -50,15 +50,12 @@
     <Compile Include="objects\Item.cs" />
     <Compile Include="objects\Bullet.cs" />
     <Compile Include="ClientObject.cs" />
-    <Compile Include="Data.cs" />
     <Compile Include="objects\Field.cs" />
-    <Compile Include="objects\Rotation.cs" />
+    <Compile Include="objects\Wall.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Bomb.cs" />
     <Compile Include="GameController.cs" />
     <Compile Include="IPlayController.cs" />
-    <Compile Include="objects\Color.cs" />
-    <Compile Include="objects\GameObject.cs" />
     <Compile Include="objects\Player.cs" />
     <Compile Include="objects\Position.cs" />
     <Compile Include="objects\Weapons.cs" />

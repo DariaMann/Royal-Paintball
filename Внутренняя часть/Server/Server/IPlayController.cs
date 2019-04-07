@@ -8,9 +8,9 @@ namespace Server
 {
     public interface IPlayController
     {
-        Dictionary<string, Dictionary<string, string>> MovePlayer(int playerID, Dictionary<string, Dictionary<string, string>> str);
-        void Shoot(string  weapon, int playerID);
-        void SelectWeapon(string weapon, int playerID);
+        Dictionary<string, Dictionary<string, string>> MovePlayerr(string playerID, Dictionary<string, Dictionary<string, string>> str, Field f);
+        Dictionary<string, Dictionary<string, string>> Shoott(Dictionary<string, Dictionary<string, string>> str, string playerID, Field f);
+        Dictionary<string, Dictionary<string, string>> ChangeWeapon(string playerID, Dictionary<string, Dictionary<string, string>> str, Field f);
     }
     
 }

@@ -37,6 +37,7 @@ public class NetworkManager : MonoBehaviour {
     public GameObject shotgun;
     public GameObject bomb;
     public GameObject pistol;
+    public GameObject wall;
 
     public GameObject magazineP;
     public GameObject magazineS;
@@ -67,12 +68,10 @@ public class NetworkManager : MonoBehaviour {
     void Start () {
         clientTCP.Connect();//коннект с сервером                                     конект
 
-        clientData.Add("id", "-1"); //clientData.Add("pos_x", ""); clientData.Add("pos_y", ""); clientData.Add("pos_z", "");//позиция игрока
-        //clientData.Add("rot_x", ""); clientData.Add("rot_y", ""); clientData.Add("rot_z", "");//вращение игрока
-        //clientData.Add("life", ""); clientData.Add("dir", ""); clientData.Add("shoot", ""); clientData.Add("weapon", "");
-        //clientData.Add("mousePosX", ""); 
+        clientData.Add("id", "-1");
 
         clientTCP.SendFirstMessage(clientData);//отправка первого сообщения серверу               отправляю сообщение
+        Debug.Log(clientData["id"]);
         mess = clientTCP.GetPos();//данные с сервера                                 принимаю сообщение с сервера
         InstantiatePlayer(Convert.ToString(my_ID), mess);//создание меня             создаю себя
 
@@ -103,7 +102,7 @@ public class NetworkManager : MonoBehaviour {
             }
         }
     }
-    public void KeyMoveDown()
+    public void KeyMoveDown()//движение пользователя
     {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
@@ -137,7 +136,7 @@ public class NetworkManager : MonoBehaviour {
         }
 
     }
-    public void Actoin()
+    public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
     {
         KeyMoveDown();
         if (Input.GetKey(KeyCode.F))//поднятие предметов
@@ -245,7 +244,7 @@ public class NetworkManager : MonoBehaviour {
     {
         shoot = "F";
     }
-    void OnMouseDown()
+    void OnMouseDown()//нажатие мыши для стрельбы
     {
         switch (dasha[my_ID]["weapon"])
         {
@@ -290,7 +289,7 @@ public class NetworkManager : MonoBehaviour {
     {
             weaponPref = GameObject.FindGameObjectWithTag("Weapon");
         
-            Vector3 v = weaponPref.transform.position;
+            Vector2 v = weaponPref.transform.position;
             Destroy(weaponPref);
             weaponPref = Instantiate(weap, v, Quaternion.identity);
             weapon = nameWeap;
@@ -302,18 +301,18 @@ public class NetworkManager : MonoBehaviour {
     public void InstantiateBullet()
     {
         
-            Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]), Convert.ToSingle(dasha[my_ID]["pos_z"]));
-       // Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
-
+            Vector2 v = new Vector2(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]));
+       // Vector2 v = new Vector2(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]));
         var pos = Input.mousePosition;
         pos = Camera.main.ScreenToWorldPoint(pos);
 
-        startPos = new string[3] { Convert.ToString(pos.x), Convert.ToString(pos.y) , Convert.ToString(pos.z) };
-        endPos = new string[3] { Convert.ToString(v.x), Convert.ToString(v.y), Convert.ToString(v.z) };
+        startPos = new string[3] { Convert.ToString(pos.x), Convert.ToString(pos.y), "0"};
+        endPos = new string[3] { Convert.ToString(v.x), Convert.ToString(v.y),"0" };
 
-        cur = GameObject.Instantiate(bulletPref, v, Quaternion.LookRotation(pos)/* bulletPref.transform.rotation*/) as GameObject;
+      //  cur = GameObject.Instantiate(bulletPref, v, Quaternion.LookRotation(pos)/* bulletPref.transform.rotation*/) as GameObject;
 
-    
+        
+        cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
     }
     public void InstantiateMagazine()
     {
@@ -378,7 +377,7 @@ public class NetworkManager : MonoBehaviour {
             {
                 if (dasha[s]["shoot"] == "T")
                 {
-                    Vector3 v = new Vector3(Convert.ToSingle(dasha[s]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[s]["pos_y"]), Convert.ToSingle(dasha[s]["pos_z"]));
+                    Vector2 v = new Vector2(Convert.ToSingle(dasha[s]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[s]["pos_y"]));
                     cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
                 }
             }
@@ -397,20 +396,12 @@ public class NetworkManager : MonoBehaviour {
             int id = Convert.ToInt32(jsonData1[ID]["id"]);
             float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
             float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
-            float z = Convert.ToSingle(jsonData1[ID]["pos_z"]);
             float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
             float rotY = Convert.ToSingle(jsonData1[ID]["rot_y"]);
             float rotZ = Convert.ToSingle(jsonData1[ID]["rot_z"]);
             int life = Convert.ToInt32(jsonData1[ID]["life"]);
-            Vector3 v = new Vector3(x, y, z);
+            Vector2 v = new Vector2(x, y);
             GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
-
-            //создание оружия
-            //float xW = Convert.ToSingle(jsonData1[ID]["pos_xW"]);
-            //Vector3 v2 = new Vector3(xW, y, z);
-            //GameObject temp2 = Instantiate(weaponPref, v2, Quaternion.identity);
-            //temp2.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
-            //temp2.name = ID + ":" + dasha[ID]["weapon"];
 
             temp.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
             temp.name = Convert.ToString(id);
@@ -428,19 +419,11 @@ public class NetworkManager : MonoBehaviour {
             {
                 float x = Convert.ToSingle(str[s]["pos_x"]);
                 float y = Convert.ToSingle(str[s]["pos_y"]);
-                float z = Convert.ToSingle(str[s]["pos_z"]);
                 float rotX = Convert.ToSingle(str[s]["rot_x"]);
                 float rotY = Convert.ToSingle(str[s]["rot_y"]);
                 float rotZ = Convert.ToSingle(str[s]["rot_z"]);
-
-               // создание оружий других игроков
-                //float xW = Convert.ToSingle(str[s]["pos_xW"]);
-                //Vector3 v2 = new Vector3(xW, y, z);
-                //GameObject temp2 = Instantiate(weaponPref, v2, Quaternion.identity);
-                //temp2.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
-                //temp2.name = s + ":" + dasha[s]["weapon"];
-
-                Vector3 v = new Vector3(x, y, z);
+                
+                Vector2 v = new Vector2(x, y);
                 GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
                 temp.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
                 temp.name = Convert.ToString(s);
@@ -460,11 +443,10 @@ public class NetworkManager : MonoBehaviour {
                     GameObject player = GameObject.Find(s);
                     float x = Convert.ToSingle(jsonData1[s]["pos_x"]);
                     float y = Convert.ToSingle(jsonData1[s]["pos_y"]);
-                    float z = Convert.ToSingle(jsonData1[s]["pos_z"]);
                     float rotX = Convert.ToSingle(jsonData1[s]["rot_x"]);
                     float rotY = Convert.ToSingle(jsonData1[s]["rot_y"]);
                     float rotZ = Convert.ToSingle(jsonData1[s]["rot_z"]);
-                    Vector3 v = new Vector3(x, y, z);
+                    Vector2 v = new Vector2(x, y);
                     player.transform.position = v;
                     player.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
                 }
@@ -481,17 +463,33 @@ public class NetworkManager : MonoBehaviour {
         GameObject player = GameObject.Find(ID);
         float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
         float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
-        float z = Convert.ToSingle(jsonData1[ID]["pos_z"]);
         float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
         float rotY = Convert.ToSingle(jsonData1[ID]["rot_y"]);
         float rotZ = Convert.ToSingle(jsonData1[ID]["rot_z"]);
-        Vector3 v = new Vector3(x, y, z);
+        Vector2 v = new Vector2(x, y);
         player.transform.position = v;
         player.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
 
-        //GameObject weapon = GameObject.Find(ID+":"+dasha[ID]["weapon"]);
-
 
     }
-      
+    public void InstantiateWall(string ID, string str)//Создание стен
+    {
+        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
+        dasha = jsonData1;
+        foreach (string s in jsonData1.Keys)
+            my_ID = s;
+        ID = my_ID;
+
+        if (jsonData1.ContainsKey(my_ID))
+        {
+            for (int i = 0; i < Convert.ToInt32(jsonData1[ID]["countWall"]); i++)
+            {
+                float x = Convert.ToSingle(jsonData1[ID]["wall_x"]);
+                float y = Convert.ToSingle(jsonData1[ID]["wall_y"]);
+                Vector2 v = new Vector2(x, y);
+                GameObject temp = Instantiate(wall, v, Quaternion.identity);
+            }
+            
+        }
+    }
 }

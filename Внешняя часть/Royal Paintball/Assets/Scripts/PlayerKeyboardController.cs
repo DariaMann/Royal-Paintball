@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerKeyboardController : MonoBehaviour {
 
@@ -23,7 +21,6 @@ public class PlayerKeyboardController : MonoBehaviour {
 
     public void Start()
     {
-        //AddNewFood();
         x = Plane.transform.position.x;
         z = Plane.transform.position.z;
     }

@@ -13,12 +13,12 @@ namespace Server
             Random rn = new Random(); // объявление переменной для генерации чисел
             this.X = rn.Next(-2, 5); //rn.Next(-8, 8);
             this.Y = rn.Next(-2, 5);//rn.Next(-4, 4);
-            this.Z = -2.77f;//-1;
+         //   this.Z = -2.77f;//-1;
         }
        
     
         public float X { get; set; }
         public float Y { get; set; }
-        public float Z { get; set; }
+    //    public float Z { get; set; }
     }
 }

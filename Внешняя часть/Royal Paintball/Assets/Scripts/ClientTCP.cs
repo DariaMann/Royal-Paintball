@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 using System.Text;
 using System.Net.Sockets;
-using System.Net;
 using Newtonsoft.Json;
 
 public class ClientTCP  {
@@ -14,7 +11,6 @@ public class ClientTCP  {
     private bool connected;
     public static NetworkStream myStream;
     private byte[] asyncBuff;
-    //public bool shoot = false;
 
 
 
@@ -48,7 +44,7 @@ public class ClientTCP  {
                 response.Append(Encoding.UTF8.GetString(data, 0, bytes));
             }
             while (myStream.DataAvailable); // пока данные есть в потоке
-      //  Debug.Log("MES: "+response.ToString());
+
             return response.ToString();
         
     }
@@ -90,43 +86,43 @@ public class ClientTCP  {
         myStream.Write(buffer, 0, buffer.Length);
        
     }
-    private void ConnectCallback(IAsyncResult ar)
-    {
-        try
-        {
-            playerSocket.EndConnect(ar);
-            if(playerSocket.Connected == false)
-            {
-                connected = false;
-                connecting = false;
-                return;
-            }
-            else
-            {
-                playerSocket.NoDelay = true;
-                myStream = playerSocket.GetStream();
-               myStream.BeginRead(asyncBuff, 0, 8192, OnReceive, null);
-                connected = true;
-                connecting = false;
-                Debug.Log("Успешное подключение к серверу");
-            }
-        }
-        catch
-        {
-            connecting = false;
-            connected = false;
-            Debug.Log("Невозможно подключится к серверу");
-        }
-    }
-    private void OnReceive(IAsyncResult ar)//при получении
-    {
-        try
-        {
-            int byteAmt = myStream.EndRead(ar);
-            byte[] myBytes = new byte[byteAmt];
-            Buffer.BlockCopy(asyncBuff, 0, myBytes, 0, byteAmt);
-            if (byteAmt == 0) return;
-        }
-        catch { }
-    }
+    //private void ConnectCallback(IAsyncResult ar)
+    //{
+    //    try
+    //    {
+    //        playerSocket.EndConnect(ar);
+    //        if(playerSocket.Connected == false)
+    //        {
+    //            connected = false;
+    //            connecting = false;
+    //            return;
+    //        }
+    //        else
+    //        {
+    //            playerSocket.NoDelay = true;
+    //            myStream = playerSocket.GetStream();
+    //           myStream.BeginRead(asyncBuff, 0, 8192, OnReceive, null);
+    //            connected = true;
+    //            connecting = false;
+    //            Debug.Log("Успешное подключение к серверу");
+    //        }
+    //    }
+    //    catch
+    //    {
+    //        connecting = false;
+    //        connected = false;
+    //        Debug.Log("Невозможно подключится к серверу");
+    //    }
+    //}
+    //private void OnReceive(IAsyncResult ar)//при получении
+    //{
+    //    try
+    //    {
+    //        int byteAmt = myStream.EndRead(ar);
+    //        byte[] myBytes = new byte[byteAmt];
+    //        Buffer.BlockCopy(asyncBuff, 0, myBytes, 0, byteAmt);
+    //        if (byteAmt == 0) return;
+    //    }
+    //    catch { }
+    //}
 }

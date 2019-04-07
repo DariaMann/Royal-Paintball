@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Item
+    public class Wall
     {
-        public string Name { get; set; }
+        public float[] Pos { get; set; }
         public int Count { get; set; }
 
-        public Item(string name,int count)
+        public Wall(float x, float y, int count)
         {
-            this.Name = name;
-            this.Count = count;
 
+            this.Count = count;
+            this.Pos = new float[2] { x, y };
         }
+
     }
 }

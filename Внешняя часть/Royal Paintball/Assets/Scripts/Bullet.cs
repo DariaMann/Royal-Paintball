@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 
@@ -21,15 +19,11 @@ public class Bullet : MonoBehaviour {
     {
         target = MousePos;
     }
-    private void Move()
-    {
-        
-    }
     void Update () {
-        var mousePosition = Input.mousePosition;
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
+   //     var mousePosition = Input.mousePosition;
+   //     mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
                                                                        //  f = mousePosition;
-      //  Vector3 mp = new Vector3(mousePosition.x, mousePosition.y, -2.77f);
+ //      Vector3 mp = new Vector3(mousePosition.x, mousePosition.y, -2.77f);
 
         transform.Translate(Vector3.forward /*mousePosition*/ * Speed * Time.deltaTime);
         RaycastHit hit;//в кого врезаются

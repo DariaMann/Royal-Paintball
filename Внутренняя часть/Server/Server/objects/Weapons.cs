@@ -9,8 +9,6 @@ namespace Server
 
     public abstract class Weapons
     {
-        public Color Color { get; set; }//цвет оружия
-        public Color ColorBul { get; set; }//цвет пули
         public double Direction { get; set; }//направление полета пули(местонахождение мыши)
         public int CountBullets { get; set; }//количество пуль за один выстрел
         public int Power { get; set; }//сила удара пули

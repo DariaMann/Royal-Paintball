@@ -1,15 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
+﻿using UnityEngine;
 
-[Serializable]
-public class MyClass
-{
-    public int level;
-    public float timeElapsed;
-    public string playerName;
-}
 public class CamMove : MonoBehaviour {
 
      public GameObject player;

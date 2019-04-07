@@ -8,7 +8,6 @@ namespace Server
 {
     public class Bullet
     {
-        public Color Color { get; set; }
         public int ID { get; set; }
         public string Weapon { get; set; }
         public float[] EndPos { get; set; }

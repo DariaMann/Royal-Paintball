@@ -9,12 +9,11 @@ namespace Server
 {
     public class Field
     {
-        public Color color { get; set; }
-        //public IList<Player> Players { get; set; }
         public Dictionary<string, Player> Players { get; set; }
         public List<Bullet> Bull { get; set; }
         public List<Item> Items { get; set; }
         public Dictionary<string, Bullet> Bullets { get; set; }
+        public Dictionary<int, Wall> Walls { get; set; }
         public Weapons SelectedWeapons { get; set; }
         public List<int> Magazines = new List<int>();
         public Pistol P{ get; set; }
