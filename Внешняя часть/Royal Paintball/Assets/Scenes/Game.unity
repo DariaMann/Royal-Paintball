@@ -1252,8 +1252,8 @@ MonoBehaviour:
   gun: {fileID: 1768196200222138, guid: 3f09cdc7bf43f874fa093056af1afc62, type: 2}
   shotgun: {fileID: 1700715487831334, guid: ce7eb5aec97cd8d458d7d3eb28130550, type: 2}
   bomb: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}
-  pistol: {fileID: 1610737920709112, guid: bd407619f5dce724bb0a9e768d30e2bb, type: 2}
-  wall: {fileID: 0}
+  pistol: {fileID: 1416977375067964, guid: 8959abdb369a21b4f842946e26c5dbee, type: 2}
+  wall: {fileID: 1458996902082396, guid: e0083757fe5420f478711a7d20ff2943, type: 2}
   magazineP: {fileID: 1359481999021002, guid: 07f70791be1c80243ae01a0c6594fecd, type: 2}
   magazineS: {fileID: 1359481999021002, guid: 07f70791be1c80243ae01a0c6594fecd, type: 2}
   magazineG: {fileID: 1359481999021002, guid: 07f70791be1c80243ae01a0c6594fecd, type: 2}
