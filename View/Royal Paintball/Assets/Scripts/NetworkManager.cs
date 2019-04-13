@@ -97,6 +97,7 @@ public class NetworkManager : MonoBehaviour {
                         InstantiateOther(my_ID, dasha);//создание других играков
                         InstantiateBulletOther();//стрельба других играков
                         MoveOther(my_ID, mess);//движение других играков
+                    InstantiateWeaponOther();
                     }
                 
             }
@@ -168,51 +169,7 @@ public class NetworkManager : MonoBehaviour {
             {
             InstantiateWeapon(bomb, dasha[my_ID]["bulB"],"Bomb");
             }
-            if (Input.GetKeyDown(KeyCode.Q))//выстрел
-            {
-                switch (dasha[my_ID]["weapon"])
-                {
-                    case "Pistol":
-                        {
-                            if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
-                            { InstantiateBullet(); shoot = "T"; }
-                            break;
-                        }
-                    case "Shotgun":
-                        {
-                            if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
-                            { InstantiateBullet(); shoot = "T"; }
-                            break;
-                        }
-                    case "Gun":
-                        {
-                            if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
-                            { InstantiateBullet(); shoot = "T"; }
-                            break;
-                        }
-                    case "Bomb":
-                        {
-                            if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
-                            { InstantiateBullet(); shoot = "T"; }
-                            break;
-                        }
-
-                }
-            var mousePosition = Input.mousePosition;
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
-
-            mousePosX = Convert.ToString(mousePosition.x);
-            mousePosY = Convert.ToString(mousePosition.y);
-            mousePosZ = Convert.ToString(mousePosition.z);
-
-            Debug.Log("SHOOT: " + shoot);
-
-
-            }
-            else
-            {
-                shoot = "F";
-            }
+           
             switch (weapon)//обновление количества пуль
             {
                 case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; Magazine.text = dasha[my_ID]["magazineP"]; break; }
@@ -238,6 +195,7 @@ public class NetworkManager : MonoBehaviour {
                 
         }
         Timer.text = dasha[my_ID]["timer"];
+       
 
     }
     private void OnMouseUp()
@@ -287,15 +245,58 @@ public class NetworkManager : MonoBehaviour {
     }
     public void InstantiateWeapon(GameObject weap,string countBul, string nameWeap)
     {
-            weaponPref = GameObject.FindGameObjectWithTag("Weapon");
-        
-            Vector2 v = weaponPref.transform.position;
+        GameObject Player = GameObject.Find(my_ID);
+        Transform w = Player.transform.GetChild(0);
+        weaponPref = w.gameObject;
+       // weaponPref = Player.transform.GetChild(0);
+            Vector2 v = w.position;
             Destroy(weaponPref);
             weaponPref = Instantiate(weap, v, Quaternion.identity);
             weapon = nameWeap;
             weaponPref.transform.parent = GameObject.Find(my_ID).transform;
-        CountBul.text = countBul;//dasha[my_ID]["bulP"];
+        
+    }
+    public void InstantiateWeaponOther()
+    {
+        GameObject weap=pistol;
+        foreach (string s in dasha.Keys)
+        {
+            if (s != my_ID)
+            {
+                string nameWeap = dasha[s]["weapon"];
+                switch (nameWeap)
+                {
 
+                    case "Pistol":
+                        {
+                            weap = pistol;break;
+                        }
+                    case "Shotgun":
+                        {
+                            weap = shotgun;
+                            break;
+                        }
+                    case "Gun":
+                        {
+                            weap = gun;
+                            break;
+                        }
+                    case "Bomb":
+                        {
+                            weap = bomb;
+                            break;
+                        }
+                }
+         
+                GameObject Player = GameObject.Find(s);
+                weaponPref = Player.transform.GetChild(0).gameObject;
+                Vector2 v = weaponPref.transform.position;
+                Destroy(weaponPref);
+                weaponPref = Instantiate(weap, v, Quaternion.identity);
+                weapon = nameWeap;
+                weaponPref.transform.parent = GameObject.Find(s).transform;
+            }
+        }
 
     }
     public void InstantiateBullet()

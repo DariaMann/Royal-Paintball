@@ -35,6 +35,7 @@ public class ClientTCP  {
     }
     public string GetPos ()//получение данных с сервера
     {
+        try{
             byte[] data = new byte[256];
             StringBuilder response = new StringBuilder();
             myStream = playerSocket.GetStream();
@@ -46,7 +47,11 @@ public class ClientTCP  {
             while (myStream.DataAvailable); // пока данные есть в потоке
 
             return response.ToString();
-        
+        }
+        catch
+        {
+            return "0";
+        }
     }
     
     public void SendFirstMessage(Dictionary<string,string> clientData)//отправка сообщения со всеми данными
