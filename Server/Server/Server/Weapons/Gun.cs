@@ -21,22 +21,9 @@ namespace Server
             this.CountMagazine = 0;
             this.MaxCountMag = 30;
         }
-        public override void Shoot(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
+        public override void Shoot()
         {
-            f.SelectedWeapons = f.G;
-            f.Players[playerID].Weap = f.SelectedWeapons;
-            int bul = f.Players[playerID].Weap.CountBullets--;
-            dasha[playerID]["bulG"] = Convert.ToString(--bul);
-            //this.CountBullets -= 1;
-        }
-        public override void LiftItem(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
-        {
-            dasha[playerID]["magazineG"] = Convert.ToString(f.Players[playerID].Weap.CountMagazine);
-        }
-        public override void Reload(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha, string bul, string mag)
-        {
-            dasha[playerID]["bulG"] = bul;
-            dasha[playerID]["magazineG"] = mag;
+            this.CountBullets -= 1;
         }
     }
 }

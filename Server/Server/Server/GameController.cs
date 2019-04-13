@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class GameController: IPlayController//Consumer
+    public class GameController: IPlayController
     {
         private Field field;//поле игры
-        
+
+
         public GameController(Field field)
         {
             this.field = field;
-          
-    }
+        }
        
         public Dictionary<string, Dictionary<string, string>> LiftItem(string playerID, Dictionary<string, Dictionary<string, string>> dasha)//поднятие вещей
         {
@@ -22,10 +22,38 @@ namespace Server
             {
                 for (int i = 0; i < field.Items.Count; i++) {
                     field.Players[playerID].Weap.CountMagazine += field.Items[i].Count;
-                    field.Items[i].LiftItem(field, playerID, dasha, field.Items[i].Name);
+                    
+                    
+                    switch (field.Items[i].Name)
+                    {
+                        case "Pistol":
+                            {
+                                dasha[playerID]["magazineP"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
+                        case "Shotgun":
+                            {
+                                dasha[playerID]["magazineS"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
+                        case "Gun":
+                            {
+                                dasha[playerID]["magazineG"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
+                        case "Bomb":
+                            {
+                                dasha[playerID]["magazineB"] = Convert.ToString(field.Players[playerID].Weap.CountMagazine);
+                                break;
+                            }
+
+
+                    }
                     field.Items.Remove(field.Items[i]);
+
                 }
-            } 
+
+                } 
             return dasha;
         }
         public Dictionary<string, Dictionary<string, string>> Woundd(string playerID, Dictionary<string, Dictionary<string, string>> dasha,Field f)//выстрел
@@ -46,7 +74,13 @@ namespace Server
         }
         public Dictionary<string, Dictionary<string, string>> ChangeWeapon(string playerID, Dictionary<string, Dictionary<string, string>> dasha, Field f)//смена оружия
         {
-            f.Players[playerID].Weap.ChangeWeap(f,playerID,dasha);
+            switch (dasha[playerID]["weapon"])
+            {
+                case "Pistol": { f.SelectedWeapons = f.P; break; }
+                case "Shotgun": { f.SelectedWeapons = f.S; break; }
+                case "Gun": { f.SelectedWeapons = f.G; break; }
+                case "Bomb": { f.SelectedWeapons = f.B; break; }
+            }
             f.Players[playerID].Weap = f.SelectedWeapons;
             return dasha;
         }
@@ -61,7 +95,9 @@ namespace Server
                 {
                     if (f.Players[playerID].Weap.CountMagazine == f.Players[playerID].Weap.MaxCountMag)
                     {
+                        /*dasha[playerID]["bulP"]*/
                         bul = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine));
+                        /* dasha[playerID]["magazineP"]*/
                         mag = Convert.ToString(Convert.ToInt32(f.Players[playerID].Weap.CountMagazine) - f.Players[playerID].Weap.MaxCountMag);
                         f.Players[playerID].Weap.CountBullets = f.Players[playerID].Weap.CountMagazine;
                         f.Players[playerID].Weap.CountMagazine = f.Players[playerID].Weap.CountMagazine - f.Players[playerID].Weap.MaxCountMag;
@@ -90,11 +126,46 @@ namespace Server
 
                 else
                 {
+                    //if (f.Players[playerID].Weap.CountMagazine == f.Players[playerID].Weap.MaxCountMag)
+                    ////while (bul != Convert.ToString(f.Players[playerID].Weap.MaxCountMag) || f.Players[playerID].Weap.CountMagazine == 0)
+                    ////{
+                    ////    f.Players[playerID].Weap.CountBullets += 1;
+                    ////    f.Players[playerID].Weap.CountMagazine -= 1;
+                    ////}
+                    //bul = Convert.ToString(f.Players[playerID].Weap.CountMagazine);
+                    //mag = Convert.ToString(f.Players[playerID].Weap.CountBullets);
+
                 }
             }
             if (bul != "" && mag != "")
             {
-                f.Players[playerID].Weap.Reload(f, playerID, dasha, bul, mag);
+                switch (dasha[playerID]["weapon"])
+                {
+                    case "Pistol":
+                        {
+                            dasha[playerID]["bulP"] = bul;
+                            dasha[playerID]["magazineP"] = mag;
+                            break;
+                        }
+                    case "Shotgun":
+                        {
+                            dasha[playerID]["bulS"] = bul;
+                            dasha[playerID]["magazineS"] = mag;
+                            break;
+                        }
+                    case "Gun":
+                        {
+                            dasha[playerID]["bulG"] = bul;
+                            dasha[playerID]["magazineG"] = mag;
+                            break;
+                        }
+                    case "Bomb":
+                        {
+                            dasha[playerID]["bulB"] = bul;
+                            dasha[playerID]["magazineB"] = mag;
+                            break;
+                        }
+                }
             }
 
             return dasha;
@@ -147,24 +218,53 @@ namespace Server
         }
         public Dictionary<string, Dictionary<string, string>> Shoott(Dictionary<string, Dictionary<string, string>> dasha, string playerID,Field f)//стрельба
         {
+
           Bullet bull = new Bullet(Convert.ToSingle(dasha[playerID]["startX"]), Convert.ToSingle(dasha[playerID]["startY"]), Convert.ToSingle(dasha[playerID]["startZ"]), Convert.ToSingle(dasha[playerID]["endX"]), Convert.ToSingle(dasha[playerID]["endY"]), Convert.ToSingle(dasha[playerID]["endZ"]), dasha[playerID]["weapon"], Convert.ToInt32(playerID));
-          f.Bull.Add(bull);
-          f.Players[playerID].Weap.Shoot(f,playerID,dasha);
-          return dasha;
+
+             // f.Bullets.Add(playerID, bull); 
+            f.Bull.Add(bull);
+            //int bul = f.Players[playerID].Weap.CountBullets--;//-1 пуля в оружии 
+            switch (dasha[playerID]["weapon"])
+            {
+                case "Pistol":
+                    {
+                        f.SelectedWeapons = f.P;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulP"] = Convert.ToString(--bul);
+                        break;
+                    }
+                case "Shotgun":
+                    {
+                        f.SelectedWeapons = f.S;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulS"] = Convert.ToString(--bul);
+                        break;
+                    }
+                case "Gun":
+                    {
+                        f.SelectedWeapons = f.G;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulG"] = Convert.ToString(--bul);
+                        break;
+                    }
+                case "Bomb":
+                    {
+                        f.SelectedWeapons = f.B;
+                        f.Players[playerID].Weap = f.SelectedWeapons;
+                        int bul = f.Players[playerID].Weap.CountBullets--;
+                        dasha[playerID]["bulB"] = Convert.ToString(--bul);
+                        break;
+                    }
+            }
+            return dasha;
         }
         public Dictionary<string, Dictionary<string, string>> BulFlight(Dictionary<string, Dictionary<string, string>> dasha, string playerID)//направление полета пули
         {
-           
-           
             for (int i = 0; i < field.Bull.Count; i++)
             {
-                while (field.Bull[i].StartPos[0] != field.Bull[i].EndPos[0]&& field.Bull[i].StartPos[1] != field.Bull[i].EndPos[1])
-                {
-                    
-                }
-
-
-
                 float xS = field.Bull[i].StartPos[0];
                 float yS = field.Bull[i].StartPos[1];
                 float zS = field.Bull[i].StartPos[2];
@@ -175,6 +275,7 @@ namespace Server
                 float b = yE - yS;
                 float c = a * a + b * b;
                 c = Convert.ToSingle(Math.Sqrt(c));//гепотинуза по которой полетит пуля
+
             }
             return dasha;
         }

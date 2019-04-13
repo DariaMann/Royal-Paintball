@@ -7,23 +7,6 @@ using System.Threading;
 
 namespace Server
 {
-    public class NowTime
-    {
-        public int invokeCount;
-
-        public NowTime()
-        {
-            invokeCount = 0;
-        }
-
-        // This method is called by the timer delegate.
-        public void CheckStatus(Object stateInfo)
-        {
-            // AutoResetEvent autoEvent = (AutoResetEvent)stateInfo;
-             Console.WriteLine((++invokeCount).ToString());
-            //++invokeCount;
-        }
-    }
     public class Field
     {
         public Dictionary<string, Player> Players { get; set; }
@@ -40,7 +23,7 @@ namespace Server
         TimerCallback tm = new TimerCallback(Count);
         public Timer timer { get; set; }
         public static int num { get; set; }
-        public int tim { get; set; }
+
         public Field()
         {
             this.Magazines = new List<int>();
@@ -54,17 +37,18 @@ namespace Server
             this.B = new Bomb();
             this.SelectedWeapons = P;
             num = 0;
-            // this.timer = new Timer(tm,num, 0, 1000);
-            NowTime statusChecker = new NowTime();
-            this.timer = new Timer(statusChecker.CheckStatus, num, 0, 1000);
-            
+           this.timer = new Timer(tm,num, 0, 1000);
         }
         public static void Count(object obj)
         {
+          //  int x = (int)obj;
+          //  x += 1;
+           // Console.WriteLine(x);
+          //  num = x;
            num++;
            Console.WriteLine(num);
 
         }
-       
+
     }
 }

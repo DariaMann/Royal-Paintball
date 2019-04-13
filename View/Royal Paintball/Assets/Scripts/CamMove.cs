@@ -7,19 +7,11 @@ public class CamMove : MonoBehaviour {
     
     void Start()
     {
-       // player = GameObject.FindGameObjectWithTag("Weapon");
-        //  player = GameObject.Find(net.my_ID);
-        //Debug.Log("Name: " + net.my_ID);
-      //  offset = this.transform.position - player.transform.position;
+       offset = this.transform.position - player.transform.position;
     }
     void LateUpdate()
     {
-     //   player = GameObject.FindGameObjectWithTag("Weapon");
-        //player = GameObject.Find("Player: 0");
-        //player = GameObject.FindGameObjectWithTag("Player");
-        //  player = GameObject.Find(net.my_ID);
-        // Debug.Log("Name: " + net.my_ID);
-        ////Debug.Log("Name: " + net.my_ID);
-      //  this.transform.position = player.transform.position + offset;
+        player = GameObject.FindGameObjectWithTag("Player");
+        this.transform.position = player.transform.position + offset;
     }
 }

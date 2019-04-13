@@ -88,18 +88,17 @@ public class NetworkManager : MonoBehaviour {
                 mess = clientTCP.GetPos();//данные с сервера  
                 var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(mess);
                 dasha = jsonData1;
-            if (dasha.Count != 0)
-            {
-                Actoin();//метод отслеживающий нажатие клавишь 
-                MovePlayer(my_ID, mess);//мое движение
-                if (dasha.Count > 1)//для других играков
+                if (dasha.Count != 0)
                 {
-                    InstantiateOther(my_ID, dasha);//создание других играков
-                    InstantiateBulletOther();//стрельба других играков
-                    MoveOther(my_ID, mess);//движение других играков
-                    FinishOther();
-                }
-
+                    Actoin();//метод отслеживающий нажатие клавишь 
+                    MovePlayer(my_ID, mess);//мое движение
+                    if (dasha.Count > 1)//для других играков
+                    {
+                        InstantiateOther(my_ID, dasha);//создание других играков
+                        InstantiateBulletOther();//стрельба других играков
+                        MoveOther(my_ID, mess);//движение других играков
+                    }
+                
             }
         }
     }
@@ -169,53 +168,52 @@ public class NetworkManager : MonoBehaviour {
             {
             InstantiateWeapon(bomb, dasha[my_ID]["bulB"],"Bomb");
             }
-        //if (Input.GetKeyDown(KeyCode.Q))//выстрел
-        //{
-        //    switch (dasha[my_ID]["weapon"])
-        //    {
-        //        case "Pistol":
-        //            {
-        //                if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
-        //                { InstantiateBullet(); shoot = "T"; }
-        //                break;
-        //            }
-        //        case "Shotgun":
-        //            {
-        //                if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
-        //                { InstantiateBullet(); shoot = "T"; }
-        //                break;
-        //            }
-        //        case "Gun":
-        //            {
-        //                if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
-        //                { InstantiateBullet(); shoot = "T"; }
-        //                break;
-        //            }
-        //        case "Bomb":
-        //            {
-        //                if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
-        //                { InstantiateBullet(); shoot = "T"; }
-        //                break;
-        //            }
+            if (Input.GetKeyDown(KeyCode.Q))//выстрел
+            {
+                switch (dasha[my_ID]["weapon"])
+                {
+                    case "Pistol":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
+                    case "Shotgun":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
+                    case "Gun":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
+                    case "Bomb":
+                        {
+                            if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
+                            { InstantiateBullet(); shoot = "T"; }
+                            break;
+                        }
 
-        //    }
-        //    var mousePosition = Input.mousePosition;
-        //    mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
+                }
+            var mousePosition = Input.mousePosition;
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
 
-        //    mousePosX = Convert.ToString(mousePosition.x);
-        //    mousePosY = Convert.ToString(mousePosition.y);
-        //    mousePosZ = Convert.ToString(mousePosition.z);
+            mousePosX = Convert.ToString(mousePosition.x);
+            mousePosY = Convert.ToString(mousePosition.y);
+            mousePosZ = Convert.ToString(mousePosition.z);
 
-        //    Debug.Log("SHOOT: " + shoot);
+            Debug.Log("SHOOT: " + shoot);
 
 
-
-        //}
-        //else
-        //{
-        //    shoot = "F";
-        //}
-        switch (weapon)//обновление количества пуль
+            }
+            else
+            {
+                shoot = "F";
+            }
+            switch (weapon)//обновление количества пуль
             {
                 case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; Magazine.text = dasha[my_ID]["magazineP"]; break; }
                 case "Shotgun": { CountBul.text = dasha[my_ID]["bulS"]; Magazine.text = dasha[my_ID]["magazineS"]; break; }
@@ -229,28 +227,20 @@ public class NetworkManager : MonoBehaviour {
                 wound = "T";
                 Lifes.text = dasha[my_ID]["life"];
             }
-            if (Convert.ToInt32(dasha[my_ID]["life"]) == 0)
-            {
-                FinishPlayer();
-            }
         }
         else
         {
             wound = "F";
         }
-        //if(dasha[my_ID]["life"]=="0")
-        //{
-        //    InstantiateMagazine();
+        if(dasha[my_ID]["life"]=="0")
+        {
+            InstantiateMagazine();
                 
-        //}
+        }
         Timer.text = dasha[my_ID]["timer"];
 
     }
     private void OnMouseUp()
-    {
-        shoot = "F";
-    }
-    private void OnMouseDrag()
     {
         shoot = "F";
     }
@@ -501,23 +491,5 @@ public class NetworkManager : MonoBehaviour {
             }
             
         }
-    }
-    public void FinishPlayer()//смерть игрока
-    {
-        Destroy(playerList[Convert.ToInt32(my_ID)]);
-        playerList.Remove(Convert.ToInt32(my_ID));
-        IsItFirstMessage = false;
-    }
-    public void FinishOther()//смерть других игроков
-    {
-        foreach (string s in dasha.Keys)
-        {
-            if (s != my_ID)
-            {
-                Destroy(playerList[Convert.ToInt32(s)]);
-                playerList.Remove(Convert.ToInt32(s));
-            }
-
-            }
     }
 }
