@@ -92,8 +92,9 @@ public class NetworkManager : MonoBehaviour {
                 {
                     Actoin();//метод отслеживающий нажатие клавишь 
                     MovePlayer(my_ID, mess);//мое движение
-                    if (dasha.Count > 1)//для других играков
+                    if (dasha.Count > 4)//для других играков
                     {
+                    Debug.Log("DASHA: " + dasha.Count);
                         InstantiateOther(my_ID, dasha);//создание других играков
                         InstantiateBulletOther();//стрельба других играков
                         MoveOther(my_ID, mess);//движение других играков
@@ -261,7 +262,7 @@ public class NetworkManager : MonoBehaviour {
         GameObject weap=pistol;
         foreach (string s in dasha.Keys)
         {
-            if (s != my_ID)
+            if (s != my_ID && s != "bullets" && s != "walls" && s != "trees")
             {
                 string nameWeap = dasha[s]["weapon"];
                 switch (nameWeap)
@@ -374,7 +375,7 @@ public class NetworkManager : MonoBehaviour {
     {
         foreach (string s in dasha.Keys)
         {
-            if (s != my_ID)
+            if (s != my_ID && s != "bullets" && s != "walls" && s != "trees")
             {
                 if (dasha[s]["shoot"] == "T")
                 {
@@ -416,7 +417,7 @@ public class NetworkManager : MonoBehaviour {
     {
         foreach (string s in str.Keys)
         {
-            if (s != ID && !playerList.ContainsKey(Convert.ToInt32(s)))
+            if (s != ID && s != "bullets" && s != "walls" && s != "trees" && !playerList.ContainsKey(Convert.ToInt32(s)))
             {
                 float x = Convert.ToSingle(str[s]["pos_x"]);
                 float y = Convert.ToSingle(str[s]["pos_y"]);
@@ -439,7 +440,7 @@ public class NetworkManager : MonoBehaviour {
         {
             foreach (string s in jsonData1.Keys)
             {
-                if (s != ID)
+                if (s != ID && s != "bullets" && s != "walls" && s != "trees")
                 {
                     GameObject player = GameObject.Find(s);
                     float x = Convert.ToSingle(jsonData1[s]["pos_x"]);

@@ -43,6 +43,11 @@ namespace Server
             Gun g = new Gun();
             Pistol p = new Pistol();
             Dictionary<string, string> player1 = new Dictionary<string, string>();
+
+            Dictionary<string, string> walls = new Dictionary<string, string>();
+            Dictionary<string, string> bullets = new Dictionary<string, string>();
+            Dictionary<string, string> trees = new Dictionary<string, string>();
+
             string x = Convert.ToString(pos.X);//x игрока
             string y = Convert.ToString(pos.Y);//у игрока
                                                // string z = Convert.ToString(pos.Z);//z игрока
@@ -80,6 +85,13 @@ namespace Server
 
             string timer = Convert.ToString(f.timer);
 
+            if (!dasha.ContainsKey("walls"))
+                dasha.Add("walls", walls);
+            if (!dasha.ContainsKey("trees"))
+                dasha.Add("trees", trees);
+            if (!dasha.ContainsKey("bullets"))
+                dasha.Add("bullets", bullets);
+
             player1.Add("id", id);//
             player1.Add("pos_x", x); player1.Add("pos_y", y); //позиция игрока
             player1.Add("rot_x", xRot); player1.Add("rot_y", "0"); player1.Add("rot_z", "0");//вращение игрока
@@ -91,14 +103,10 @@ namespace Server
             player1.Add("startX", startPosX); player1.Add("startY", startPosY); player1.Add("startZ", startPosZ);
             player1.Add("endX", endPosX); player1.Add("endY", endPosY); player1.Add("endZ", endPosZ);
             player1.Add("timer", timer);
-            //foreach(int c in f.Walls.Keys)
-            //{
-            //    //string str = "wall: " + c;
-            //    //player1.Add(str, timer);
-            //}
+            
             if (!dasha.ContainsKey(id))
                 dasha.Add(id, player1);
-
+            
             f.Players.Add(id, pl);
             string serialized = JsonConvert.SerializeObject(dasha);
             return serialized;
