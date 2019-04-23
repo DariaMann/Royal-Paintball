@@ -10,8 +10,7 @@ namespace Server
     {
         public Pistol()
         {
-          
-            this.CountBullets = 12;
+            this.CountBullets = 5;
             this.Power = 1;
             this.Direction = 1;//направление мыши
             this.FlightTime = 1.4;
@@ -24,12 +23,8 @@ namespace Server
         }
         public override void Shoot(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
-            f.SelectedWeapons = f.P;
-            f.Players[playerID].Weap = f.SelectedWeapons;
             int bul = f.Players[playerID].Weap.CountBullets--;
             dasha[playerID]["bulP"] = Convert.ToString(--bul);
-            // throw new NotImplementedException();
-            // this.CountBullets -= 1;
         }
         public override void LiftItem(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {

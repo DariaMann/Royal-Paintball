@@ -13,9 +13,13 @@ public class NetworkManager : MonoBehaviour {
     public GameObject playerPref;
     public GameObject weaponPref;
     public GameObject bulletPref;
+    public GameObject treePref;
+    public GameObject wallPref;
     public GameObject cur;
     public Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
+    public Dictionary<int, GameObject> treeList = new Dictionary<int, GameObject>();
+    public Dictionary<int, GameObject> wallList = new Dictionary<int, GameObject>();
     public Text Lifes;
     public Text CountBul;
     public Text Magazine;
@@ -73,7 +77,9 @@ public class NetworkManager : MonoBehaviour {
         clientTCP.SendFirstMessage(clientData);//отправка первого сообщения серверу               отправляю сообщение
         Debug.Log(clientData["id"]);
         mess = clientTCP.GetPos();//данные с сервера                                 принимаю сообщение с сервера
-        InstantiatePlayer(Convert.ToString(my_ID), mess);//создание меня             создаю себя
+        InstantiatePlayer();//создание меня             создаю себя
+        InstantiateTree();
+        InstantiateWall();
 
         startPos = new string[3] { "N", "N", "N" };
         endPos = new string[3] { "N", "N", "N" };
@@ -82,10 +88,12 @@ public class NetworkManager : MonoBehaviour {
 
     private void Update()
     {
+        
         if (IsItFirstMessage)
         {
           clientTCP.Send(my_ID, mess, Dir, shoot, weapon, wound,liftItem, reload, clientData,startPos,endPos);
                 mess = clientTCP.GetPos();//данные с сервера  
+
                 var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(mess);
                 dasha = jsonData1;
                 if (dasha.Count != 0)
@@ -94,11 +102,10 @@ public class NetworkManager : MonoBehaviour {
                     MovePlayer(my_ID, mess);//мое движение
                     if (dasha.Count > 4)//для других играков
                     {
-                    Debug.Log("DASHA: " + dasha.Count);
                         InstantiateOther(my_ID, dasha);//создание других играков
                         InstantiateBulletOther();//стрельба других играков
                         MoveOther(my_ID, mess);//движение других играков
-                    InstantiateWeaponOther();
+                        InstantiateWeaponOther();
                     }
                 
             }
@@ -140,6 +147,17 @@ public class NetworkManager : MonoBehaviour {
     }
     public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
     {
+      
+        for (int i = 0;i<bulletList.Count;i++)
+        {
+            if (dasha["bullets"][Convert.ToString(i)+"x"] == "N")
+            {
+                Destroy(bulletList[i]);
+                bulletList.Remove(i);
+            }
+            Vector2 v = new Vector3(Convert.ToSingle(dasha["bullets"][Convert.ToString(i) + "x"]), Convert.ToSingle(dasha["bullets"][Convert.ToString(i) + "y"]),0);
+            bulletList[i].transform.position = v;
+        }
         KeyMoveDown();
         if (Input.GetKey(KeyCode.F))//поднятие предметов
             {
@@ -171,7 +189,7 @@ public class NetworkManager : MonoBehaviour {
             InstantiateWeapon(bomb, dasha[my_ID]["bulB"],"Bomb");
             }
            
-            switch (weapon)//обновление количества пуль
+            switch /*(dasha[my_ID]["weapon"])//*/(weapon)//обновление количества пуль
             {
                 case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; Magazine.text = dasha[my_ID]["magazineP"]; break; }
                 case "Shotgun": { CountBul.text = dasha[my_ID]["bulS"]; Magazine.text = dasha[my_ID]["magazineS"]; break; }
@@ -200,6 +218,10 @@ public class NetworkManager : MonoBehaviour {
 
     }
     private void OnMouseUp()
+    {
+        shoot = "F";
+    }
+    private void OnMouseDrag()
     {
         shoot = "F";
     }
@@ -257,6 +279,35 @@ public class NetworkManager : MonoBehaviour {
             weaponPref.transform.parent = GameObject.Find(my_ID).transform;
         
     }
+    public void InstantiateTree()
+    {
+        for(int i = 1; i<=dasha["trees"].Count/2;i++)
+        {
+            Debug.Log(Convert.ToString(i) + "x");
+            Debug.Log(dasha["trees"].Count);
+            float x = Convert.ToSingle(dasha["trees"][Convert.ToString(i) + "x"]);
+            float y = Convert.ToSingle(dasha["trees"][Convert.ToString(i) + "y"]);
+            Vector2 vec = new Vector2(x,y);
+            GameObject temp = Instantiate(treePref, vec, Quaternion.identity);
+            temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
+            treeList.Add(i, temp);
+        }
+
+    }
+    public void InstantiateWall()
+    {
+        for (int i = 1; i <= dasha["walls"].Count / 2; i++)
+        {
+            Debug.Log(Convert.ToString(i) + "x");
+            Debug.Log(dasha["walls"].Count);
+            float x = Convert.ToSingle(dasha["walls"][Convert.ToString(i) + "x"]);
+            float y = Convert.ToSingle(dasha["walls"][Convert.ToString(i) + "y"]);
+            Vector2 vec = new Vector2(x, y);
+            GameObject temp = Instantiate(wallPref, vec, Quaternion.identity);
+            wallList.Add(i, temp);
+        }
+
+    }
     public void InstantiateWeaponOther()
     {
         GameObject weap=pistol;
@@ -304,17 +355,18 @@ public class NetworkManager : MonoBehaviour {
     {
         
             Vector2 v = new Vector2(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]));
-       // Vector2 v = new Vector2(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]));
         var pos = Input.mousePosition;
         pos = Camera.main.ScreenToWorldPoint(pos);
 
-        startPos = new string[3] { Convert.ToString(pos.x), Convert.ToString(pos.y), "0"};
-        endPos = new string[3] { Convert.ToString(v.x), Convert.ToString(v.y),"0" };
+        endPos = new string[3] { Convert.ToString(pos.x), Convert.ToString(pos.y), "0"};
+        startPos = new string[3] { Convert.ToString(v.x), Convert.ToString(v.y),"0" };
 
-      //  cur = GameObject.Instantiate(bulletPref, v, Quaternion.LookRotation(pos)/* bulletPref.transform.rotation*/) as GameObject;
-
-        
         cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
+
+        bulletList.Add(bulletList.Count, cur);
+
+        Debug.Log("BulletListCount: " + bulletList.Count);
+
     }
     public void InstantiateMagazine()
     {
@@ -385,23 +437,21 @@ public class NetworkManager : MonoBehaviour {
             }
         }
     }
-    public void InstantiatePlayer(string ID, string str)//Создание игрока
+    public void InstantiatePlayer()//Создание игрока
     {
-        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string,Dictionary<string, string> >> (str);
+        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string,Dictionary<string, string> >> (mess);
         dasha = jsonData1;
         foreach (string s in jsonData1.Keys)
             my_ID = s;
-        ID = my_ID;
-        Debug.Log("ID: " + ID);
         if (jsonData1.ContainsKey(my_ID))
         {
-            int id = Convert.ToInt32(jsonData1[ID]["id"]);
-            float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
-            float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
-            float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
-            float rotY = Convert.ToSingle(jsonData1[ID]["rot_y"]);
-            float rotZ = Convert.ToSingle(jsonData1[ID]["rot_z"]);
-            int life = Convert.ToInt32(jsonData1[ID]["life"]);
+            int id = Convert.ToInt32(jsonData1[my_ID]["id"]);
+            float x = Convert.ToSingle(jsonData1[my_ID]["pos_x"]);
+            float y = Convert.ToSingle(jsonData1[my_ID]["pos_y"]);
+            float rotX = Convert.ToSingle(jsonData1[my_ID]["rot_x"]);
+            float rotY = Convert.ToSingle(jsonData1[my_ID]["rot_y"]);
+            float rotZ = Convert.ToSingle(jsonData1[my_ID]["rot_z"]);
+            int life = Convert.ToInt32(jsonData1[my_ID]["life"]);
             Vector2 v = new Vector2(x, y);
             GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
 
@@ -410,7 +460,7 @@ public class NetworkManager : MonoBehaviour {
             if (!playerList.ContainsKey(id))
             playerList.Add(id, temp);
             Lifes.text = Convert.ToString(life);
-            CountBul.text = jsonData1[ID]["bulP"];
+            CountBul.text = jsonData1[my_ID]["bulP"];
         }
     }
     public void InstantiateOther(string ID, Dictionary<string, Dictionary<string, string>> str)//Создание других играков

@@ -7,64 +7,43 @@ using System.Threading;
 
 namespace Server
 {
-    public class NowTime
-    {
-        public int invokeCount;
-
-        public NowTime()
-        {
-            invokeCount = 0;
-        }
-
-        // This method is called by the timer delegate.
-        public void CheckStatus(Object stateInfo)
-        {
-            // AutoResetEvent autoEvent = (AutoResetEvent)stateInfo;
-             Console.WriteLine((++invokeCount).ToString());
-            //++invokeCount;
-        }
-    }
+   
     public class Field
     {
         public Dictionary<string, Player> Players { get; set; }
-        public List<Bullet> Bull { get; set; }
-        public List<Item> Items { get; set; }
         public Dictionary<string, Bullet> Bullets { get; set; }
         public Dictionary<int, Wall> Walls { get; set; }
         public Dictionary<int, Tree> Trees { get; set; }
-        public Weapons SelectedWeapons { get; set; }
-        public List<int> Magazines = new List<int>();
-        public Pistol P{ get; set; }
-        public Shotgun S { get; set; }
-        public Gun G { get; set; }
-        public Bomb B { get; set; }
         TimerCallback tm = new TimerCallback(Count);
-        public Timer timer { get; set; }
+      public Timer timer { get; set; }
         public static int num { get; set; }
-        public int tim { get; set; }
+
         public Field()
         {
-            this.Magazines = new List<int>();
-            this.Items = new List<Item>();
-            this.Bull = new List<Bullet>();
              this.Players =  new Dictionary<string, Player>();
             this.Bullets = new Dictionary<string, Bullet>();
-            this.P = new Pistol();
-            this.S = new Shotgun();
-            this.G = new Gun();
-            this.B = new Bomb();
-            this.SelectedWeapons = P;
+            this.Walls = new Dictionary<int, Wall>();
+            this.Trees = new Dictionary<int, Tree>();
+            
             num = 0;
-            // this.timer = new Timer(tm,num, 0, 1000);
-            NowTime statusChecker = new NowTime();
-            this.timer = new Timer(statusChecker.CheckStatus, num, 0, 1000);
+
+           this.timer = new Timer(tm, num, 0, 1000);
+            AllWalls();
+        }
+        public void AllTrees()
+        {
             
         }
+        public void AllWalls()
+        {
+            Walls.Add(1, new Wall(-18, -38));
+
+        }
+
         public static void Count(object obj)
         {
            num++;
            Console.WriteLine(num);
-
         }
        
     }

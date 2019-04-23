@@ -8,14 +8,14 @@ namespace Server
 {
     public class Wall
     {
-        public float[] Pos { get; set; }
-        public int Count { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
 
-        public Wall(float x, float y, int count)
+        public Wall(float x, float y)
         {
 
-            this.Count = count;
-            this.Pos = new float[2] { x, y };
+            this.X = x;
+            this.Y = y;
         }
 
     }

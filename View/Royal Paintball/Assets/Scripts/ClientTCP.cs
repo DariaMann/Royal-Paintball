@@ -76,7 +76,7 @@ public class ClientTCP  {
         jsonData1[Id]["liftItem"] = liftItem;
 
         jsonData1[Id]["reload"] = reload;
-        Debug.Log(startPos.Length);
+
         jsonData1[Id]["startX"] = startPos[0];
         jsonData1[Id]["startY"] = startPos[1];
         jsonData1[Id]["startZ"] = startPos[2];

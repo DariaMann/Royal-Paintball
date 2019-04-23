@@ -24,23 +24,27 @@ namespace Server
         public int CountMagazine { get; set; }
         public int MaxCountMag { get; set; }
 
-        public void ChangeWeap(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
+        public void ChangeWeap(Field f, string weap,string ID)
         {
-            if(dasha[playerID]["weapon"] == "Pistol")
+            if(weap == "Pistol")
             {
-                f.SelectedWeapons = f.P;
+             ///   f.SelectedWeapons = f.P;
+               f.Players[ID].Weap = f.Players[ID].P;
             }
-            if (dasha[playerID]["weapon"] == "Shotgun")
+            if (weap == "Shotgun")
             {
-                f.SelectedWeapons = f.S;
+               // f.SelectedWeapons = f.S;
+                f.Players[ID].Weap = f.Players[ID].S;
             }
-            if (dasha[playerID]["weapon"] == "Gun")
+            if (weap == "Gun")
             {
-                f.SelectedWeapons = f.G;
+               // f.SelectedWeapons = f.G;
+                f.Players[ID].Weap = f.Players[ID].G;
             }
-            if (dasha[playerID]["weapon"] == "Bumb")
+            if (weap == "Bumb")
             {
-                f.SelectedWeapons = f.B;
+              //  f.SelectedWeapons = f.B;
+               f.Players[ID].Weap = f.Players[ID].B;
             }
         }
 

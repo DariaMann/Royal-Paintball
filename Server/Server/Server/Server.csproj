@@ -52,7 +52,7 @@
     <Compile Include="ClientObject.cs" />
     <Compile Include="objects\Field.cs" />
     <Compile Include="objects\Wall.cs" />
-    <Compile Include="Tree.cs" />
+    <Compile Include="objects\Tree.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Bomb.cs" />
     <Compile Include="GameController.cs" />

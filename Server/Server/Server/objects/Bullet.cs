@@ -12,9 +12,17 @@ namespace Server
         public string Weapon { get; set; }
         public float[] EndPos { get; set; }
         public float[] StartPos { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float a { get; set; }
+        public float b { get; set; }
 
         public Bullet(float startX, float startY, float startZ, float endX, float endY, float endZ, string weapon,int id)
         {
+            this.a = a;
+            this.b = b;
+            this.X = startX;
+            this.Y = startY;
             this.Weapon = weapon;
             this.StartPos = new float[3];
             StartPos[0] = startX;

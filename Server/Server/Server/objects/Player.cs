@@ -15,12 +15,20 @@ namespace Server
         public string Direction { get; set; }
         public string Weapon { get; set; }
         public Weapons Weap{ get; set; }
+        public Pistol P { get; set; }
+        public Shotgun S { get; set; }
+        public Gun G { get; set; }
+        public Bomb B { get; set; }
         public string Shoot { get; set; }
         public float[] Pos { get; set; }
 
-        public Player( int id, float x, float y, float xR,Weapons weap)
+        public Player( int id, float x, float y, float xR)
         {
-            this.Weap = weap;
+            this.P = new Pistol();
+            this.S = new Shotgun();
+            this.G = new Gun();
+            this.B = new Bomb();
+            this.Weap = P;
             this.Lifes = 30;
             this.Direction = "N";
             this.Shoot = "F";

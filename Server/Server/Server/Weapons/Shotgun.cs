@@ -24,11 +24,8 @@ namespace Server
         }
         public override void Shoot(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
-            f.SelectedWeapons = f.S;
-            f.Players[playerID].Weap = f.SelectedWeapons;
             int bul = f.Players[playerID].Weap.CountBullets--;
             dasha[playerID]["bulS"] = Convert.ToString(--bul);
-            //this.CountBullets -= 1;
         }
         public override void LiftItem(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {

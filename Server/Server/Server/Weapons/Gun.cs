@@ -23,8 +23,6 @@ namespace Server
         }
         public override void Shoot(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
         {
-            f.SelectedWeapons = f.G;
-            f.Players[playerID].Weap = f.SelectedWeapons;
             int bul = f.Players[playerID].Weap.CountBullets--;
             dasha[playerID]["bulG"] = Convert.ToString(--bul);
             //this.CountBullets -= 1;
