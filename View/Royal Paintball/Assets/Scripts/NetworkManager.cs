@@ -15,24 +15,21 @@ public class NetworkManager : MonoBehaviour {
     public GameObject bulletPref;
     public GameObject treePref;
     public GameObject wallPref;
+    public GameObject circlePref;
     public GameObject cur;
     public Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> treeList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> wallList = new Dictionary<int, GameObject>();
+    public Dictionary<int, GameObject> itemList = new Dictionary<int, GameObject>();
     public Text Lifes;
     public Text CountBul;
     public Text Magazine;
     public Text Timer;
-    public string my_ID = "111";
+    public int my_ID = 111;
 
-    public string Dir = "N";
-    
     public string weapon = "Pistol";
-    public string shoot = "F";
-    public string wound = "F";
-    public string liftItem = "F";
-    public string reload = "F";
+
     static public bool IsItFirstMessage = false;
     static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
     static public Dictionary<string, string> clientData = new Dictionary<string, string>();
@@ -42,72 +39,82 @@ public class NetworkManager : MonoBehaviour {
     public GameObject bomb;
     public GameObject pistol;
     public GameObject wall;
-
     public GameObject magazineP;
     public GameObject magazineS;
     public GameObject magazineG;
     public GameObject magazineB;
-    List<GameObject> countMag = new List<GameObject>();
 
-    public string mousePosX = "N";
-    public string mousePosY = "N";
-    public string mousePosZ = "N";
-
-    public string[] startPos = new string[3] {"N","N","N"};
-    public string[] endPos = new string[3] { "N", "N", "N" };
-
-
-    public bool TheEnd=false;
-
+    public Player player = new Player();
+    public Field field = new Field();
 
     private void Awake()
     {
-        if (GameObject.FindGameObjectsWithTag("NetworkManager").Length == 1 )
+        if (GameObject.FindGameObjectsWithTag("NetworkManager").Length == 1)
             DontDestroyOnLoad(this);
         else
             Destroy(this);
-       
+
     }
 
-    void Start () {
-        clientTCP.Connect();//коннект с сервером                                     конект
+    void Start() {
+        clientTCP.Connect();//коннект с сервером                                     
 
-        clientData.Add("id", "-1");
+        player.ID = -1;
+        clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
 
-        clientTCP.SendFirstMessage(clientData);//отправка первого сообщения серверу               отправляю сообщение
-        Debug.Log(clientData["id"]);
-        mess = clientTCP.GetPos();//данные с сервера                                 принимаю сообщение с сервера
-        InstantiatePlayer();//создание меня             создаю себя
+        mess = clientTCP.GetPos();//данные с сервера  
+        
+        Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+        field = jsonData1;
+
+        MyId();
+        InstantiatePlayer();//создание играков
         InstantiateTree();
         InstantiateWall();
+        InstantiateCircle();
 
-        startPos = new string[3] { "N", "N", "N" };
-        endPos = new string[3] { "N", "N", "N" };
         IsItFirstMessage = true;
     }
 
     private void Update()
     {
-        
+
         if (IsItFirstMessage)
         {
-          clientTCP.Send(my_ID, mess, Dir, shoot, weapon, wound,liftItem, reload, clientData,startPos,endPos);
-                mess = clientTCP.GetPos();//данные с сервера  
+            clientTCP.Send(field.Player[my_ID]);
+            mess = clientTCP.GetPos();//данные с сервера  
 
-                var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(mess);
-                dasha = jsonData1;
-                if (dasha.Count != 0)
+          Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); ;
+            field = jsonData1;
+            DelBull();
+            if (field.Bullet.Count>0)
+            {
+                MoveBull();
+            }
+            if (field.Player.Count != 0)
+            {
+                Actoin();//метод отслеживающий нажатие клавишь 
+                InstantiatePlayer();
+                MovePlayer();//движение
+          
+                if (field.Player.Count > 1)//для других играков
                 {
-                    Actoin();//метод отслеживающий нажатие клавишь 
-                    MovePlayer(my_ID, mess);//мое движение
-                    if (dasha.Count > 4)//для других играков
-                    {
-                        InstantiateOther(my_ID, dasha);//создание других играков
-                        InstantiateBulletOther();//стрельба других играков
-                        MoveOther(my_ID, mess);//движение других играков
-                        InstantiateWeaponOther();
-                    }
-                
+                    InstantiateWeaponOther();
+                    InstantiateBulletOther();//стрельба других играков
+                }
+            }
+        }
+        Debug.Log("Plauerlist: " + playerList.Count);
+    }
+    public void DelBull()
+    {
+        if (field.Bullet.Count < bulletList.Count)
+        {
+            while (field.Bullet.Count != bulletList.Count)
+            {
+                GameObject bul = bulletList[bulletList.Count - 1];
+                bulletList.Remove(bulletList.Count - 1);
+                Destroy(bul);
             }
         }
     }
@@ -115,30 +122,30 @@ public class NetworkManager : MonoBehaviour {
     {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            Dir = "W";
+            field.Player[my_ID].Direction = "W";
         }
         else
         {
             if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
             {
 
-                Dir = "S";
+                field.Player[my_ID].Direction = "S";
             }
             else
             {
                 if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
                 {
-                    Dir = "A";
+                    field.Player[my_ID].Direction = "A";
                 }
                 else
                 {
                     if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
                     {
-                        Dir = "D";
+                        field.Player[my_ID].Direction = "D";
                     }
                     else
                     {
-                        Dir = "N";
+                        field.Player[my_ID].Direction = "N";
                     }
                 }
             }
@@ -147,401 +154,325 @@ public class NetworkManager : MonoBehaviour {
     }
     public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
     {
-      
-        for (int i = 0;i<bulletList.Count;i++)
-        {
-            if (dasha["bullets"][Convert.ToString(i)+"x"] == "N")
-            {
-                Destroy(bulletList[i]);
-                bulletList.Remove(i);
-            }
-            Vector2 v = new Vector3(Convert.ToSingle(dasha["bullets"][Convert.ToString(i) + "x"]), Convert.ToSingle(dasha["bullets"][Convert.ToString(i) + "y"]),0);
-            bulletList[i].transform.position = v;
-        }
+        
         KeyMoveDown();
         if (Input.GetKey(KeyCode.F))//поднятие предметов
-            {
-            liftItem = "T";
-            }
-            if (Input.GetKey(KeyCode.R))//перезарядка оружия
-            {
-            reload = "T";
-            }
+        {
+            field.Player[my_ID].LiftItem = true;
+        }
+        if (Input.GetKey(KeyCode.R))//перезарядка оружия
+        {
+            field.Player[my_ID].Reload = true;
+        }
         else
         {
-            reload = "F";
+            field.Player[my_ID].Reload = false;
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-            InstantiateWeapon(pistol, dasha[my_ID]["bulP"],"Pistol");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-            InstantiateWeapon(shotgun, dasha[my_ID]["bulS"],"Shotgun");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-            InstantiateWeapon(gun, dasha[my_ID]["bulG"],"Gun");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-            InstantiateWeapon(bomb, dasha[my_ID]["bulB"],"Bomb");
-            }
-           
-            switch /*(dasha[my_ID]["weapon"])//*/(weapon)//обновление количества пуль
-            {
-                case "Pistol": { CountBul.text = dasha[my_ID]["bulP"]; Magazine.text = dasha[my_ID]["magazineP"]; break; }
-                case "Shotgun": { CountBul.text = dasha[my_ID]["bulS"]; Magazine.text = dasha[my_ID]["magazineS"]; break; }
-                case "Gun": { CountBul.text = dasha[my_ID]["bulG"]; Magazine.text = dasha[my_ID]["magazineG"]; break; }
-                case "Bomb": { CountBul.text = dasha[my_ID]["bulB"]; Magazine.text = dasha[my_ID]["magazineB"]; break; }
-            }
-        if (Input.GetKey(KeyCode.Z))//попадание в меня
         {
-            if (Convert.ToInt32(dasha[my_ID]["life"]) >= 0)
-            {
-                wound = "T";
-                Lifes.text = dasha[my_ID]["life"];
-            }
+            field.Player[my_ID].Weapon = "Pistol";
+            InstantiateWeapon(pistol, field.Player[my_ID].Weapon);
         }
-        else
+        if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            wound = "F";
+            field.Player[my_ID].Weapon = "Shotgun";
+            InstantiateWeapon(shotgun, field.Player[my_ID].Weapon);
         }
-        if(dasha[my_ID]["life"]=="0")
+        if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            InstantiateMagazine();
-                
+            field.Player[my_ID].Weapon = "Gun";
+            InstantiateWeapon(gun, field.Player[my_ID].Weapon);
         }
-        Timer.text = dasha[my_ID]["timer"];
-       
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            field.Player[my_ID].Weapon = "Bomb";
+            InstantiateWeapon(bomb, field.Player[my_ID].Weapon);
+        }
+         CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
+         Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
+        Lifes.text = Convert.ToString(field.Player[my_ID].Life);
 
+
+        if (field.Player[my_ID].Life== 0)
+        {
+            InstantiateMagazine(my_ID);
+
+        }
+        MousePos();
+        SizeCircle();
+        
     }
     private void OnMouseUp()
     {
-        shoot = "F";
+        field.Player[my_ID].Shoot = false;
     }
     private void OnMouseDrag()
     {
-        shoot = "F";
+        field.Player[my_ID].Shoot = false;
     }
     void OnMouseDown()//нажатие мыши для стрельбы
     {
-        switch (dasha[my_ID]["weapon"])
+        if (field.Player[my_ID].Weap.CountBullets > 0)
         {
-            case "Pistol":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
-                    { InstantiateBullet(); shoot = "T"; }
-                    break;
-                }
-            case "Shotgun":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
-                    { InstantiateBullet(); shoot = "T"; }
-                    break;
-                }
-            case "Gun":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
-                    { InstantiateBullet(); shoot = "T"; }
-                    break;
-                }
-            case "Bomb":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
-                    { InstantiateBullet(); shoot = "T"; }
-                    break;
-                }
-
+            field.Player[my_ID].Shoot = true;
+            InstantiateBullet();
         }
-        var mousePosition = Input.mousePosition;
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
-
-        mousePosX = Convert.ToString(mousePosition.x);
-        mousePosY = Convert.ToString(mousePosition.y);
-        mousePosZ = Convert.ToString(mousePosition.z);
-
-        Debug.Log("SHOOT: " + shoot);
-
-
-    }
-    public void InstantiateWeapon(GameObject weap,string countBul, string nameWeap)
-    {
-        GameObject Player = GameObject.Find(my_ID);
-        Transform w = Player.transform.GetChild(0);
-        weaponPref = w.gameObject;
-       // weaponPref = Player.transform.GetChild(0);
-            Vector2 v = w.position;
-            Destroy(weaponPref);
-            weaponPref = Instantiate(weap, v, Quaternion.identity);
-            weapon = nameWeap;
-            weaponPref.transform.parent = GameObject.Find(my_ID).transform;
         
     }
-    public void InstantiateTree()
+   
+    public void MousePos()
     {
-        for(int i = 1; i<=dasha["trees"].Count/2;i++)
-        {
-            Debug.Log(Convert.ToString(i) + "x");
-            Debug.Log(dasha["trees"].Count);
-            float x = Convert.ToSingle(dasha["trees"][Convert.ToString(i) + "x"]);
-            float y = Convert.ToSingle(dasha["trees"][Convert.ToString(i) + "y"]);
-            Vector2 vec = new Vector2(x,y);
-            GameObject temp = Instantiate(treePref, vec, Quaternion.identity);
-            temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
-            treeList.Add(i, temp);
-        }
-
+        var mousePosition = Input.mousePosition;
+        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
+        field.Player[my_ID].MousePos[0] = mousePosition.x;
+        field.Player[my_ID].MousePos[1] = mousePosition.y;
+        field.Player[my_ID].MousePos[2] = mousePosition.z;
     }
-    public void InstantiateWall()
-    {
-        for (int i = 1; i <= dasha["walls"].Count / 2; i++)
-        {
-            Debug.Log(Convert.ToString(i) + "x");
-            Debug.Log(dasha["walls"].Count);
-            float x = Convert.ToSingle(dasha["walls"][Convert.ToString(i) + "x"]);
-            float y = Convert.ToSingle(dasha["walls"][Convert.ToString(i) + "y"]);
-            Vector2 vec = new Vector2(x, y);
-            GameObject temp = Instantiate(wallPref, vec, Quaternion.identity);
-            wallList.Add(i, temp);
-        }
 
+    public void InstantiateWeapon(GameObject weap, string nameWeap)
+    {
+        GameObject Player = GameObject.Find(Convert.ToString(my_ID));
+        Transform w = Player.transform.GetChild(0);
+        weaponPref = w.gameObject;
+        Vector2 v = w.position;
+        Destroy(weaponPref);
+        weaponPref = Instantiate(weap, v, Quaternion.identity);
+        weapon = nameWeap;
+        weaponPref.transform.parent = GameObject.Find(Convert.ToString(my_ID)).transform;
     }
     public void InstantiateWeaponOther()
     {
-        GameObject weap=pistol;
-        foreach (string s in dasha.Keys)
+        GameObject weap = pistol;
+        foreach (int c in field.Player.Keys)
         {
-            if (s != my_ID && s != "bullets" && s != "walls" && s != "trees")
+            if (field.Player[c].ID != my_ID)
             {
-                string nameWeap = dasha[s]["weapon"];
+                string nameWeap = field.Player[c].Weapon;
                 switch (nameWeap)
                 {
 
                     case "Pistol":
                         {
-                            weap = pistol;break;
+                            field.Player[c].Weap = field.Player[c].P;
+                            weap = pistol; break;
                         }
                     case "Shotgun":
                         {
+                            field.Player[c].Weap = field.Player[c].S;
                             weap = shotgun;
                             break;
                         }
                     case "Gun":
                         {
+                            field.Player[c].Weap = field.Player[c].G;
                             weap = gun;
                             break;
                         }
                     case "Bomb":
                         {
+                            field.Player[c].Weap = field.Player[c].B;
                             weap = bomb;
                             break;
                         }
                 }
-         
-                GameObject Player = GameObject.Find(s);
+
+                GameObject Player = GameObject.Find(Convert.ToString(field.Player[c].ID));
                 weaponPref = Player.transform.GetChild(0).gameObject;
                 Vector2 v = weaponPref.transform.position;
                 Destroy(weaponPref);
                 weaponPref = Instantiate(weap, v, Quaternion.identity);
                 weapon = nameWeap;
-                weaponPref.transform.parent = GameObject.Find(s).transform;
+                weaponPref.transform.parent = GameObject.Find(Convert.ToString(field.Player[c].ID)).transform;
             }
         }
 
     }
+
+    public void InstantiateTree()
+    {
+        for (int i = 0; i < field.Tree.Count; i++)
+        {
+            Vector2 vec = new Vector2(field.Tree[i].X, field.Tree[i].Y);
+            GameObject temp = Instantiate(treePref, vec, Quaternion.identity);
+            temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
+            treeList.Add(i, temp);
+        }
+    }
+    public void InstantiateWall()
+    {
+        for (int i = 0; i < field.Wall.Count; i++)
+        {
+            Vector2 vec = new Vector2(field.Wall[i].X, field.Wall[i].Y);
+            GameObject temp = Instantiate(wallPref, vec, Quaternion.identity);
+            temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
+       //     treeList.Add(i, temp);
+        }
+
+    }
+   
     public void InstantiateBullet()
     {
-        
-            Vector2 v = new Vector2(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[my_ID]["pos_y"]));
-        var pos = Input.mousePosition;
-        pos = Camera.main.ScreenToWorldPoint(pos);
+            Vector2 v = new Vector2(field.Player[my_ID].X + 1.2f, field.Player[my_ID].Y);
+            var pos = Input.mousePosition;
+            pos = Camera.main.ScreenToWorldPoint(pos);
 
-        endPos = new string[3] { Convert.ToString(pos.x), Convert.ToString(pos.y), "0"};
-        startPos = new string[3] { Convert.ToString(v.x), Convert.ToString(v.y),"0" };
+            field.Player[my_ID].End = new float[2] { pos.x, pos.y };
+            field.Player[my_ID].Start = new float[2] { v.x, v.y };
 
-        cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
-
-        bulletList.Add(bulletList.Count, cur);
-
-        Debug.Log("BulletListCount: " + bulletList.Count);
-
+            cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
+        cur.name = Convert.ToString(bulletList.Count);
+        bulletList.Add(bulletList.Count,cur);
     }
-    public void InstantiateMagazine()
+    public void InstantiateBulletOther()
     {
-        switch(dasha[my_ID]["weapon"])
+        foreach (int c in field.Player.Keys)
         {
-            case "Pistol":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulP"]) > 0)
-                    {
-                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]), Convert.ToSingle(dasha[my_ID]["pos_y"]) + 1F, Convert.ToSingle(dasha[my_ID]["pos_z"]));
-                        GameObject mag = GameObject.Instantiate(magazineP, v, bulletPref.transform.rotation) as GameObject;
-                        mag.name = dasha[my_ID]["bulP"];
-                        countMag.Add(mag);
-                    }
-                    break;
-                }
-            case "Shotgun":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulS"]) > 0)
-                    {
-                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]), Convert.ToSingle(dasha[my_ID]["pos_y"]) - 1F, Convert.ToSingle(dasha[my_ID]["pos_z"]));
-                        GameObject mag = GameObject.Instantiate(magazineS, v, bulletPref.transform.rotation) as GameObject;
-                        mag.name = dasha[my_ID]["bulS"];
-                        countMag.Add(mag);
-                    }
-                    break;
-                }
-            case "Gun":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulG"]) > 0)
-                    {
-                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]) + 1F, Convert.ToSingle(dasha[my_ID]["pos_y"]), Convert.ToSingle(dasha[my_ID]["pos_z"]));
-                        GameObject mag = GameObject.Instantiate(magazineG, v, bulletPref.transform.rotation) as GameObject;
-                        mag.name = dasha[my_ID]["bulG"];
-                        countMag.Add(mag);
-                    }
-                    break;
-                }
-            case "Bomb":
-                {
-                    if (Convert.ToInt32(dasha[my_ID]["bulB"]) > 0)
-                    {
-                        Vector3 v = new Vector3(Convert.ToSingle(dasha[my_ID]["pos_x"]) - 1F, Convert.ToSingle(dasha[my_ID]["pos_y"]) + 1F, Convert.ToSingle(dasha[my_ID]["pos_z"]));
-                        GameObject mag = GameObject.Instantiate(magazineB, v, bulletPref.transform.rotation) as GameObject;
-                        mag.name = dasha[my_ID]["bulB"];
-                        countMag.Add(mag);
-                    }
-                    break;
-                }
-        }
-       
-    }
-    public void InstantiateMagazineOther()
-    {
-
-    }
-    public void InstantiateBulletOther()  
-    {
-        foreach (string s in dasha.Keys)
-        {
-            if (s != my_ID && s != "bullets" && s != "walls" && s != "trees")
+            if (field.Player[c].ID != my_ID)
             {
-                if (dasha[s]["shoot"] == "T")
+                if (field.Player[c].Shoot == true)
                 {
-                    Vector2 v = new Vector2(Convert.ToSingle(dasha[s]["pos_x"]) + 0.8f, Convert.ToSingle(dasha[s]["pos_y"]));
+                    Vector2 v = new Vector2(field.Player[c].X + 0.8f, field.Player[c].Y);
                     cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
+                   // bulletList.Add(bulletList.Count, cur);
                 }
             }
         }
     }
-    public void InstantiatePlayer()//Создание игрока
+    public void InstantiateMagazine(int ID)
     {
-        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string,Dictionary<string, string> >> (mess);
-        dasha = jsonData1;
-        foreach (string s in jsonData1.Keys)
-            my_ID = s;
-        if (jsonData1.ContainsKey(my_ID))
+        if(field.Item.Count>0)
         {
-            int id = Convert.ToInt32(jsonData1[my_ID]["id"]);
-            float x = Convert.ToSingle(jsonData1[my_ID]["pos_x"]);
-            float y = Convert.ToSingle(jsonData1[my_ID]["pos_y"]);
-            float rotX = Convert.ToSingle(jsonData1[my_ID]["rot_x"]);
-            float rotY = Convert.ToSingle(jsonData1[my_ID]["rot_y"]);
-            float rotZ = Convert.ToSingle(jsonData1[my_ID]["rot_z"]);
-            int life = Convert.ToInt32(jsonData1[my_ID]["life"]);
-            Vector2 v = new Vector2(x, y);
-            GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
-
-            temp.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
-            temp.name = Convert.ToString(id);
-            if (!playerList.ContainsKey(id))
-            playerList.Add(id, temp);
-            Lifes.text = Convert.ToString(life);
-            CountBul.text = jsonData1[my_ID]["bulP"];
-        }
-    }
-    public void InstantiateOther(string ID, Dictionary<string, Dictionary<string, string>> str)//Создание других играков
-    {
-        foreach (string s in str.Keys)
-        {
-            if (s != ID && s != "bullets" && s != "walls" && s != "trees" && !playerList.ContainsKey(Convert.ToInt32(s)))
+            for(int i=0;i<field.Item.Count;i++)
             {
-                float x = Convert.ToSingle(str[s]["pos_x"]);
-                float y = Convert.ToSingle(str[s]["pos_y"]);
-                float rotX = Convert.ToSingle(str[s]["rot_x"]);
-                float rotY = Convert.ToSingle(str[s]["rot_y"]);
-                float rotZ = Convert.ToSingle(str[s]["rot_z"]);
-                
-                Vector2 v = new Vector2(x, y);
-                GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
-                temp.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
-                temp.name = Convert.ToString(s);
-                playerList.Add(Convert.ToInt32(s), temp);
-            }
-        }
-    }
-    public void MoveOther(string ID, string str)//движение других играков
-    {
-        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-        if (jsonData1.Count > 1)
-        {
-            foreach (string s in jsonData1.Keys)
-            {
-                if (s != ID && s != "bullets" && s != "walls" && s != "trees")
+                switch (field.Item[i].Name)
                 {
-                    GameObject player = GameObject.Find(s);
-                    float x = Convert.ToSingle(jsonData1[s]["pos_x"]);
-                    float y = Convert.ToSingle(jsonData1[s]["pos_y"]);
-                    float rotX = Convert.ToSingle(jsonData1[s]["rot_x"]);
-                    float rotY = Convert.ToSingle(jsonData1[s]["rot_y"]);
-                    float rotZ = Convert.ToSingle(jsonData1[s]["rot_z"]);
-                    Vector2 v = new Vector2(x, y);
-                    player.transform.position = v;
-                    player.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
+                    case "Pistol": {
+                            Vector2 v = new Vector2(player.X, player.Y+1.5f);
+                            GameObject temp = Instantiate(magazineP, v, Quaternion.identity);
+                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                            temp.name = field.Item[i].Name;
+                            itemList.Add(field.Item[i].Count, temp);
+                            break; }
+                    case "Shotgun":
+                        {
+                            Vector2 v = new Vector2(player.X, player.Y - 1.5f);
+                            GameObject temp = Instantiate(magazineS, v, Quaternion.identity);
+                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                            temp.name = field.Item[i].Name;
+                            itemList.Add(field.Item[i].Count, temp);
+                            break;
+                        }
+                    case "Gun":
+                        {
+                            Vector2 v = new Vector2(player.X - 1.5f, player.Y);
+                            GameObject temp = Instantiate(magazineG, v, Quaternion.identity);
+                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                            temp.name = field.Item[i].Name;
+                            itemList.Add(field.Item[i].Count, temp);
+                            break;
+                        }
+                    case "Bomb":
+                        {
+                            Vector2 v = new Vector2(player.X + 1.5f, player.Y);
+                            GameObject temp = Instantiate(magazineB, v, Quaternion.identity);
+                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                            temp.name = field.Item[i].Name;
+                            itemList.Add(field.Item[i].Count, temp);
+                            break;
+                        }
                 }
             }
+           
+        }
+        if (field.Player[my_ID].Weap.CountBullets > 0)
+        {
+            Vector2 v = new Vector2(field.Player[my_ID].X, field.Player[my_ID].Y + 1F);
+            GameObject mag = GameObject.Instantiate(magazineP, v, bulletPref.transform.rotation) as GameObject;
+            mag.name = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
         }
     }
-    public void MovePlayer(string ID, string str)//двжение игрока
+   
+    public void InstantiateCircle()//Создание игрока
     {
-        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-        if (jsonData1.Count>1)
-        {
-            InstantiateOther(ID, jsonData1);
-        }
-        GameObject player = GameObject.Find(ID);
-        float x = Convert.ToSingle(jsonData1[ID]["pos_x"]);
-        float y = Convert.ToSingle(jsonData1[ID]["pos_y"]);
-        float rotX = Convert.ToSingle(jsonData1[ID]["rot_x"]);
-        float rotY = Convert.ToSingle(jsonData1[ID]["rot_y"]);
-        float rotZ = Convert.ToSingle(jsonData1[ID]["rot_z"]);
-        Vector2 v = new Vector2(x, y);
-        player.transform.position = v;
-        player.transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
+        Vector2 v = new Vector2(field.circle.X,field.circle.Y);
+        GameObject temp = Instantiate(circlePref, v, Quaternion.identity);
 
+        temp.transform.rotation = Quaternion.Euler(90,180, 0);
+        temp.transform.localScale = new Vector3(field.circle.Size[0],1, field.circle.Size[1]);
 
     }
-    public void InstantiateWall(string ID, string str)//Создание стен
+    public void SizeCircle()
     {
-        var jsonData1 = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(str);
-        dasha = jsonData1;
-        foreach (string s in jsonData1.Keys)
-            my_ID = s;
-        ID = my_ID;
+       GameObject temp = GameObject.FindGameObjectWithTag("Circle");
+        temp.transform.localScale = new Vector3(field.circle.Size[0], 1, field.circle.Size[1]);
+    }
 
-        if (jsonData1.ContainsKey(my_ID))
+   public void MyId()
+    {
+        //Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+        //field = jsonData1;
+       //Debug.Log(field.Player.Count);
+        foreach (int c in field.Player.Keys)
         {
-            for (int i = 0; i < Convert.ToInt32(jsonData1[ID]["countWall"]); i++)
+            my_ID = field.Player[c].ID;
+        }
+    }
+    public void InstantiatePlayer()//Создание игроков
+    {
+        foreach (int c in field.Player.Keys)
+        {
+            if (!playerList.ContainsKey(c))
             {
-                float x = Convert.ToSingle(jsonData1[ID]["wall_x"]);
-                float y = Convert.ToSingle(jsonData1[ID]["wall_y"]);
-                Vector2 v = new Vector2(x, y);
-                GameObject temp = Instantiate(wall, v, Quaternion.identity);
+                player = field.Player[c];
+                Vector2 v = new Vector2(player.X, player.Y);
+                GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
+
+                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                temp.name = Convert.ToString(c);
+                Lifes.text = Convert.ToString(player.Life);
+                playerList.Add(c, temp);
             }
-            
+        }
+    }
+    
+    public void MovePlayer()//двжение игрока
+    {
+
+            foreach (int c in field.Player.Keys)
+            {
+
+                GameObject player = GameObject.Find(Convert.ToString(field.Player[c].ID));
+                Vector2 v = new Vector2(field.Player[c].X, field.Player[c].Y);
+                player.transform.position = v;
+                player.transform.rotation = Quaternion.Euler(field.Player[c].XRot, field.Player[c].YRot, 0);
+
+            }
+        
+    }
+    public void MoveBull()
+    {
+        if (playerList.Count==1)
+     //   for (int i = 0; i < bulletList.Count; i++)
+     foreach(int i in bulletList.Keys)
+        {
+                Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
+                Debug.Log(bulletList.Count);
+                bulletList[i].transform.position = v;
+        }
+        else
+        {
+            //for (int i = 0; i < field.Bullet.Count; i++)
+            foreach(Bullet bul in field.Bullet)
+            {
+                foreach (int j in bulletList.Keys)
+                {
+                    //Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
+                    Vector2 v = new Vector2(bul.X,bul.Y);
+                    bulletList[j].transform.position = v;
+
+                }
+            }
         }
     }
 }

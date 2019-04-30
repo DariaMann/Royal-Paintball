@@ -10,6 +10,12 @@ namespace Server
     {
         public float X { get; set; }
         public float Y { get; set; }
+        public int[] Size { get; set; }
+
+        public Tree()
+        {
+            Size = new int[2] { 4, 2 };
+        }
 
     }
 }

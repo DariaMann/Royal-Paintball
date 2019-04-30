@@ -10,25 +10,58 @@ namespace Server
    
     public class Field
     {
-        public Dictionary<string, Player> Players { get; set; }
-        public Dictionary<string, Bullet> Bullets { get; set; }
-        public Dictionary<int, Wall> Walls { get; set; }
-        public Dictionary<int, Tree> Trees { get; set; }
-        TimerCallback tm = new TimerCallback(Count);
+       // public Dictionary<int, Wall> Walls { get; set; }
+      //  public Dictionary<int, Tree> Trees { get; set; }
+
+        public List<Tree> Tree { get; set; }
+        public List<Wall> Wall { get; set; }
+        public List<Bullet> Bullet { get; set; }
+        public List<Item> Item { get; set; }
+        public Dictionary<int, Player> Player { get; set; }
+        public Circle circle { get; set; }
+
+      TimerCallback tm = new TimerCallback(Count);
       public Timer timer { get; set; }
         public static int num { get; set; }
 
         public Field()
         {
-             this.Players =  new Dictionary<string, Player>();
-            this.Bullets = new Dictionary<string, Bullet>();
-            this.Walls = new Dictionary<int, Wall>();
-            this.Trees = new Dictionary<int, Tree>();
-            
-            num = 0;
+            Tree = new List<Tree>();
+            Tree.Add(
+                new Tree
+                {
+                    X = 8,
+                    Y = 0
+                });
+            Tree.Add(
+                 new Tree
+                 {
+                     X = 7,
+                     Y = 9
+                 });
+           
+            Wall = new List<Wall>();
+            Wall.Add(
+                new Wall(0, 0)
+                {
+                    X = 0,
+                    Y = 0
+                });
+            Wall.Add(
+               new Wall(3, 0)
+               {
+                   X = 3,
+                   Y = 0
+               });
+            Bullet = new List<Bullet>();
+            Item = new List<Item>();
 
+            Player = new Dictionary<int, Player>();
+            circle = new Circle();
+            num = 0;
+            
            this.timer = new Timer(tm, num, 0, 1000);
-            AllWalls();
+            
         }
         public void AllTrees()
         {
@@ -36,14 +69,15 @@ namespace Server
         }
         public void AllWalls()
         {
-            Walls.Add(1, new Wall(-18, -38));
+            //Walls.Add(1, new Wall(-18, -38));
 
         }
 
         public static void Count(object obj)
         {
            num++;
-           Console.WriteLine(num);
+
+            // Console.WriteLine(num);
         }
        
     }

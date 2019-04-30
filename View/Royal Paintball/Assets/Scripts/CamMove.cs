@@ -7,11 +7,11 @@ public class CamMove : MonoBehaviour {
     
     void Start()
     {
-       offset = this.transform.position - player.transform.position;
+       //offset = this.transform.position - player.transform.position;
     }
     void LateUpdate()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-        this.transform.position = player.transform.position + offset;
+        //player = GameObject.FindGameObjectWithTag("Player");
+        //this.transform.position = player.transform.position + offset;
     }
 }

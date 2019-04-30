@@ -10,12 +10,14 @@ namespace Server
     {
         public float X { get; set; }
         public float Y { get; set; }
+        public int[] Size { get; set; }
 
         public Wall(float x, float y)
         {
 
             this.X = x;
             this.Y = y;
+            Size = new int[2] { 1, 2 };
         }
 
     }

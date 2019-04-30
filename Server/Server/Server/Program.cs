@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace Server
 {
@@ -20,13 +21,17 @@ namespace Server
             // устанавливаем метод обратного вызова
             Field f = new Field();
             // диалог сервера с клиентами
+
             while (true)
             {
+                
                 // Получаем входящее подключение
                 TcpClient client = server.AcceptTcpClient();
                 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
-               
+
+               // var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
+               // Console.WriteLine(mess);
 
                 ClientObject clientObject = new ClientObject(client,f);
                

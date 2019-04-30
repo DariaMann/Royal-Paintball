@@ -8,35 +8,57 @@ namespace Server
 {
     public class Player 
     {
-        public Weapons SelectedFigure { get; set; }//выбраное оружие
-        public Position Position { get; set; }
-        public int Lifes { get; set; }
+        public int Life { get; set; }
         public int ID { get; set; }
         public string Direction { get; set; }
+        
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float XRot { get; set; }
+        public float YRot { get; set; }
+        public bool Shoot { get; set; }
+        public bool Reload { get; set; }
+        public bool LiftItem { get; set; }
+        public int[] CountBull { get; set; }
+        public int[] CountMag { get; set; }
+        public float[] MousePos { get; set; }
+        public int[] Size { get; set; }
+
+        public float[] Start { get; set; }
+        public float[] End { get; set; }
+
         public string Weapon { get; set; }
         public Weapons Weap{ get; set; }
         public Pistol P { get; set; }
         public Shotgun S { get; set; }
         public Gun G { get; set; }
         public Bomb B { get; set; }
-        public string Shoot { get; set; }
-        public float[] Pos { get; set; }
 
-        public Player( int id, float x, float y, float xR)
+        public Player()
         {
-            this.P = new Pistol();
-            this.S = new Shotgun();
-            this.G = new Gun();
-            this.B = new Bomb();
-            this.Weap = P;
-            this.Lifes = 30;
-            this.Direction = "N";
-            this.Shoot = "F";
-            this.Weapon = "Pistol";
-            this.Position = new Position();
-            Pos = new float[2] {x,y};
-            this.ID = id;
+            P = new Pistol();
+            S = new Shotgun();
+            G = new Gun();
+            B = new Bomb();
+            Weap = P;
+            Position pos = new Position();
+            X = pos.X;
+            Y = pos.Y;
+            XRot = -90;
+            YRot = 0;
+            Life = 30;
+            Direction = "N";
+            Shoot = false;
+            Weapon = "Pistol";
+            LiftItem = false;
+            CountBull = new int[] { 12, 7, 30, 5 };
+            CountMag = new int[] { 24, 0, 0, 3 };
+            Start = new float[2];
+            End = new float[2];
+            MousePos = new float[3];
+            Size = new int[] { 1,1};
+
         }
-    
+      
     }
 }

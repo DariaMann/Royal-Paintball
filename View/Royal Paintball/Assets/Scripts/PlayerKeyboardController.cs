@@ -2,42 +2,46 @@
 
 public class PlayerKeyboardController : MonoBehaviour {
 
-    float XSize = 9f;
-    float ZSize = 9f;
-    [SerializeField]
-    GameObject foodPrefab;
-    GameObject curFood;
-    Vector3 curPos;
-    [SerializeField]
-    int countFood;
+    public GameObject decal;
+    public GameObject cur;
+    public int count;
+    public Vector3 lastPos;
+    public int Speed;
+    public GameObject Player;
 
-    float x;
-    float z;
-    public GameObject Plane;
+    Vector3 target;
 
-
-    public float seconds = 1f;
-    public float timer = 10f;
-
-    public void Start()
+    private void Start()
     {
-        x = Plane.transform.position.x;
-        z = Plane.transform.position.z;
+        lastPos = transform.position;
     }
-    void AddNewFood()//Добавление еды
+    public void SetTarget(Vector3 MousePos)
     {
-        countFood = Random.Range(7, 20);
-        int j = countFood;
-        for (int i = 0; i < j; i++)
+        target = MousePos;
+    }
+    void Update()
+    {
+        //     var mousePosition = Input.mousePosition;
+        //     mousePosition = Camera.main.ScreenToWorldPoint(mousePosition); //положение мыши из экранных в мировые координаты
+        //  f = mousePosition;
+        //      Vector3 mp = new Vector3(mousePosition.x, mousePosition.y, -2.77f);
+
+        transform.Translate(Vector3.forward /*mousePosition*/ * Speed * Time.deltaTime);
+        RaycastHit hit;//в кого врезаются
+        if (Physics.Linecast(lastPos, transform.position, out hit))//врезание пули
         {
-            RandomPos();
-            curFood = GameObject.Instantiate(foodPrefab, curPos, Quaternion.identity) as GameObject;
-            countFood++;
-        }
-    }
+            GameObject d = Instantiate<GameObject>(decal);
+            d.transform.position = hit.point + hit.normal * 0.001f;
+            d.transform.rotation = Quaternion.LookRotation(-hit.normal);
+            Destroy(d, 10);
+            //Destroy(gameObject);
+            Debug.Log(hit.transform.name);
 
-    void RandomPos()//Рандомная позиция
-    {
-        curPos = new Vector3(Random.Range(z * -1, z), 0.25f, Random.Range(x * -1, x));
+        }
+        //Vector3 b = new Vector3(transform.position.x, transform.position.y,-2.77f);
+        lastPos = transform.position;
+
+
+
     }
 }

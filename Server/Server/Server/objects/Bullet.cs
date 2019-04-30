@@ -10,28 +10,26 @@ namespace Server
     {
         public int ID { get; set; }
         public string Weapon { get; set; }
-        public float[] EndPos { get; set; }
-        public float[] StartPos { get; set; }
+ 
         public float X { get; set; }
         public float Y { get; set; }
         public float a { get; set; }
         public float b { get; set; }
 
-        public Bullet(float startX, float startY, float startZ, float endX, float endY, float endZ, string weapon,int id)
+        public Bullet(float endX, float endY,float x, float y, string weapon,int id,float speed)
         {
-            this.a = a;
-            this.b = b;
-            this.X = startX;
-            this.Y = startY;
+            float cos;
+            float sin;
+            float k = (endY - y) / (endX - x);
+
+            cos = Convert.ToSingle(Math.Sqrt(1 / (1 + k * k)));
+            sin = k * cos;
+            
+            this.a = speed * cos;
+            this.b = speed * sin;
+            this.X = x;
+            this.Y = y;
             this.Weapon = weapon;
-            this.StartPos = new float[3];
-            StartPos[0] = startX;
-            StartPos[1] = startY;
-            StartPos[2] = startZ;
-            this.EndPos = new float[3];
-            EndPos[0] = endX;
-            EndPos[1] = endY;
-            EndPos[2] = endZ;
             this.ID = id;
         }
     }

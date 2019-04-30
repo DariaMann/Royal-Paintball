@@ -34,3 +34,14 @@ C:\Users\Daria\Desktop\Competiton\Server\Server\Server\obj\Debug\Server.csproj.C
 C:\Users\Daria\Desktop\Competiton\Server\Server\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\Daria\Desktop\Competiton\Server\Server\Server\obj\Debug\Server.exe
 C:\Users\Daria\Desktop\Competiton\Server\Server\Server\obj\Debug\Server.pdb
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\bin\Debug\Server.exe.config
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\bin\Debug\Server.exe
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\bin\Debug\Server.pdb
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\obj\Debug\Server.csprojAssemblyReference.cache
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\obj\Debug\Server.csproj.CopyComplete
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\obj\Debug\Server.exe
+C:\Users\Daria\Desktop\Временная версия\Royal-Paintball\Server\Server\Server\obj\Debug\Server.pdb
