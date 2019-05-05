@@ -16,7 +16,7 @@ namespace Server
         {
             X = 0;
             Y = 0;
-            Size = new int[] { 20, 20 };
+            Size = new int[] { 30, 30 };
         }
     }
 }

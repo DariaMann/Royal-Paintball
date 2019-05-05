@@ -10,9 +10,9 @@ namespace Server
    
     public class Field
     {
-       // public Dictionary<int, Wall> Walls { get; set; }
-      //  public Dictionary<int, Tree> Trees { get; set; }
-
+        public float X { get; set; }
+        public float Y { get; set; }
+        public int[] Size { get; set; }
         public List<Tree> Tree { get; set; }
         public List<Wall> Wall { get; set; }
         public List<Bullet> Bullet { get; set; }
@@ -20,12 +20,14 @@ namespace Server
         public Dictionary<int, Player> Player { get; set; }
         public Circle circle { get; set; }
 
-      TimerCallback tm = new TimerCallback(Count);
-      public Timer timer { get; set; }
-        public static int num { get; set; }
-
+        public List<string> Colors { get; set; }
+        public int time;
+        
         public Field()
         {
+            X = 0;
+            Y = 0;
+            Size = new int[2] {50,50};
             Tree = new List<Tree>();
             Tree.Add(
                 new Tree
@@ -41,12 +43,12 @@ namespace Server
                  });
            
             Wall = new List<Wall>();
-            Wall.Add(
-                new Wall(0, 0)
-                {
-                    X = 0,
-                    Y = 0
-                });
+            //Wall.Add(
+            //    new Wall(0, 0)
+            //    {
+            //        X = 0,
+            //        Y = 0
+            //    });
             Wall.Add(
                new Wall(3, 0)
                {
@@ -55,13 +57,11 @@ namespace Server
                });
             Bullet = new List<Bullet>();
             Item = new List<Item>();
-
+            this.time = new int();
             Player = new Dictionary<int, Player>();
             circle = new Circle();
-            num = 0;
-            
-           this.timer = new Timer(tm, num, 0, 1000);
-            
+            Colors = new List<string> { "blue", "red", "yellow","orange", "pink", "green", "black", "white" };
+           
         }
         public void AllTrees()
         {
@@ -73,12 +73,6 @@ namespace Server
 
         }
 
-        public static void Count(object obj)
-        {
-           num++;
-
-            // Console.WriteLine(num);
-        }
        
     }
 }

@@ -17,8 +17,6 @@ namespace Server
         public double RechargeTime { get; set; }//время для перезарядки оружия
         public int InityalCountBul { get; set; }//начальное количество пуль
         public abstract void Shoot();// метод стрельбы
-    //    public abstract void LiftItem(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha);
-        public abstract void Reload(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha, string bul, string mag);
         public int Index { get; set; }//индекс оружия
         public int TakenLives { get; set; }//количество отнятых жизней за попадание
         public int CountMagazine { get; set; }
@@ -28,22 +26,18 @@ namespace Server
         {
             if(weap == "Pistol")
             {
-             ///   f.SelectedWeapons = f.P;
                f.Player[ID].Weap = f.Player[ID].P;
             }
             if (weap == "Shotgun")
             {
-               // f.SelectedWeapons = f.S;
                 f.Player[ID].Weap = f.Player[ID].S;
             }
             if (weap == "Gun")
             {
-               // f.SelectedWeapons = f.G;
                 f.Player[ID].Weap = f.Player[ID].G;
             }
             if (weap == "Bumb")
             {
-              //  f.SelectedWeapons = f.B;
                f.Player[ID].Weap = f.Player[ID].B;
             }
         }

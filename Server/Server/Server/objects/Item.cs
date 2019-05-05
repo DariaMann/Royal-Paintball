@@ -10,11 +10,17 @@ namespace Server
     {
         public string Name { get; set; }
         public int Count { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public int Index { get; set; }
 
-        public Item(string name, int count)
+        public Item(string name, int count,float x,float y,int i)
         {
             this.Name = name;
             this.Count = count;
+            this.X = x;
+            this.Y = y;
+            this.Index = i;
 
         }
         //public void LiftItem(Field field, string playerID, Dictionary<string, Dictionary<string, string>> dasha,string ItemName)

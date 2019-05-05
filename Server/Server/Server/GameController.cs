@@ -10,44 +10,110 @@ namespace Server
     public class GameController: IPlayController//Consumer
     {
         public Field field;//поле игры
-        TimerCallback tm = new TimerCallback(Count);
-        public Timer timer { get; set; }
-        static int i;
-        public static void Count(object obj)
-        {
-            i++;
-           // Console.WriteLine(i);
-           // BulFlight();
-        }
 
         public GameController(Field field)
         {
             this.field = field;
-
-            i = 0;
-            this.timer = new Timer(tm, i, 0, 1000);
         }
        
         public void LiftItem(int ID)//поднятие вещей
         {
-           //float x = field.Players[playerID].Pos[0];
-           // float y = field.Players[playerID].Pos[1];
-           //// float radius = 5;
-           // if (field.Items.Count != 0)
-           // {
-           //     for (int i = 0; i < field.Items.Count; i++) {
-           //         field.Players[playerID].Weap.CountMagazine += field.Items[i].Count;
-           //         field.Items[i].LiftItem(field, playerID, dasha, field.Items[i].Name);
-           //         field.Items.Remove(field.Items[i]);
-           //     }
-           // } 
+            foreach (int c in field.Player.Keys)
+            {
+                for (int i = 0; i < field.Item.Count; i++)
+                {
+                    float aX = field.Player[c].X - (field.Player[c].Size[0] + 5);
+                    float aY = field.Player[c].Y  + (field.Player[c].Size[1] + 5);
+                    float bX = field.Player[c].X  + (field.Player[c].Size[0] + 5);
+                    float bY = field.Player[c].Y  + (field.Player[c].Size[1] + 5);
+                    float cX = field.Player[c].X  + (field.Player[c].Size[0] + 5);
+                    float cY = field.Player[c].Y  - (field.Player[c].Size[1] + 5);
+                    float dX = field.Player[c].X - (field.Player[c].Size[0] + 5);
+                    float dY = field.Player[c].Y  - (field.Player[c].Size[1] + 5);
+                    if (field.Item[i].X > aX && field.Item[i].X < bX)
+                    {
+                        if (field.Item[i].Y > dY && field.Item[i].Y < aY)
+                        {
+                            switch(field.Item[i].Name)
+                            {
+                                case "Pistol":
+                                    {
+                                        field.Player[c].P.CountMagazine += field.Item[i].Count;
+                                      
+                                        break;
+                                    }
+                                case "Shotgun":
+                                    {
+                                        field.Player[c].S.CountMagazine += field.Item[i].Count;
+                                        break;
+                                    }
+                                case "Gun":
+                                    {
+
+                                        field.Player[c].G.CountMagazine += field.Item[i].Count;
+                                        break;
+                                    }
+                                case "Bomb":
+                                    {
+                                        field.Player[c].B.CountMagazine += field.Item[i].Count;
+                                        break;
+                                    }
+                            }
+                            field.Item.Remove(field.Item[i]);
+                        }
+                    }
+                }
+
+            }
+            //float x = field.Players[playerID].Pos[0];
+            // float y = field.Players[playerID].Pos[1];
+            //// float radius = 5;
+            // if (field.Items.Count != 0)
+            // {
+            //     for (int i = 0; i < field.Items.Count; i++) {
+            //         field.Players[playerID].Weap.CountMagazine += field.Items[i].Count;
+            //         field.Items[i].LiftItem(field, playerID, dasha, field.Items[i].Name);
+            //         field.Items.Remove(field.Items[i]);
+            //     }
+            // } 
         }
 
-        public void Woundd(int ID)//ранение
+        public int WeapWound(string weapon, int ID)
         {
+            int countLife = 0;
+            switch (weapon)
+            {
+                case "Pistol":
+                    {
+                        countLife = field.Player[ID].P.TakenLives;
+                        break;
+                    }
+                case "Shotgun":
+                    {
+                        countLife = field.Player[ID].S.TakenLives;
+                        break;
+                    }
+                case "Gun":
+                    {
+                        countLife = field.Player[ID].G.TakenLives;
+                        break;
+                    }
+                case "Bomb":
+                    {
+                        countLife = field.Player[ID].B.TakenLives;
+                        break;
+                    }
+            }
+            return countLife;
+        }
+
+        public void Woundd(int ID,int takenLifes)//ранение
+        {
+            
+
             if (field.Player[ID].Life > 0)
             {
-                field.Player[ID].Life -= 1;
+                field.Player[ID].Life += takenLifes;
             }
         }
 
@@ -118,15 +184,71 @@ namespace Server
                     {
                         if (field.Bullet[i].Y > dY && field.Bullet[i].Y < aY)
                         {
-                            Woundd(c);
-                            DelBul(field.Bullet[i]);
-                            // field.Bullet[i].ID = 0;
-                            break;
+                            if (field.Player[c].ID != field.Bullet[i].ID)
+                            {
+                                int countTakenLife = WeapWound(field.Bullet[i].Weapon, ID);
+                                Woundd(c, countTakenLife);
+                                DelBul(field.Bullet[i]);
+                                // field.Bullet[i].ID = 0;
+                                break;
+                            }
                         }
                     }
                 }
             }
+            for (int i = 0; i < field.Bullet.Count; i++)
+            {
+                    float aX = field.X - field.Size[0];
+                    float aY = field.Y + field.Size[1];
+                    float bX = field.X + field.Size[0];
+                    float bY = field.Y + field.Size[1];
+                    float cX = field.X + field.Size[0];
+                    float cY = field.Y - field.Size[1];
+                    float dX = field.X - field.Size[0];
+                    float dY = field.Y - field.Size[1];
+                    if (field.Bullet[i].X < aX || field.Bullet[i].X > bX|| field.Bullet[i].Y < dY || field.Bullet[i].Y > aY)
+                    {
+                                DelBul(field.Bullet[i]);
+                            
+                    }
+            }
+            foreach (int c in field.Player.Keys)
+            {
+                float aX = field.circle.X - field.circle.Size[0];
+                float aY = field.circle.Y + field.circle.Size[1];
+                float bX = field.circle.X + field.circle.Size[0];
+                float bY = field.circle.Y + field.circle.Size[1];
+                float cX = field.circle.X + field.circle.Size[0];
+                float cY = field.circle.Y - field.circle.Size[1];
+                float dX = field.circle.X - field.circle.Size[0];
+                float dY = field.circle.Y - field.circle.Size[1];
+                if (field.Player[c].X < aX || field.Player[c].X > bX || field.Player[c].Y < dY || field.Player[c].Y > aY)
+                {
+                    Woundd(c,1);
+                }
+            }
+            //foreach (int c in field.Player.Keys)
+            //{
+            //    float aX = field.Player[c].X - field.Player[c].Size[0];
+            //    float aY = field.Player[c].Y + field.Player[c].Size[1];
+            //    float bX = field.Player[c].X + field.Player[c].Size[0];
+            //    float bY = field.Player[c].Y + field.Player[c].Size[1];
+            //    float cX = field.Player[c].X + field.Player[c].Size[0];
+            //    float cY = field.Player[c].Y - field.Player[c].Size[1];
+            //    float dX = field.Player[c].X - field.Player[c].Size[0];
+            //    float dY = field.Player[c].Y - field.Player[c].Size[1];
+            //    if (field.Wall[i].X > aX && field.Wall[i].X < bX)
+            //    {
+            //        if (field.Wall[i].Y > dY && field.Wall[i].Y < aY)
+            //        {
+            //            string badSide = "";
+            //            if(field.Player[c].X<field.Wall[i].X)
+            //            {
 
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         public void ChangeWeapon(int ID,string weapon)//смена оружия
@@ -186,17 +308,20 @@ namespace Server
         {
             int pistol = field.Player[ID].P.CountBullets + field.Player[ID].P.CountMagazine;
             if (pistol != 0)
-            { field.Item.Add(new Item("Pistol", pistol)); }
+            { field.Item.Add(new Item("Pistol", pistol, field.Player[ID].X, field.Player[ID].Y + 1.5f,field.Item.Count)); }
             int shotgun = field.Player[ID].S.CountBullets + field.Player[ID].S.CountMagazine;
             if (shotgun != 0)
-            { field.Item.Add(new Item("Shotgun", shotgun)); }
+            { field.Item.Add(new Item("Shotgun", shotgun, field.Player[ID].X, field.Player[ID].Y - 1.5f, field.Item.Count)); }
             int gun = field.Player[ID].G.CountBullets + field.Player[ID].G.CountMagazine;
             if (gun != 0)
-            { field.Item.Add(new Item("Gun", gun)); }
+            { field.Item.Add(new Item("Gun", gun, field.Player[ID].X - 1.5f, field.Player[ID].Y, field.Item.Count)); }
             int bomb = field.Player[ID].B.CountBullets + field.Player[ID].B.CountMagazine;
             if (bomb != 0)
-            { field.Item.Add(new Item("Bomb", bomb)); }
-
+            { field.Item.Add(new Item("Bomb", bomb, field.Player[ID].X + 1.5f, field.Player[ID].Y, field.Item.Count)); }
+            field.Player[ID].P.CountBullets = 0; field.Player[ID].P.CountMagazine = 0;
+            field.Player[ID].S.CountBullets = 0; field.Player[ID].S.CountMagazine = 0;
+            field.Player[ID].G.CountBullets = 0; field.Player[ID].G.CountMagazine = 0;
+            field.Player[ID].B.CountBullets = 0; field.Player[ID].B.CountMagazine = 0;
             field.Player.Remove(ID);
         }
 
@@ -223,6 +348,7 @@ namespace Server
             if(field.Bullet.Contains(bul))
             field.Bullet.Remove(bul);
         }
+
        public void SmallCircle()
         {
             field.circle.Size[0] -= 3;

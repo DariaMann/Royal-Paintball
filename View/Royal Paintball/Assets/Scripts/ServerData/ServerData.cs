@@ -9,6 +9,7 @@ public class Field
     public List<Item> Item { get; set; }
     public Dictionary<int, Player> Player { get; set; }
     public Circle circle { get; set; }
+    public int time;
 }
 public class Circle
 {
@@ -33,6 +34,7 @@ public class Bullet
     public float Y { get; set; }
     public float a { get; set; }
     public float b { get; set; }
+    public GameObject bul { get; set; }
 }
 public class Wall
 {
@@ -44,6 +46,9 @@ public class Item
 {
     public string Name { get; set; }
     public int Count { get; set; }
+    public float X { get; set; }
+    public float Y { get; set; }
+    public int Index { get; set; }
 }
 public class Tree
 {
@@ -77,6 +82,8 @@ public class Player
     public Shotgun S { get; set; }
     public Gun G { get; set; }
     public Bomb B { get; set; }
+
+    public string Color { get; set; }
 
 }
 public class Weapons

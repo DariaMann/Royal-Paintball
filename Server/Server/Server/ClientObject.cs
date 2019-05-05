@@ -13,6 +13,7 @@ namespace Server
         public TcpClient client;
         public Field field;//поле игры
         public GameController cont;
+        DateTime now;
         public ClientObject(TcpClient tcpClient, Field Field)
         {
             this.field = Field;
@@ -20,21 +21,27 @@ namespace Server
         }
         public string PlayerData1()//создание игрока 
         {
-            First();//генерация ID игрока
+            string color = First();//генерация ID игрока
             field.Player.Add(
                 ID,
                 new Player()
                 {
                     ID = ID,
+                    Color = color
                 });
+         //   field.time = now.Minute;
             string json = JsonConvert.SerializeObject(field, Formatting.Indented);
             return json;
         }
-            public void First()
+            public string First()
         {
             Random rn = new Random(); // объявление переменной для генерации чисел
             int id = rn.Next(0, 1000);
             ID = id;
+            int col = rn.Next(0, field.Colors.Count);
+            string color = field.Colors[col];
+            field.Colors.Remove(color);
+            return color;
         }
         public Player count(Player player)//метод реакции сервера на сообщения клиента
         {
@@ -55,8 +62,12 @@ namespace Server
 
             if (player.Life == 0)
             {
-                //cont.FinishGame(player.ID);
+                cont.FinishGame(player.ID);
             }
+            //if(player.Life > 31)
+            //{
+            //    cont.FinishGame(player.ID);
+            //}
 
             if (player.LiftItem == true)//поднятие вещей
             {
@@ -71,8 +82,7 @@ namespace Server
             {
                 cont.BulFlight();
             }
-            //field.Player[ID].X = field.Player[ID].MousePos[0];
-            //field.Player[ID].Y = field.Player[ID].MousePos[1];
+            field.time = now.Minute;
             return player;
         }
         public void Process()
@@ -82,10 +92,20 @@ namespace Server
            // {
                 stream = client.GetStream();
                 byte[] data = new byte[256]; // буфер для получаемых данных
-                while (true)
+
+            while (true)
                 {
-                    // получаем сообщение
-                    StringBuilder builder = new StringBuilder();
+
+
+                now = DateTime.Now;
+                Console.WriteLine(now.Millisecond);
+
+
+
+
+
+                // получаем сообщение
+                StringBuilder builder = new StringBuilder();
                     int bytes = 0;
 
                     do
@@ -106,7 +126,7 @@ namespace Server
                     // отправляем обратно сообщение 
                     {
                         message = PlayerData1();
-                 //   Console.WriteLine("СЕРВЕР: " + message);
+                    Console.WriteLine("СЕРВЕР: " + message);
                         data = Encoding.UTF8.GetBytes(message);
                         stream.Write(data, 0, data.Length);
                     }
@@ -116,7 +136,7 @@ namespace Server
                         jsonData1 = count(jsonData1);
                         
                         var mess = JsonConvert.SerializeObject(field, Formatting.Indented);
-                        Console.WriteLine("СЕРВЕР: " + mess);
+                       Console.WriteLine("СЕРВЕР: " + mess);
                         data = Encoding.UTF8.GetBytes(mess);
                         stream.Write(data, 0, data.Length);
                         stream.Flush();

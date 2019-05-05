@@ -34,6 +34,8 @@ namespace Server
         public Gun G { get; set; }
         public Bomb B { get; set; }
 
+        public string Color { get; set; }
+
         public Player()
         {
             P = new Pistol();

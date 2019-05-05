@@ -11,8 +11,7 @@ public class ClientTCP  {
     private bool connected;
     public static NetworkStream myStream;
     private byte[] asyncBuff;
-
-    // static Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+    
     public void Connect()
     {
         try
@@ -53,10 +52,18 @@ public class ClientTCP  {
     
     public void SendFirstMessage(Player clientData)//отправка сообщения со всеми данными
     {
-        string message = JsonConvert.SerializeObject(clientData, Formatting.Indented);
-        byte[] buffer = Encoding.ASCII.GetBytes(message);
-        myStream = playerSocket.GetStream();
-        myStream.Write(buffer, 0, buffer.Length);
+        try
+        {
+            string message = JsonConvert.SerializeObject(clientData, Formatting.Indented);
+            byte[] buffer = Encoding.ASCII.GetBytes(message);
+            myStream = playerSocket.GetStream();
+            myStream.Write(buffer, 0, buffer.Length);
+        }
+        catch
+        {
+            playerSocket.GetStream().Close();
+            playerSocket.Close();
+        }
     }
     public void Send(Player player)//отправка сообщения со всеми данными
     {

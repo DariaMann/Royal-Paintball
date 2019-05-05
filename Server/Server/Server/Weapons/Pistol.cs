@@ -25,14 +25,5 @@ namespace Server
         {
             this.CountBullets--;
         }
-        //public override void LiftItem(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha)
-        //{
-        //    dasha[playerID]["magazineP"] = Convert.ToString(f.Players[playerID].Weap.CountMagazine);
-        //}
-        public override void Reload(Field f, string playerID, Dictionary<string, Dictionary<string, string>> dasha,string bul,string mag)
-        {
-            dasha[playerID]["bulP"] = bul;
-            dasha[playerID]["magazineP"] = mag;
-        }
     }
 }

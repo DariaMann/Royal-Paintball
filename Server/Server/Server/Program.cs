@@ -22,7 +22,7 @@ namespace Server
             Field f = new Field();
             // диалог сервера с клиентами
 
-            while (true)
+            while (true)//поправить
             {
                 
                 // Получаем входящее подключение

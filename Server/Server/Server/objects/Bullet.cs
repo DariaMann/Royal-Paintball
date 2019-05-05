@@ -20,13 +20,26 @@ namespace Server
         {
             float cos;
             float sin;
-            float k = (endY - y) / (endX - x);
+            if (endX >= x)
+            {
+                float k = (endY - y) / (endX - x);
 
-            cos = Convert.ToSingle(Math.Sqrt(1 / (1 + k * k)));
-            sin = k * cos;
-            
-            this.a = speed * cos;
-            this.b = speed * sin;
+                cos = Convert.ToSingle(Math.Sqrt(1 / (1 + k * k)));
+                sin = k * cos;
+
+                this.a = speed * cos;
+                this.b = speed * sin;
+            }
+            else
+            {
+                float k = (endY - y) / (endX - x);
+
+                cos = Convert.ToSingle(-Math.Sqrt(1 / (1 + k * k)));
+                sin = k * cos;
+
+                this.a = speed * cos;
+                this.b = speed * sin;
+            }
             this.X = x;
             this.Y = y;
             this.Weapon = weapon;

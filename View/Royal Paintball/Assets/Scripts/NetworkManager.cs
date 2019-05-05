@@ -26,7 +26,7 @@ public class NetworkManager : MonoBehaviour {
     public Text CountBul;
     public Text Magazine;
     public Text Timer;
-    public int my_ID = 111;
+    public int my_ID;
 
     public string weapon = "Pistol";
 
@@ -44,8 +44,12 @@ public class NetworkManager : MonoBehaviour {
     public GameObject magazineG;
     public GameObject magazineB;
 
+    public Image arrow;
+
     public Player player = new Player();
     public Field field = new Field();
+
+    public Color[] Colors = new Color[8];
 
     private void Awake()
     {
@@ -81,30 +85,55 @@ public class NetworkManager : MonoBehaviour {
 
         if (IsItFirstMessage)
         {
-            clientTCP.Send(field.Player[my_ID]);
-            mess = clientTCP.GetPos();//данные с сервера  
+            if (field.Player.ContainsKey(my_ID))
+            {
+                clientTCP.Send(field.Player[my_ID]);
+                mess = clientTCP.GetPos();//данные с сервера  
 
-          Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); ;
-            field = jsonData1;
-            DelBull();
+                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); ;
+                field = jsonData1;
+            }
+                DelBull();
+                DelPlayer();
+                DelMgazine();
             if (field.Bullet.Count>0)
             {
-                MoveBull();
+                InBul();
+              MoveBull();
             }
             if (field.Player.Count != 0)
             {
                 Actoin();//метод отслеживающий нажатие клавишь 
                 InstantiatePlayer();
                 MovePlayer();//движение
-          
+                PlayerRotation();
+                ArrowRotation();
+                InstantiateMagazine();
+
+
                 if (field.Player.Count > 1)//для других играков
                 {
                     InstantiateWeaponOther();
-                    InstantiateBulletOther();//стрельба других играков
                 }
             }
         }
-        Debug.Log("Plauerlist: " + playerList.Count);
+    }
+    public void PlayerRotation()
+    {
+        foreach (int c in field.Player.Keys)
+        {
+            Vector3 mousePosition = new Vector3(field.Player[c].MousePos[0], field.Player[c].MousePos[1], field.Player[c].MousePos[2]);
+            var angle = Vector2.Angle(Vector2.right, mousePosition - playerList[c].transform.position);//угол между вектором от объекта к мыше и осью х
+            playerList[c].transform.eulerAngles = new Vector3(0f, 0f, playerList[c].transform.position.y < mousePosition.y ? angle : -angle);//немного магии на последок
+        }
+
+    }
+    public void ArrowRotation()
+    {
+        Vector3 circlePos = new Vector3(0, 0,0);
+        //var angle = Vector2.Angle(Vector2.right, circlePos - playerList[my_ID].transform.position);//угол между вектором от объекта к мыше и осью х
+        var angle = Vector2.Angle(Vector2.left, circlePos- playerList[my_ID].transform.position );//угол между вектором от объекта к мыше и осью х
+        arrow.transform.eulerAngles = new Vector3(0f, 0f, playerList[my_ID].transform.position.y > circlePos.y ? angle : -angle);//немного магии на последок
     }
     public void DelBull()
     {
@@ -118,6 +147,45 @@ public class NetworkManager : MonoBehaviour {
             }
         }
     }
+    public void DelPlayer()
+    {
+        int i = 0;
+        if (field.Player.Count < playerList.Count)
+        {
+            while (field.Player.Count != playerList.Count)
+            {
+                foreach (int c in playerList.Keys)
+                {
+                    if (!field.Player.ContainsKey(Convert.ToInt32(playerList[c].name)))
+                  {
+                        int name = Convert.ToInt32(playerList[c].name);
+                        GameObject pl = playerList[c];
+                        i = c;
+                        Destroy(pl);
+                        if(name == my_ID)
+                        {
+                            SceneManager.LoadScene("Play");
+                        }
+                  }
+                }
+                playerList.Remove(i);
+
+            }
+        }
+    }
+    public void DelMgazine()
+    {
+        if (field.Item.Count < itemList.Count)
+        {
+            while (field.Item.Count != itemList.Count)
+            {
+                GameObject item = itemList[itemList.Count-1];
+                itemList.Remove(itemList.Count - 1);
+                Destroy(item);
+            }
+        }
+    }
+    
     public void KeyMoveDown()//движение пользователя
     {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
@@ -192,12 +260,17 @@ public class NetworkManager : MonoBehaviour {
          CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
          Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
         Lifes.text = Convert.ToString(field.Player[my_ID].Life);
+        Timer.text = Convert.ToString(field.time);
 
-
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            field.Player[my_ID].LiftItem = true;
+        }
+        else { field.Player[my_ID].LiftItem = false; }
         if (field.Player[my_ID].Life== 0)
         {
-            InstantiateMagazine(my_ID);
-
+            InstantiateMagazine();
+            SceneManager.LoadScene("Play");
         }
         MousePos();
         SizeCircle();
@@ -220,7 +293,6 @@ public class NetworkManager : MonoBehaviour {
         }
         
     }
-   
     public void MousePos()
     {
         var mousePosition = Input.mousePosition;
@@ -229,7 +301,6 @@ public class NetworkManager : MonoBehaviour {
         field.Player[my_ID].MousePos[1] = mousePosition.y;
         field.Player[my_ID].MousePos[2] = mousePosition.z;
     }
-
     public void InstantiateWeapon(GameObject weap, string nameWeap)
     {
         GameObject Player = GameObject.Find(Convert.ToString(my_ID));
@@ -288,7 +359,6 @@ public class NetworkManager : MonoBehaviour {
         }
 
     }
-
     public void InstantiateTree()
     {
         for (int i = 0; i < field.Tree.Count; i++)
@@ -310,90 +380,93 @@ public class NetworkManager : MonoBehaviour {
         }
 
     }
-   
     public void InstantiateBullet()
     {
-            Vector2 v = new Vector2(field.Player[my_ID].X + 1.2f, field.Player[my_ID].Y);
+            Vector2 v = new Vector2(field.Player[my_ID].X, field.Player[my_ID].Y);
             var pos = Input.mousePosition;
             pos = Camera.main.ScreenToWorldPoint(pos);
 
             field.Player[my_ID].End = new float[2] { pos.x, pos.y };
             field.Player[my_ID].Start = new float[2] { v.x, v.y };
 
-            cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
-        cur.name = Convert.ToString(bulletList.Count);
-        bulletList.Add(bulletList.Count,cur);
+        //cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
+        //cur.name = Convert.ToString(bulletList.Count);
+        //Color(field.Player[my_ID].Color, cur);
+        //bulletList.Add(bulletList.Count, cur);
     }
-    public void InstantiateBulletOther()
+    public void InBul()
     {
-        foreach (int c in field.Player.Keys)
+        if(field.Bullet.Count>0)
         {
-            if (field.Player[c].ID != my_ID)
+            for(int i = 0;i<field.Bullet.Count;i++)
             {
-                if (field.Player[c].Shoot == true)
+                if (!bulletList.ContainsKey(i))
                 {
-                    Vector2 v = new Vector2(field.Player[c].X + 0.8f, field.Player[c].Y);
+                    Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
                     cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
-                   // bulletList.Add(bulletList.Count, cur);
+                    cur.name = Convert.ToString(i);
+                    Color(field.Player[field.Bullet[i].ID].Color, cur);
+                    bulletList.Add(i, cur);
                 }
             }
         }
     }
-    public void InstantiateMagazine(int ID)
+ 
+    public void InstantiateMagazine()
     {
         if(field.Item.Count>0)
         {
-            for(int i=0;i<field.Item.Count;i++)
+            for (int i = 0; i < field.Item.Count; i++)
             {
-                switch (field.Item[i].Name)
+                if (!itemList.ContainsKey(i))
                 {
-                    case "Pistol": {
-                            Vector2 v = new Vector2(player.X, player.Y+1.5f);
-                            GameObject temp = Instantiate(magazineP, v, Quaternion.identity);
-                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
-                            temp.name = field.Item[i].Name;
-                            itemList.Add(field.Item[i].Count, temp);
-                            break; }
-                    case "Shotgun":
-                        {
-                            Vector2 v = new Vector2(player.X, player.Y - 1.5f);
-                            GameObject temp = Instantiate(magazineS, v, Quaternion.identity);
-                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
-                            temp.name = field.Item[i].Name;
-                            itemList.Add(field.Item[i].Count, temp);
-                            break;
-                        }
-                    case "Gun":
-                        {
-                            Vector2 v = new Vector2(player.X - 1.5f, player.Y);
-                            GameObject temp = Instantiate(magazineG, v, Quaternion.identity);
-                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
-                            temp.name = field.Item[i].Name;
-                            itemList.Add(field.Item[i].Count, temp);
-                            break;
-                        }
-                    case "Bomb":
-                        {
-                            Vector2 v = new Vector2(player.X + 1.5f, player.Y);
-                            GameObject temp = Instantiate(magazineB, v, Quaternion.identity);
-                            temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
-                            temp.name = field.Item[i].Name;
-                            itemList.Add(field.Item[i].Count, temp);
-                            break;
-                        }
+                    switch (field.Item[i].Name)
+                    {
+                        case "Pistol":
+                            {
+                                // Vector2 v = new Vector2(player.X, player.Y + 1.5f);
+                                Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
+                                GameObject temp = Instantiate(magazineP, v, Quaternion.identity);
+                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                                temp.name = field.Item[i].Name;
+                                itemList.Add(i, temp);
+                                break;
+                            }
+                        case "Shotgun":
+                            {
+                                Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
+                                GameObject temp = Instantiate(magazineS, v, Quaternion.identity);
+                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                                temp.name = field.Item[i].Name;
+                                itemList.Add(i, temp);
+                                break;
+                            }
+                        case "Gun":
+                            {
+                                Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
+                                GameObject temp = Instantiate(magazineG, v, Quaternion.identity);
+                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                                temp.name = field.Item[i].Name;
+                                itemList.Add(i, temp);
+                                break;
+                            }
+                        case "Bomb":
+                            {
+                                Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
+                                GameObject temp = Instantiate(magazineB, v, Quaternion.identity);
+                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                                temp.name = field.Item[i].Name;
+                                itemList.Add(i, temp);
+                                break;
+                            }
+                    }
                 }
             }
            
         }
-        if (field.Player[my_ID].Weap.CountBullets > 0)
-        {
-            Vector2 v = new Vector2(field.Player[my_ID].X, field.Player[my_ID].Y + 1F);
-            GameObject mag = GameObject.Instantiate(magazineP, v, bulletPref.transform.rotation) as GameObject;
-            mag.name = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
-        }
+       
     }
-   
-    public void InstantiateCircle()//Создание игрока
+    public void InstantiateCircle()//Создание 
     {
         Vector2 v = new Vector2(field.circle.X,field.circle.Y);
         GameObject temp = Instantiate(circlePref, v, Quaternion.identity);
@@ -407,8 +480,7 @@ public class NetworkManager : MonoBehaviour {
        GameObject temp = GameObject.FindGameObjectWithTag("Circle");
         temp.transform.localScale = new Vector3(field.circle.Size[0], 1, field.circle.Size[1]);
     }
-
-   public void MyId()
+    public void MyId()
     {
         //Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
         //field = jsonData1;
@@ -418,6 +490,53 @@ public class NetworkManager : MonoBehaviour {
             my_ID = field.Player[c].ID;
         }
     }
+    public void Color(string color,GameObject temp)
+    {
+
+        switch(color)
+        {
+            case "blue":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[0];
+                    break;
+                }
+            case "red":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[1];
+                    break;
+                }
+            case "yellow":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[2];
+                    break;
+                }
+            case "orange":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[3];
+                    break;
+                }
+            case "pink":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[4];
+                    break;
+                }
+            case "green":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color =  Colors[5];
+                    break;
+                }
+            case "black":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[6];
+                    break;
+                }
+            case "white":
+                {
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[7];
+                    break;
+                }
+        }
+    }
     public void InstantiatePlayer()//Создание игроков
     {
         foreach (int c in field.Player.Keys)
@@ -425,17 +544,18 @@ public class NetworkManager : MonoBehaviour {
             if (!playerList.ContainsKey(c))
             {
                 player = field.Player[c];
+
                 Vector2 v = new Vector2(player.X, player.Y);
                 GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
 
                 temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                 temp.name = Convert.ToString(c);
+                Color(player.Color, temp);
                 Lifes.text = Convert.ToString(player.Life);
                 playerList.Add(c, temp);
             }
         }
     }
-    
     public void MovePlayer()//двжение игрока
     {
 
@@ -452,27 +572,11 @@ public class NetworkManager : MonoBehaviour {
     }
     public void MoveBull()
     {
-        if (playerList.Count==1)
-     //   for (int i = 0; i < bulletList.Count; i++)
-     foreach(int i in bulletList.Keys)
-        {
-                Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
-                Debug.Log(bulletList.Count);
-                bulletList[i].transform.position = v;
-        }
-        else
-        {
-            //for (int i = 0; i < field.Bullet.Count; i++)
-            foreach(Bullet bul in field.Bullet)
+        foreach (int i in bulletList.Keys)
             {
-                foreach (int j in bulletList.Keys)
-                {
-                    //Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
-                    Vector2 v = new Vector2(bul.X,bul.Y);
-                    bulletList[j].transform.position = v;
-
-                }
+                Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
+               
+                bulletList[i].transform.position = v;
             }
-        }
     }
 }
