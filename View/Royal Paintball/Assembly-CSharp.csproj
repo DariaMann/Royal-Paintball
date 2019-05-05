@@ -67,12 +67,9 @@
     <Compile Include="Assets\Particlecollection_Free samples\Plugins\Effect\Script\RenderEffect.cs" />
     <Compile Include="Assets\Particlecollection_Free samples\Plugins\Effect\Script\TransformExtension.cs" />
     <Compile Include="Assets\Scripts\Buttons.cs" />
-    <Compile Include="Assets\Scripts\CamMove.cs" />
     <Compile Include="Assets\Scripts\ClientTCP.cs" />
     <Compile Include="Assets\Scripts\NetworkManager.cs" />
-    <Compile Include="Assets\Scripts\PlayerKeyboardController.cs" />
     <Compile Include="Assets\Scripts\ServerData\ServerData.cs" />
-    <Compile Include="Assets\Scripts\Weapon.cs" />
     <Compile Include="Assets\StarNestSkybox\Scripts\CameraScroll.cs" />
     <Compile Include="Assets\StarNestSkybox\Scripts\SkyboxSwitcher.cs" />
     <Compile Include="Assets\Stylized Astronaut\Character\Player.cs" />

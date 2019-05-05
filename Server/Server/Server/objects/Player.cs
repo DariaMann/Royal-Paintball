@@ -19,8 +19,6 @@ namespace Server
         public bool Shoot { get; set; }
         public bool Reload { get; set; }
         public bool LiftItem { get; set; }
-        public int[] CountBull { get; set; }
-        public int[] CountMag { get; set; }
         public float[] MousePos { get; set; }
         public int[] Size { get; set; }
 
@@ -53,12 +51,10 @@ namespace Server
             Shoot = false;
             Weapon = "Pistol";
             LiftItem = false;
-            CountBull = new int[] { 12, 7, 30, 5 };
-            CountMag = new int[] { 24, 0, 0, 3 };
             Start = new float[2];
             End = new float[2];
             MousePos = new float[3];
-            Size = new int[] { 1,1};
+            Size = new int[] {1,1};
 
         }
       

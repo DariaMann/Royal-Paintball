@@ -13,9 +13,12 @@ public class NetworkManager : MonoBehaviour {
     public GameObject playerPref;
     public GameObject weaponPref;
     public GameObject bulletPref;
-    public GameObject treePref;
+    public GameObject OakPref;
+    public GameObject FirPref;
+    public GameObject PoplarPref;
     public GameObject wallPref;
     public GameObject circlePref;
+    public GameObject camera;
     public GameObject cur;
     public Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
@@ -29,6 +32,8 @@ public class NetworkManager : MonoBehaviour {
     public int my_ID;
 
     public string weapon = "Pistol";
+
+    private Vector3 offset;
 
     static public bool IsItFirstMessage = false;
     static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
@@ -59,7 +64,6 @@ public class NetworkManager : MonoBehaviour {
             Destroy(this);
 
     }
-
     void Start() {
         clientTCP.Connect();//коннект с сервером                                     
 
@@ -77,9 +81,10 @@ public class NetworkManager : MonoBehaviour {
         InstantiateWall();
         InstantiateCircle();
 
+        offset = camera.transform.position - playerList[my_ID].transform.position;
+
         IsItFirstMessage = true;
     }
-
     private void Update()
     {
 
@@ -93,6 +98,7 @@ public class NetworkManager : MonoBehaviour {
                 Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); ;
                 field = jsonData1;
             }
+            CamMove();
                 DelBull();
                 DelPlayer();
                 DelMgazine();
@@ -118,13 +124,74 @@ public class NetworkManager : MonoBehaviour {
             }
         }
     }
+    public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
+    {
+
+        KeyMoveDown();
+        if (Input.GetKey(KeyCode.F))//поднятие предметов
+        {
+            field.Player[my_ID].LiftItem = true;
+        }
+        if (Input.GetKey(KeyCode.R))//перезарядка оружия
+        {
+            field.Player[my_ID].Reload = true;
+        }
+        else
+        {
+            field.Player[my_ID].Reload = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            field.Player[my_ID].Weapon = "Pistol";
+            InstantiateWeapon(pistol, field.Player[my_ID].Weapon);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            field.Player[my_ID].Weapon = "Shotgun";
+            InstantiateWeapon(shotgun, field.Player[my_ID].Weapon);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            field.Player[my_ID].Weapon = "Gun";
+            InstantiateWeapon(gun, field.Player[my_ID].Weapon);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            field.Player[my_ID].Weapon = "Bomb";
+            InstantiateWeapon(bomb, field.Player[my_ID].Weapon);
+        }
+        CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
+        Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
+        Lifes.text = Convert.ToString(field.Player[my_ID].Life);
+        Timer.text = Convert.ToString(field.time);
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            field.Player[my_ID].LiftItem = true;
+        }
+        else { field.Player[my_ID].LiftItem = false; }
+        if (field.Player[my_ID].Life == 0)
+        {
+            InstantiateMagazine();
+            SceneManager.LoadScene("Play");
+        }
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+        MousePos();
+        SizeCircle();
+    }
+
     public void PlayerRotation()
     {
         foreach (int c in field.Player.Keys)
         {
             Vector3 mousePosition = new Vector3(field.Player[c].MousePos[0], field.Player[c].MousePos[1], field.Player[c].MousePos[2]);
             var angle = Vector2.Angle(Vector2.right, mousePosition - playerList[c].transform.position);//угол между вектором от объекта к мыше и осью х
-            playerList[c].transform.eulerAngles = new Vector3(0f, 0f, playerList[c].transform.position.y < mousePosition.y ? angle : -angle);//немного магии на последок
+            //playerList[c].transform.eulerAngles = new Vector3(0f, 0f, playerList[c].transform.position.y < mousePosition.y ? angle : -angle);//немного магии на последок
+            playerList[c].transform.eulerAngles = new Vector3(playerList[c].transform.position.y > mousePosition.y ? angle : -angle, 90f, -90f);//немного магии на последок
         }
 
     }
@@ -135,6 +202,7 @@ public class NetworkManager : MonoBehaviour {
         var angle = Vector2.Angle(Vector2.left, circlePos- playerList[my_ID].transform.position );//угол между вектором от объекта к мыше и осью х
         arrow.transform.eulerAngles = new Vector3(0f, 0f, playerList[my_ID].transform.position.y > circlePos.y ? angle : -angle);//немного магии на последок
     }
+
     public void DelBull()
     {
         if (field.Bullet.Count < bulletList.Count)
@@ -185,7 +253,7 @@ public class NetworkManager : MonoBehaviour {
             }
         }
     }
-    
+   
     public void KeyMoveDown()//движение пользователя
     {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
@@ -220,62 +288,6 @@ public class NetworkManager : MonoBehaviour {
         }
 
     }
-    public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
-    {
-        
-        KeyMoveDown();
-        if (Input.GetKey(KeyCode.F))//поднятие предметов
-        {
-            field.Player[my_ID].LiftItem = true;
-        }
-        if (Input.GetKey(KeyCode.R))//перезарядка оружия
-        {
-            field.Player[my_ID].Reload = true;
-        }
-        else
-        {
-            field.Player[my_ID].Reload = false;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            field.Player[my_ID].Weapon = "Pistol";
-            InstantiateWeapon(pistol, field.Player[my_ID].Weapon);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            field.Player[my_ID].Weapon = "Shotgun";
-            InstantiateWeapon(shotgun, field.Player[my_ID].Weapon);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            field.Player[my_ID].Weapon = "Gun";
-            InstantiateWeapon(gun, field.Player[my_ID].Weapon);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            field.Player[my_ID].Weapon = "Bomb";
-            InstantiateWeapon(bomb, field.Player[my_ID].Weapon);
-        }
-         CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
-         Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
-        Lifes.text = Convert.ToString(field.Player[my_ID].Life);
-        Timer.text = Convert.ToString(field.time);
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            field.Player[my_ID].LiftItem = true;
-        }
-        else { field.Player[my_ID].LiftItem = false; }
-        if (field.Player[my_ID].Life== 0)
-        {
-            InstantiateMagazine();
-            SceneManager.LoadScene("Play");
-        }
-        MousePos();
-        SizeCircle();
-        
-    }
     private void OnMouseUp()
     {
         field.Player[my_ID].Shoot = false;
@@ -301,6 +313,7 @@ public class NetworkManager : MonoBehaviour {
         field.Player[my_ID].MousePos[1] = mousePosition.y;
         field.Player[my_ID].MousePos[2] = mousePosition.z;
     }
+
     public void InstantiateWeapon(GameObject weap, string nameWeap)
     {
         GameObject Player = GameObject.Find(Convert.ToString(my_ID));
@@ -364,9 +377,33 @@ public class NetworkManager : MonoBehaviour {
         for (int i = 0; i < field.Tree.Count; i++)
         {
             Vector2 vec = new Vector2(field.Tree[i].X, field.Tree[i].Y);
-            GameObject temp = Instantiate(treePref, vec, Quaternion.identity);
-            temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
-            treeList.Add(i, temp);
+            switch (field.Tree[i].Type)
+            {
+                case "Oak":
+                    {
+                       
+                        GameObject temp = Instantiate(OakPref, vec, Quaternion.identity);
+                        temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                        treeList.Add(i, temp);
+                        break;
+                    }
+                case "Fir":
+                    {
+
+                        GameObject temp = Instantiate(FirPref, vec, Quaternion.identity);
+                        temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                        treeList.Add(i, temp);
+                        break;
+                    }
+                case "Poplar":
+                    {
+
+                        GameObject temp = Instantiate(PoplarPref, vec, Quaternion.identity);
+                        temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                        treeList.Add(i, temp);
+                        break;
+                    }
+            }
         }
     }
     public void InstantiateWall()
@@ -388,11 +425,6 @@ public class NetworkManager : MonoBehaviour {
 
             field.Player[my_ID].End = new float[2] { pos.x, pos.y };
             field.Player[my_ID].Start = new float[2] { v.x, v.y };
-
-        //cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
-        //cur.name = Convert.ToString(bulletList.Count);
-        //Color(field.Player[my_ID].Color, cur);
-        //bulletList.Add(bulletList.Count, cur);
     }
     public void InBul()
     {
@@ -411,7 +443,6 @@ public class NetworkManager : MonoBehaviour {
             }
         }
     }
- 
     public void InstantiateMagazine()
     {
         if(field.Item.Count>0)
@@ -475,25 +506,42 @@ public class NetworkManager : MonoBehaviour {
         temp.transform.localScale = new Vector3(field.circle.Size[0],1, field.circle.Size[1]);
 
     }
+    public void InstantiatePlayer()//Создание игроков
+    {
+        foreach (int c in field.Player.Keys)
+        {
+            if (!playerList.ContainsKey(c))
+            {
+                player = field.Player[c];
+
+                Vector2 v = new Vector2(player.X, player.Y);
+                GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
+
+                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                temp.name = Convert.ToString(c);
+                Color(player.Color, temp);
+                Lifes.text = Convert.ToString(player.Life);
+                playerList.Add(c, temp);
+            }
+        }
+    }
+
     public void SizeCircle()
     {
-       GameObject temp = GameObject.FindGameObjectWithTag("Circle");
+        GameObject temp = GameObject.FindGameObjectWithTag("Circle");
         temp.transform.localScale = new Vector3(field.circle.Size[0], 1, field.circle.Size[1]);
     }
     public void MyId()
     {
-        //Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-        //field = jsonData1;
-       //Debug.Log(field.Player.Count);
         foreach (int c in field.Player.Keys)
         {
             my_ID = field.Player[c].ID;
         }
     }
-    public void Color(string color,GameObject temp)
+    public void Color(string color, GameObject temp)
     {
 
-        switch(color)
+        switch (color)
         {
             case "blue":
                 {
@@ -522,7 +570,7 @@ public class NetworkManager : MonoBehaviour {
                 }
             case "green":
                 {
-                    temp.transform.GetComponent<Renderer>().material.color =  Colors[5];
+                    temp.transform.GetComponent<Renderer>().material.color = Colors[5];
                     break;
                 }
             case "black":
@@ -537,25 +585,11 @@ public class NetworkManager : MonoBehaviour {
                 }
         }
     }
-    public void InstantiatePlayer()//Создание игроков
+    public void CamMove()
     {
-        foreach (int c in field.Player.Keys)
-        {
-            if (!playerList.ContainsKey(c))
-            {
-                player = field.Player[c];
-
-                Vector2 v = new Vector2(player.X, player.Y);
-                GameObject temp = Instantiate(playerPref, v, Quaternion.identity);
-
-                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
-                temp.name = Convert.ToString(c);
-                Color(player.Color, temp);
-                Lifes.text = Convert.ToString(player.Life);
-                playerList.Add(c, temp);
-            }
-        }
+        camera.transform.position = playerList[my_ID].transform.position + offset;
     }
+
     public void MovePlayer()//двжение игрока
     {
 

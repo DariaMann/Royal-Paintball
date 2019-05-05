@@ -33,13 +33,16 @@ namespace Server
                 new Tree
                 {
                     X = 8,
-                    Y = 0
+                    Y = 0,
+                    Type = "Oak"
                 });
             Tree.Add(
                  new Tree
                  {
                      X = 7,
-                     Y = 9
+                     Y = 9,
+                     Type = "Fir"
+
                  });
            
             Wall = new List<Wall>();

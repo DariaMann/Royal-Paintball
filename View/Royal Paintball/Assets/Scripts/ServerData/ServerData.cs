@@ -54,6 +54,8 @@ public class Tree
 {
     public float X { get; set; }
     public float Y { get; set; }
+    public int[] Size { get; set; }
+    public string Type;
 
 }
 public class Player
@@ -69,8 +71,6 @@ public class Player
     public bool Shoot { get; set; }
     public bool Reload { get; set; }
     public bool LiftItem { get; set; }
-    public int[] CountBull { get; set; }
-    public int[] CountMag { get; set; }
     public float[] MousePos { get; set; }
     public int[] Size { get; set; }
 

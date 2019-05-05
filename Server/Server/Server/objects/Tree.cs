@@ -11,6 +11,7 @@ namespace Server
         public float X { get; set; }
         public float Y { get; set; }
         public int[] Size { get; set; }
+        public string Type;
 
         public Tree()
         {
