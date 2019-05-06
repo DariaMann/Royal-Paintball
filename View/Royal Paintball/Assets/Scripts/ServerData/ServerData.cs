@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 public class Field
 {
     public List<Tree> Tree { get; set; }
@@ -9,7 +10,7 @@ public class Field
     public List<Item> Item { get; set; }
     public Dictionary<int, Player> Player { get; set; }
     public Circle circle { get; set; }
-    public int time;
+    public TimeSpan time;
 }
 public class Circle
 {

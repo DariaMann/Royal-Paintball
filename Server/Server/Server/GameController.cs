@@ -273,8 +273,14 @@ namespace Server
            
         }
 
+        //public void ReloadCall(Weapons weapon)
+        //{
+
+        //}
+
         public void Reload(int ID,Player player)//перезарядка
         {
+
             if (field.Player[ID].Weap.CountMagazine != 0)
             {
                 if (field.Player[ID].Weap.CountBullets == 0)
@@ -351,8 +357,8 @@ namespace Server
 
        public void SmallCircle()
         {
-            field.circle.Size[0] -= 3;
-            field.circle.Size[1] -= 3;
+            field.circle.Size[0] -= 15;
+            field.circle.Size[1] -= 15;
         }
 
        public void MovePlayer(int ID,string dir)//движение игрока

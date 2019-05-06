@@ -13,7 +13,9 @@ namespace Server
         public TcpClient client;
         public Field field;//поле игры
         public GameController cont;
+        DateTime StartTime;
         DateTime now;
+        TimeSpan interval;
         public ClientObject(TcpClient tcpClient, Field Field)
         {
             this.field = Field;
@@ -82,7 +84,11 @@ namespace Server
             {
                 cont.BulFlight();
             }
-            field.time = now.Minute;
+            if(interval.Seconds == 3)
+            {
+                cont.SmallCircle();
+            }
+            field.time = interval;
             return player;
         }
         public void Process()
@@ -92,13 +98,15 @@ namespace Server
            // {
                 stream = client.GetStream();
                 byte[] data = new byte[256]; // буфер для получаемых данных
-
+            StartTime = DateTime.Now;
             while (true)
                 {
 
-
                 now = DateTime.Now;
-                Console.WriteLine(now.Millisecond);
+                interval = StartTime - now;
+                interval = interval.Negate();
+                //now = new DateTime(now.Year, now.Month, now.Day, now.Hour, Math.Abs( now.Minute - StartTime.Minute), Math.Abs(StartTime.Second - now.Second), Math.Abs(now.Millisecond - StartTime.Millisecond));
+                Console.WriteLine(interval);
 
 
 

@@ -33,7 +33,7 @@ namespace Server
                // var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
                // Console.WriteLine(mess);
 
-                ClientObject clientObject = new ClientObject(client,f);
+                ClientObject clientObject = new ClientObject(client,f);//Producer
                
                 // создаем новый поток для обслуживания нового клиента
                 Thread clientThread = new Thread(new ThreadStart(clientObject.Process));

@@ -21,7 +21,7 @@ namespace Server
         public Circle circle { get; set; }
 
         public List<string> Colors { get; set; }
-        public int time;
+        public TimeSpan time;
         
         public Field()
         {
@@ -60,7 +60,7 @@ namespace Server
                });
             Bullet = new List<Bullet>();
             Item = new List<Item>();
-            this.time = new int();
+            this.time = new TimeSpan();
             Player = new Dictionary<int, Player>();
             circle = new Circle();
             Colors = new List<string> { "blue", "red", "yellow","orange", "pink", "green", "black", "white" };
