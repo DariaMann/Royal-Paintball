@@ -4,23 +4,51 @@ using System.Text;
 using System.Threading;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 
 namespace Server
 {
-    public class ClientObject//Producer
+    public class Producer//Producer
     {
         static public int ID = 555;
         public TcpClient client;
         public Field field;//поле игры
-        public GameController cont;
-        DateTime StartTime;
-        DateTime now;
-        TimeSpan interval;
-        public ClientObject(TcpClient tcpClient, Field Field)
+
+        private readonly ConcurrentQueue<Player> queue;
+
+        private Thread thread;
+        private volatile bool stopped;
+
+        public Producer(TcpClient tcpClient, Field Field, ConcurrentQueue<Player> queue)
         {
+            this.queue = queue;
             this.field = Field;
             this.client = tcpClient;
+            this.stopped = true;
         }
+
+        public void Start()
+        {
+            if (stopped)
+            {
+                thread = new Thread(Process);
+
+                stopped = false;
+
+                thread.Start();
+            }
+        }
+        public void Stop()
+        {
+            if (!stopped)
+            {
+                this.stopped = true;
+
+                this.thread.Join();
+            }
+
+        }
+
         public string PlayerData1()//создание игрока 
         {
             string color = First();//генерация ID игрока
@@ -31,7 +59,7 @@ namespace Server
                     ID = ID,
                     Color = color
                 });
-         //   field.time = now.Minute;
+
             string json = JsonConvert.SerializeObject(field, Formatting.Indented);
             return json;
         }
@@ -45,52 +73,7 @@ namespace Server
             field.Colors.Remove(color);
             return color;
         }
-        public Player count(Player player)//метод реакции сервера на сообщения клиента
-        {
-            cont = new GameController(field);
 
-            if (!(player.Direction == "N"))//движение игрока
-            {
-                cont.MovePlayer(player.ID, player.Direction);
-            }
-
-            cont.ChangeWeapon(player.ID,player.Weapon);
-            if (player.Shoot == true)//выстрел
-            {
-                cont.Shoott(player.ID,player);
-            }
-
-                 cont.Hit(ID);
-
-            if (player.Life == 0)
-            {
-                cont.FinishGame(player.ID);
-            }
-            //if(player.Life > 31)
-            //{
-            //    cont.FinishGame(player.ID);
-            //}
-
-            if (player.LiftItem == true)//поднятие вещей
-            {
-                cont.LiftItem(player.ID);
-            }
-            
-            if (player.Reload == true)//перезарядка
-            {
-                cont.Reload(player.ID,player);
-            }
-            if (field.Bullet.Count != 0)
-            {
-                cont.BulFlight();
-            }
-            if(interval.Seconds == 3)
-            {
-                cont.SmallCircle();
-            }
-            field.time = interval;
-            return player;
-        }
         public void Process()
         {
             NetworkStream stream = null;
@@ -98,20 +81,8 @@ namespace Server
            // {
                 stream = client.GetStream();
                 byte[] data = new byte[256]; // буфер для получаемых данных
-            StartTime = DateTime.Now;
             while (true)
                 {
-
-                now = DateTime.Now;
-                interval = StartTime - now;
-                interval = interval.Negate();
-                //now = new DateTime(now.Year, now.Month, now.Day, now.Hour, Math.Abs( now.Minute - StartTime.Minute), Math.Abs(StartTime.Second - now.Second), Math.Abs(now.Millisecond - StartTime.Millisecond));
-                Console.WriteLine(interval);
-
-
-
-
-
                 // получаем сообщение
                 StringBuilder builder = new StringBuilder();
                     int bytes = 0;
@@ -126,7 +97,7 @@ namespace Server
 
                     string message = builder.ToString();
 
-              //  Console.WriteLine("Клиент: " + message);
+            //    Console.WriteLine("Клиент: " + message);
 
                 Player jsonData1 = JsonConvert.DeserializeObject<Player>(message);
                 
@@ -134,23 +105,20 @@ namespace Server
                     // отправляем обратно сообщение 
                     {
                         message = PlayerData1();
-                    Console.WriteLine("СЕРВЕР: " + message);
+                  //  Console.WriteLine("СЕРВЕР: " + message);
                         data = Encoding.UTF8.GetBytes(message);
                         stream.Write(data, 0, data.Length);
                     }
                     else
                     {
-                    
-                        jsonData1 = count(jsonData1);
-                        
-                        var mess = JsonConvert.SerializeObject(field, Formatting.Indented);
-                       Console.WriteLine("СЕРВЕР: " + mess);
+                    this.queue.Enqueue(jsonData1);
+                    Console.WriteLine(queue.Count);
+                    var mess = JsonConvert.SerializeObject(field, Formatting.Indented);
+                      // Console.WriteLine("СЕРВЕР: " + mess);
                         data = Encoding.UTF8.GetBytes(mess);
                         stream.Write(data, 0, data.Length);
                         stream.Flush();
                     }
-                    //}
-                    //else { stream.Flush(); }
                 }
 
             //}

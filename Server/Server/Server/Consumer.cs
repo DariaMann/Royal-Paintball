@@ -4,19 +4,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace Server
 {
-    public class GameController: IPlayController//Consumer
+    public class Consumer: IPlayController//Consumer
     {
         public Field field;//поле игры
 
-        public GameController(Field field)
+        private readonly ConcurrentQueue<Player> queue;
+
+        DateTime StartTime;
+        DateTime now;
+        TimeSpan interval;
+
+        private Thread thread;
+        private volatile bool stopped;
+
+        public Consumer(Field field, ConcurrentQueue<Player> queue)
         {
+            this.queue = queue;
             this.field = field;
+            this.stopped = true;
+            StartTime = DateTime.Now;
         }
-       
-        public void LiftItem(int ID)//поднятие вещей
+
+        public void Start()
+        {
+            if (stopped)
+            {
+                thread = new Thread(Process);
+
+                stopped = false;
+
+                thread.Start();
+            }
+        }
+
+
+        private void LiftItem(int ID)//поднятие вещей
         {
             foreach (int c in field.Player.Keys)
             {
@@ -78,7 +104,7 @@ namespace Server
             // } 
         }
 
-        public int WeapWound(string weapon, int ID)
+        private int WeapWound(string weapon, int ID)
         {
             int countLife = 0;
             switch (weapon)
@@ -107,7 +133,7 @@ namespace Server
             return countLife;
         }
 
-        public void Woundd(int ID,int takenLifes)//ранение
+        private void Woundd(int ID,int takenLifes)//ранение
         {
             
 
@@ -117,7 +143,7 @@ namespace Server
             }
         }
 
-        public void Hit(int ID)//ранение
+        private void Hit(int ID)//ранение
         {
 
             for (int i = 0; i < field.Bullet.Count; i++)
@@ -251,7 +277,7 @@ namespace Server
             //}
         }
 
-        public void ChangeWeapon(int ID,string weapon)//смена оружия
+        private void ChangeWeapon(int ID,string weapon)//смена оружия
         {
             if (weapon == "Pistol")
             {
@@ -273,12 +299,12 @@ namespace Server
            
         }
 
-        //public void ReloadCall(Weapons weapon)
+        //private void ReloadCall(Weapons weapon)
         //{
 
         //}
 
-        public void Reload(int ID,Player player)//перезарядка
+        private void Reload(int ID,Player player)//перезарядка
         {
 
             if (field.Player[ID].Weap.CountMagazine != 0)
@@ -310,7 +336,7 @@ namespace Server
             }
         }
 
-        public void FinishGame(int ID)//конец игры
+        private void FinishGame(int ID)//конец игры
         {
             int pistol = field.Player[ID].P.CountBullets + field.Player[ID].P.CountMagazine;
             if (pistol != 0)
@@ -331,15 +357,15 @@ namespace Server
             field.Player.Remove(ID);
         }
 
-        public void Shoott(int ID,Player player)//стрельба
+        private void Shoott(int ID,Player player)//стрельба
         {
             float speed = 0.1f;
             field.Bullet.Add(new Bullet(player.End[0], player.End[1], player.Start[0], player.Start[1], player.Weapon, ID,speed));
             field.Player[ID].Weap.Shoot();
             SmallCircle();
         }
-         
-        public void BulFlight()//направление полета пули
+
+        private void BulFlight()//направление полета пули
         {
 
             for (int i = 0; i < field.Bullet.Count; i++)
@@ -349,19 +375,19 @@ namespace Server
             }
         }
 
-        void DelBul(Bullet bul)
+        private void DelBul(Bullet bul)
         {
             if(field.Bullet.Contains(bul))
             field.Bullet.Remove(bul);
         }
 
-       public void SmallCircle()
+        private void SmallCircle()
         {
             field.circle.Size[0] -= 15;
             field.circle.Size[1] -= 15;
         }
 
-       public void MovePlayer(int ID,string dir)//движение игрока
+       private void MovePlayer(int ID,string dir)//движение игрока
         {
             switch (dir)
             {
@@ -387,6 +413,80 @@ namespace Server
                     }
             }
         }
-        
+
+        private void Reaction(Player player)//метод реакции сервера на сообщения клиента
+        {
+
+            if (!(player.Direction == "N"))//движение игрока
+            {
+                MovePlayer(player.ID, player.Direction);
+            }
+
+            ChangeWeapon(player.ID, player.Weapon);
+            if (player.Shoot == true)//выстрел
+            {
+                Shoott(player.ID, player);
+            }
+
+            Hit(player.ID);
+
+            if (player.Life == 0)
+            {
+                FinishGame(player.ID);
+            }
+            if (player.LiftItem == true)//поднятие вещей
+            {
+                LiftItem(player.ID);
+            }
+
+            if (player.Reload == true)//перезарядка
+            {
+                Reload(player.ID, player);
+            }
+
+            if (field.Bullet.Count != 0)
+            {
+                BulFlight();
+            }
+        }
+
+        private void ReactionInTime(Player player)
+        {
+            if (interval.Seconds == 3)
+            {
+                SmallCircle();
+            }
+            field.time = interval.Negate();
+        }
+
+        public void Stop()
+        {
+            if (!stopped)
+            {
+                this.stopped = true;
+
+                this.thread.Join();
+            }
+
+        }
+
+        public void Process()
+        {
+            
+            while (!stopped)
+            {
+               
+                
+                if (this.queue.TryDequeue(out Player pl))
+                {
+                    Reaction(pl);
+                    
+                }
+                    now = DateTime.Now;
+                    interval = StartTime - now;
+                    ReactionInTime(pl);
+                
+            }
+        }
     }
 }

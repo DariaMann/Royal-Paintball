@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections.Concurrent;
 using Newtonsoft.Json;
 
 namespace Server
@@ -18,9 +19,16 @@ namespace Server
                 // запуск слушателя
                 server.Start();
             Console.WriteLine("Ожидание подключений... ");
+
+            ConcurrentQueue<Player> queue = new ConcurrentQueue<Player>();
+
             // устанавливаем метод обратного вызова
             Field f = new Field();
             // диалог сервера с клиентами
+
+            Consumer consumer = new Consumer(f, queue);
+
+            consumer.Start();
 
             while (true)//поправить
             {
@@ -29,16 +37,14 @@ namespace Server
                 TcpClient client = server.AcceptTcpClient();
                 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
-
-               // var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
-               // Console.WriteLine(mess);
-
-                ClientObject clientObject = new ClientObject(client,f);//Producer
-               
-                // создаем новый поток для обслуживания нового клиента
-                Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
-                clientThread.Start();
                 
+                Producer producer = new Producer(client,f,queue);//Producer
+
+                 producer.Start();
+                ////// создаем новый поток для обслуживания нового клиента
+                //Thread clientThread = new Thread(new ThreadStart(producer.Process));
+                //clientThread.Start();
+
             }
         }
         

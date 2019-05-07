@@ -51,13 +51,13 @@
     <Compile Include="objects\Circle.cs" />
     <Compile Include="objects\Item.cs" />
     <Compile Include="objects\Bullet.cs" />
-    <Compile Include="ClientObject.cs" />
+    <Compile Include="Producer.cs" />
     <Compile Include="objects\Field.cs" />
     <Compile Include="objects\Wall.cs" />
     <Compile Include="objects\Tree.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Bomb.cs" />
-    <Compile Include="GameController.cs" />
+    <Compile Include="Consumer.cs" />
     <Compile Include="IPlayController.cs" />
     <Compile Include="objects\Player.cs" />
     <Compile Include="objects\Position.cs" />

@@ -35,7 +35,7 @@ public class NetworkManager : MonoBehaviour {
 
     private Vector3 offset;
 
-    static public bool IsItFirstMessage = false;
+    static public bool IsItFirstMessage = true;
     static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
     static public Dictionary<string, string> clientData = new Dictionary<string, string>();
     public string mess;
@@ -83,12 +83,12 @@ public class NetworkManager : MonoBehaviour {
 
         offset = camera.transform.position - playerList[my_ID].transform.position;
 
-        IsItFirstMessage = true;
+        IsItFirstMessage = false;
     }
     private void Update()
     {
 
-        if (IsItFirstMessage)
+        if (!IsItFirstMessage)
         {
             if (field.Player.ContainsKey(my_ID))
             {
@@ -98,7 +98,7 @@ public class NetworkManager : MonoBehaviour {
                 Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); ;
                 field = jsonData1;
             }
-            CamMove();
+                CamMove();
                 DelBull();
                 DelPlayer();
                 DelMgazine();
