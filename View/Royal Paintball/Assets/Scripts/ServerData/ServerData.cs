@@ -16,13 +16,13 @@ public class Circle
 {
     public float X { get; set; }
     public float Y { get; set; }
-    public int[] Size { get; set; }
+    public double[] Size { get; set; }
 
     public Circle()
     {
         X = 0;
         Y = 0;
-        Size = new int[] { 20, 20 };
+        Size = new double[] { 20, 20 };
     }
 }
 public class Bullet
@@ -36,6 +36,7 @@ public class Bullet
     public float a { get; set; }
     public float b { get; set; }
     public GameObject bul { get; set; }
+    public string Color { get; set; }
 }
 public class Wall
 {

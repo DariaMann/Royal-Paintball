@@ -10,13 +10,51 @@ namespace Server
     {
         public float X { get; set; }
         public float Y { get; set; }
-        public int[] Size { get; set; }
+        public double[] Size { get; set; }
+        public float Radius { get; set; }
+        public int StartTime { get; set; }
+        public float a { get; set; }
+        public float b { get; set; }
+        public float endX { get; set; }
+        public float endY { get; set; }
+        public bool go { get; set; }
 
-      public Circle()
+        public Circle()
         {
             X = 0;
             Y = 0;
-            Size = new int[] { 30, 30 };
+            Size = new double[] { 5, 5 };
+            Radius = 21;//42;
+            StartTime = 10;
+            go = false;
+        }
+
+        public void Move(int endX,int endY, float speed)
+        {
+            float cos;
+            float sin;
+            this.endX = endX;
+            this.endY = endY;
+            if (endX >= X)
+            {
+                float k = (endY - Y) / (endX - X);
+
+                cos = Convert.ToSingle(Math.Sqrt(1 / (1 + k * k)));
+                sin = k * cos;
+
+                this.a = speed * cos;
+                this.b = speed * sin;
+            }
+            else
+            {
+                float k = (endY - Y) / (endX - X);
+
+                cos = Convert.ToSingle(-Math.Sqrt(1 / (1 + k * k)));
+                sin = k * cos;
+
+                this.a = speed * cos;
+                this.b = speed * sin;
+            }
         }
     }
 }

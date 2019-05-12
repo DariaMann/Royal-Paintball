@@ -12,15 +12,12 @@ namespace Server
         {
             
             this.CountBullets = 7;
-            this.Direction = 1;//направление мыши
-            this.Power = 3;
-            this.FlightTime = 1;
-            this.RechargeTime = 0.6;
-            this.InityalCountBul = 20;
-            this.Index = 2;
             this.TakenLives = 4;
             this.CountMagazine = 0;
             this.MaxCountMag = 7;
+            this.CamShot = true;
+            this.time = new DateTime();
+            time = DateTime.Now;
         }
         public override void Shoot()
         {

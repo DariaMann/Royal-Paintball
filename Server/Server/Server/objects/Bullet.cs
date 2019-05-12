@@ -15,9 +15,18 @@ namespace Server
         public float Y { get; set; }
         public float a { get; set; }
         public float b { get; set; }
+        public DateTime time { get; set; }
 
-        public Bullet(float endX, float endY,float x, float y, string weapon,int id,float speed)
+        public float[] EndPos { get; set; }
+        public float[] StartPos { get; set; }
+
+        public string Color { get; set; }
+
+        public Bullet(float endX, float endY, float x, float y, string weapon, int id, float speed, string color)
         {
+            Color = color;
+            EndPos = new float[] { endX, endY };
+            StartPos = new float[] { X, Y };
             float cos;
             float sin;
             if (endX >= x)
@@ -44,6 +53,9 @@ namespace Server
             this.Y = y;
             this.Weapon = weapon;
             this.ID = id;
+
+            this.time = new DateTime();
+            time = DateTime.Now;
         }
     }
 }

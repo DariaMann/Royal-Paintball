@@ -11,15 +11,12 @@ namespace Server
         public Gun()
         {
             this.CountBullets = 30;
-            this.Direction = 1;//направление мыши
-            this.Power = 2;
-            this.FlightTime = 0.8;
-            this.RechargeTime = 0.5;
-            this.InityalCountBul = 10;
-            this.Index = 3;
             this.TakenLives = 3;
             this.CountMagazine = 0;
             this.MaxCountMag = 30;
+            this.CamShot = true;
+            this.time = new DateTime();
+            time = DateTime.Now;
         }
         public override void Shoot()
         {

@@ -3,6 +3,9 @@ using UnityEngine;
 using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json;
+using System;
+using System.Threading;
+
 
 public class ClientTCP  {
 
@@ -11,7 +14,16 @@ public class ClientTCP  {
     private bool connected;
     public static NetworkStream myStream;
     private byte[] asyncBuff;
-    
+
+    //private Thread thread;
+    //public void Start()
+    //{
+    //    thread = new Thread(clientTCP.SendFirstMessage(player));
+
+    //    thread.Start();
+
+    //}
+
     public void Connect()
     {
         try
@@ -23,11 +35,25 @@ public class ClientTCP  {
             playerSocket.NoDelay = false;
             asyncBuff = new byte[8192];
             playerSocket.Connect("127.0.0.1", 904);
+            
+          //  playerSocket.Connect("52.14.61.47", 904);
 
             connecting = true;
         }
         catch { };
         
+    }
+    public void Disconnect()
+    {
+        try
+        {
+            Debug.Log("disconnect");
+            playerSocket.GetStream().Close();
+            playerSocket.Close();
+            connecting = false;
+        }
+        catch { };
+
     }
     public string GetPos ()//получение данных с сервера
     {
@@ -61,14 +87,17 @@ public class ClientTCP  {
         }
         catch
         {
-            playerSocket.GetStream().Close();
-            playerSocket.Close();
+          
         }
     }
+
+   
     public void Send(Player player)//отправка сообщения со всеми данными
     {
-        string message = JsonConvert.SerializeObject(player, Formatting.Indented);
-        byte[] buffer = Encoding.ASCII.GetBytes(message);
-        myStream.Write(buffer, 0, buffer.Length);
+       
+            string message = JsonConvert.SerializeObject(player, Formatting.Indented);
+            byte[] buffer = Encoding.ASCII.GetBytes(message);
+            myStream.Write(buffer, 0, buffer.Length);
+        
     }
 }

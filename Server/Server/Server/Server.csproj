@@ -60,7 +60,6 @@
     <Compile Include="Consumer.cs" />
     <Compile Include="IPlayController.cs" />
     <Compile Include="objects\Player.cs" />
-    <Compile Include="objects\Position.cs" />
     <Compile Include="objects\Weapons.cs" />
     <Compile Include="Weapons\Pistol.cs" />
     <Compile Include="Program.cs" />

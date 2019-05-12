@@ -19,6 +19,7 @@ public class NetworkManager : MonoBehaviour {
     public GameObject wallPref;
     public GameObject circlePref;
     public GameObject camera;
+    public GameObject kitPref;
     public GameObject cur;
     public Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
@@ -58,16 +59,18 @@ public class NetworkManager : MonoBehaviour {
 
     private void Awake()
     {
-        if (GameObject.FindGameObjectsWithTag("NetworkManager").Length == 1)
-            DontDestroyOnLoad(this);
-        else
-            Destroy(this);
+        //if (GameObject.FindGameObjectsWithTag("NetworkManager").Length == 1)
+        //    DontDestroyOnLoad(this);
+        //else
+        //    Destroy(this);
 
     }
+ 
     void Start() {
         clientTCP.Connect();//коннект с сервером                                     
 
         player.ID = -1;
+
         clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
 
         mess = clientTCP.GetPos();//данные с сервера  
@@ -95,7 +98,7 @@ public class NetworkManager : MonoBehaviour {
                 clientTCP.Send(field.Player[my_ID]);
                 mess = clientTCP.GetPos();//данные с сервера  
 
-                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); ;
+                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); 
                 field = jsonData1;
             }
                 CamMove();
@@ -164,18 +167,13 @@ public class NetworkManager : MonoBehaviour {
         CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
         Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
         Lifes.text = Convert.ToString(field.Player[my_ID].Life);
-        Timer.text = Convert.ToString(field.time);
+        Timer.text = field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
 
         if (Input.GetKeyDown(KeyCode.F))
         {
             field.Player[my_ID].LiftItem = true;
         }
         else { field.Player[my_ID].LiftItem = false; }
-        if (field.Player[my_ID].Life == 0)
-        {
-            InstantiateMagazine();
-            SceneManager.LoadScene("Play");
-        }
         if(Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
@@ -197,9 +195,8 @@ public class NetworkManager : MonoBehaviour {
     }
     public void ArrowRotation()
     {
-        Vector3 circlePos = new Vector3(0, 0,0);
-        //var angle = Vector2.Angle(Vector2.right, circlePos - playerList[my_ID].transform.position);//угол между вектором от объекта к мыше и осью х
-        var angle = Vector2.Angle(Vector2.left, circlePos- playerList[my_ID].transform.position );//угол между вектором от объекта к мыше и осью х
+        Vector3 circlePos = new Vector3(field.circle.X, field.circle.Y, 0);
+        var angle = Vector2.Angle(Vector2.left, circlePos- playerList[my_ID].transform.position );//угол между вектором от объекта 
         arrow.transform.eulerAngles = new Vector3(0f, 0f, playerList[my_ID].transform.position.y > circlePos.y ? angle : -angle);//немного магии на последок
     }
 
@@ -230,8 +227,11 @@ public class NetworkManager : MonoBehaviour {
                         GameObject pl = playerList[c];
                         i = c;
                         Destroy(pl);
-                        if(name == my_ID)
+                     
+                        if (name == my_ID)
                         {
+                            clientTCP.Disconnect();
+                            Destroy(this);
                             SceneManager.LoadScene("Play");
                         }
                   }
@@ -317,11 +317,12 @@ public class NetworkManager : MonoBehaviour {
     public void InstantiateWeapon(GameObject weap, string nameWeap)
     {
         GameObject Player = GameObject.Find(Convert.ToString(my_ID));
-        Transform w = Player.transform.GetChild(0);
+        Transform w = Player.transform.Find("Weapon"); //Player.transform.GetChild(0);
         weaponPref = w.gameObject;
         Vector2 v = w.position;
         Destroy(weaponPref);
         weaponPref = Instantiate(weap, v, Quaternion.identity);
+        weaponPref.name = "Weapon";
         weapon = nameWeap;
         weaponPref.transform.parent = GameObject.Find(Convert.ToString(my_ID)).transform;
     }
@@ -362,10 +363,11 @@ public class NetworkManager : MonoBehaviour {
                 }
 
                 GameObject Player = GameObject.Find(Convert.ToString(field.Player[c].ID));
-                weaponPref = Player.transform.GetChild(0).gameObject;
+                weaponPref = Player.transform.Find("Weapon").gameObject;
                 Vector2 v = weaponPref.transform.position;
                 Destroy(weaponPref);
                 weaponPref = Instantiate(weap, v, Quaternion.identity);
+                weaponPref.name = "Weapon";
                 weapon = nameWeap;
                 weaponPref.transform.parent = GameObject.Find(Convert.ToString(field.Player[c].ID)).transform;
             }
@@ -437,7 +439,7 @@ public class NetworkManager : MonoBehaviour {
                     Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
                     cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
                     cur.name = Convert.ToString(i);
-                    Color(field.Player[field.Bullet[i].ID].Color, cur);
+                    Color(field.Bullet[i].Color, cur);
                     bulletList.Add(i, cur);
                 }
             }
@@ -490,6 +492,16 @@ public class NetworkManager : MonoBehaviour {
                                 itemList.Add(i, temp);
                                 break;
                             }
+                        case "Kit":
+                            {
+                                // Vector2 v = new Vector2(player.X, player.Y + 1.5f);
+                                Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
+                                GameObject temp = Instantiate(kitPref, v, Quaternion.identity);
+                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                                temp.name = field.Item[i].Name;
+                                itemList.Add(i, temp);
+                                break;
+                            }
                     }
                 }
             }
@@ -503,7 +515,7 @@ public class NetworkManager : MonoBehaviour {
         GameObject temp = Instantiate(circlePref, v, Quaternion.identity);
 
         temp.transform.rotation = Quaternion.Euler(90,180, 0);
-        temp.transform.localScale = new Vector3(field.circle.Size[0],1, field.circle.Size[1]);
+        temp.transform.localScale = new Vector3(Convert.ToSingle(field.circle.Size[0]),1, Convert.ToSingle(field.circle.Size[1]));
 
     }
     public void InstantiatePlayer()//Создание игроков
@@ -529,7 +541,8 @@ public class NetworkManager : MonoBehaviour {
     public void SizeCircle()
     {
         GameObject temp = GameObject.FindGameObjectWithTag("Circle");
-        temp.transform.localScale = new Vector3(field.circle.Size[0], 1, field.circle.Size[1]);
+        temp.transform.localScale = new Vector3(Convert.ToSingle(field.circle.Size[0]), 1, Convert.ToSingle(field.circle.Size[1]));
+        temp.transform.position = new Vector2(field.circle.X, field.circle.Y);
     }
     public void MyId()
     {
@@ -540,36 +553,44 @@ public class NetworkManager : MonoBehaviour {
     }
     public void Color(string color, GameObject temp)
     {
-
+       // Destroy(temp.transform.FindChild("Player").transform.GetComponent<Renderer>().material);
         switch (color)
         {
+           
             case "blue":
                 {
+
+                    // temp.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[0];
                     temp.transform.GetComponent<Renderer>().material.color = Colors[0];
                     break;
                 }
             case "red":
                 {
+                    //  temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[1];
                     temp.transform.GetComponent<Renderer>().material.color = Colors[1];
                     break;
                 }
             case "yellow":
                 {
+                    //   temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[2];
                     temp.transform.GetComponent<Renderer>().material.color = Colors[2];
                     break;
                 }
             case "orange":
                 {
+                    // temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[3];
                     temp.transform.GetComponent<Renderer>().material.color = Colors[3];
                     break;
                 }
             case "pink":
                 {
+                    //temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[4];
                     temp.transform.GetComponent<Renderer>().material.color = Colors[4];
                     break;
                 }
             case "green":
                 {
+                    //temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[5];
                     temp.transform.GetComponent<Renderer>().material.color = Colors[5];
                     break;
                 }
@@ -587,7 +608,7 @@ public class NetworkManager : MonoBehaviour {
     }
     public void CamMove()
     {
-        camera.transform.position = playerList[my_ID].transform.position + offset;
+       camera.transform.position = playerList[my_ID].transform.position + offset;
     }
 
     public void MovePlayer()//двжение игрока

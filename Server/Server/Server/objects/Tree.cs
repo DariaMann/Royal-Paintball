@@ -13,10 +13,12 @@ namespace Server
         public int[] Size { get; set; }
         public string Type;
 
-        public Tree()
+        public Tree(float x,float y,string type)
         {
+            this.X = x;
+            this.Y = y;
+            this.Type = type;
             Size = new int[2] { 4, 2 };
         }
-
     }
 }

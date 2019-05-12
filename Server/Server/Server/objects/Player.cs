@@ -34,6 +34,8 @@ namespace Server
 
         public string Color { get; set; }
 
+        public bool OutCircle { get; set; }
+
         public Player()
         {
             P = new Pistol();
@@ -41,12 +43,12 @@ namespace Server
             G = new Gun();
             B = new Bomb();
             Weap = P;
-            Position pos = new Position();
-            X = pos.X;
-            Y = pos.Y;
+            Random rn = new Random(); // объявление переменной для генерации чисел
+            this.X = rn.Next(-2, 5); 
+            this.Y = rn.Next(-2, 5);
             XRot = -90;
             YRot = 0;
-            Life = 30;
+            Life = 50;
             Direction = "N";
             Shoot = false;
             Weapon = "Pistol";
@@ -55,6 +57,7 @@ namespace Server
             End = new float[2];
             MousePos = new float[3];
             Size = new int[] {1,1};
+            OutCircle = false;
 
         }
       

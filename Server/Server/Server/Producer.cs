@@ -10,21 +10,26 @@ namespace Server
 {
     public class Producer//Producer
     {
-        static public int ID = 555;
+        public int Id = 555;
         public TcpClient client;
         public Field field;//поле игры
 
         private readonly ConcurrentQueue<Player> queue;
+        private readonly ConcurrentQueue<Field> dataForSend;
 
         private Thread thread;
         private volatile bool stopped;
 
-        public Producer(TcpClient tcpClient, Field Field, ConcurrentQueue<Player> queue)
+        public Producer(TcpClient tcpClient, Field Field, ConcurrentQueue<Player> queue, ConcurrentQueue<Field> dataForSend)
         {
             this.queue = queue;
             this.field = Field;
             this.client = tcpClient;
             this.stopped = true;
+            this.dataForSend = dataForSend;
+            Random rn = new Random(); // объявление переменной для генерации чисел
+            int id = rn.Next(0, 1000);
+            this.Id = id;
         }
 
         public void Start()
@@ -52,11 +57,12 @@ namespace Server
         public string PlayerData1()//создание игрока 
         {
             string color = First();//генерация ID игрока
+           
             field.Player.Add(
-                ID,
+                Id,
                 new Player()
                 {
-                    ID = ID,
+                    ID = Id,
                     Color = color
                 });
 
@@ -65,9 +71,7 @@ namespace Server
         }
             public string First()
         {
-            Random rn = new Random(); // объявление переменной для генерации чисел
-            int id = rn.Next(0, 1000);
-            ID = id;
+            Random rn = new Random();
             int col = rn.Next(0, field.Colors.Count);
             string color = field.Colors[col];
             field.Colors.Remove(color);
@@ -97,29 +101,44 @@ namespace Server
 
                     string message = builder.ToString();
 
-            //    Console.WriteLine("Клиент: " + message);
+                Console.WriteLine("Клиент: " + message);
 
                 Player jsonData1 = JsonConvert.DeserializeObject<Player>(message);
-                
-                    if (jsonData1.ID == -1 )
-                    // отправляем обратно сообщение 
-                    {
-                        message = PlayerData1();
-                  //  Console.WriteLine("СЕРВЕР: " + message);
-                        data = Encoding.UTF8.GetBytes(message);
-                        stream.Write(data, 0, data.Length);
-                    }
-                    else
-                    {
+
+                try { 
+                if (jsonData1.ID == -1)
+                // отправляем обратно сообщение 
+                {
+                    message = PlayerData1();
+                         Console.WriteLine("СЕРВЕР: " + message);
+                    data = Encoding.UTF8.GetBytes(message);
+                    stream.Write(data, 0, data.Length);
+                }
+                else
+                {
                     this.queue.Enqueue(jsonData1);
                     Console.WriteLine(queue.Count);
-                    var mess = JsonConvert.SerializeObject(field, Formatting.Indented);
-                      // Console.WriteLine("СЕРВЕР: " + mess);
-                        data = Encoding.UTF8.GetBytes(mess);
-                        stream.Write(data, 0, data.Length);
-                        stream.Flush();
+                        try
+                        {
+                            var mess = JsonConvert.SerializeObject(field, Formatting.Indented);
+                            Console.WriteLine("СЕРВЕР: " + mess);
+                            data = Encoding.UTF8.GetBytes(mess);
+                            stream.Write(data, 0, data.Length);
+                            stream.Flush();
+                        }
+                        catch
+                        { }
+
                     }
                 }
+                catch (System.NullReferenceException e) {
+
+                    if (!field.Player.ContainsKey(Id))
+                    {
+                        Stop();
+                    }
+                }
+            }
 
             //}
 

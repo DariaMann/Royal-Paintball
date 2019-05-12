@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Server
@@ -20,13 +21,14 @@ namespace Server
                 server.Start();
             Console.WriteLine("Ожидание подключений... ");
 
-            ConcurrentQueue<Player> queue = new ConcurrentQueue<Player>();
-
+            ConcurrentQueue<Player> queue = new ConcurrentQueue<Player>();//data from client
+            ConcurrentQueue<Field> dataForSend = new ConcurrentQueue<Field>();//data from server
+            List<Producer> producers = new List<Producer>();
             // устанавливаем метод обратного вызова
             Field f = new Field();
             // диалог сервера с клиентами
 
-            Consumer consumer = new Consumer(f, queue);
+            Consumer consumer = new Consumer(f, queue,dataForSend);
 
             consumer.Start();
 
@@ -38,16 +40,12 @@ namespace Server
                 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
                 
-                Producer producer = new Producer(client,f,queue);//Producer
+                Producer producer = new Producer(client,f,queue,dataForSend);
+
+                producers.Add(producer);
 
                  producer.Start();
-                ////// создаем новый поток для обслуживания нового клиента
-                //Thread clientThread = new Thread(new ThreadStart(producer.Process));
-                //clientThread.Start();
-
             }
         }
-        
-        
     }
 }
