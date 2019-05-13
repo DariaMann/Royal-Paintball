@@ -1626,7 +1626,6 @@ MonoBehaviour:
   Timer: {fileID: 1575821649}
   my_ID: 0
   weapon: Pistol
-  mess: 
   gun: {fileID: 1768196200222138, guid: 3f09cdc7bf43f874fa093056af1afc62, type: 2}
   shotgun: {fileID: 1700715487831334, guid: ce7eb5aec97cd8d458d7d3eb28130550, type: 2}
   bomb: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}

@@ -133,20 +133,20 @@ namespace Server
             }
         }
 
-        public void mp()
-        {
-            foreach (int c in field.Player.Keys)
-            {
-                float aX = field.Player[c].X - field.Player[c].Size[0];
-                float aY = field.Player[c].Y + field.Player[c].Size[1];
-                float bX = field.Player[c].X + field.Player[c].Size[0];
-                float bY = field.Player[c].Y + field.Player[c].Size[1];
-                float cX = field.Player[c].X + field.Player[c].Size[0];
-                float cY = field.Player[c].Y - field.Player[c].Size[1];
-                float dX = field.Player[c].X - field.Player[c].Size[0];
-                float dY = field.Player[c].Y - field.Player[c].Size[1];
-            }
-        }
+        //public void mp()
+        //{
+        //    foreach (int c in field.Player.Keys)
+        //    {
+        //        float aX = field.Player[c].X - field.Player[c].Size[0];
+        //        float aY = field.Player[c].Y + field.Player[c].Size[1];
+        //        float bX = field.Player[c].X + field.Player[c].Size[0];
+        //        float bY = field.Player[c].Y + field.Player[c].Size[1];
+        //        float cX = field.Player[c].X + field.Player[c].Size[0];
+        //        float cY = field.Player[c].Y - field.Player[c].Size[1];
+        //        float dX = field.Player[c].X - field.Player[c].Size[0];
+        //        float dY = field.Player[c].Y - field.Player[c].Size[1];
+        //    }
+        //}
 
         private void Hit(int ID)//ранение
         {
@@ -278,7 +278,25 @@ namespace Server
         private void ReloadCall(int ID)
         {
             field.Player[ID].Weap.CamShot = false;
-            DateTime dt = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second+2, now.Millisecond);
+            int second= now.Second;
+            {
+                if (now.Second == 59) {
+                    second = 1;
+                  
+                }
+                else{
+                    if (now.Second == 60)
+                    {
+                        second = 2;
+                    }
+                    else
+                    {
+                         second = now.Second + 2;
+                    }
+                }
+
+            }
+            DateTime dt = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, second, now.Millisecond);
             field.Player[ID].Weap.time = dt;
         }
 
@@ -408,7 +426,7 @@ namespace Server
 
             for (int i = 0; i < field.Bullet.Count; i++)
             {
-                if(field.Bullet[i].StartPos[0]- field.Bullet[i].X <5)
+                //if(field.Bullet[i].StartPos[0]- field.Bullet[i].X <5)
                 {
                     field.Bullet[i].X += field.Bullet[i].a;
                     field.Bullet[i].Y += field.Bullet[i].b;
@@ -461,7 +479,7 @@ namespace Server
 
         private void MovePlayer(int ID,string dir)//движение игрока
         {
-            float speed = 0.3f;
+            float speed = 0.5f;
             switch (dir)
             {
                 case "W":
@@ -524,7 +542,7 @@ namespace Server
             }
         }
 
-        private void ReactionInTime(Player player)
+        private void ReactionInTime(Player player)//метод который выполняется независимо от клиента
         {
             if (field.time.Seconds == 30)
             {
@@ -552,15 +570,17 @@ namespace Server
                 if (this.queue.TryDequeue(out Player pl))
                 {
                     Reaction(pl);
-                    this.dataForSend.Enqueue(field);
                 }
-                if (field.Player.Count > 0)
-                {
                     now = DateTime.Now;
                     interval = StartTime - now;
                     ReactionInTime(pl);
-                }
-               // this.dataForSend.Enqueue(field);
+                    this.dataForSend.Enqueue(field);
+                //Console.WriteLine(dataForSend.Count);
+                //if (dataForSend.Count > 1000)
+                //{
+                //    for (int i = 0; i < 100; i++)
+                //    { this.dataForSend.TryDequeue(out Field f); }
+                //}
             }
         }
     }

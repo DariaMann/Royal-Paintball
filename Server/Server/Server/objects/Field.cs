@@ -58,23 +58,21 @@ namespace Server
                 }
                 Tree.Add(new Tree(x,y,type));
             }
-            //Wall = new List<Wall>();
-            //for (int i = 0; i < 30; i++)
-            //{
-            //    float x = rn.Next(-40, 40); //rn.Next(-8, 8);
-            //    float y = rn.Next(-40, 40);//rn.Next(-4, 4);
-            //    Wall.Add(new Wall(x, y));
-            // }
-            AllWalls();
+            Wall = new List<Wall>();
+            for (int i = 0; i < 30; i++)
+            {
+                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
+                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                Wall.Add(new Wall(x, y));
+            }
             Bullet = new List<Bullet>();
-            //Item = new List<Item>();
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    float x = rn.Next(-40, 40); //rn.Next(-8, 8);
-            //    float y = rn.Next(-40, 40);//rn.Next(-4, 4);
-            //    Item.Add(new Item("Kit", 5, x, y, Item.Count));
-            //}
-            AllKit();
+            Item = new List<Item>();
+            for (int i = 0; i < 10; i++)
+            {
+                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
+                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                Item.Add(new Item("Kit", 5, x, y, Item.Count));
+            }
             this.time = new TimeSpan();
             Player = new Dictionary<int, Player>();
             circle = new Circle();

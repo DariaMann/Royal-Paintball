@@ -23,8 +23,8 @@ namespace Server
         {
             X = 0;
             Y = 0;
-            Size = new double[] { 5, 5 };
-            Radius = 21;//42;
+            Radius = 84;
+            Size = new double[] { 20, 20 };
             StartTime = 10;
             go = false;
         }

@@ -94,10 +94,9 @@ public class ClientTCP  {
    
     public void Send(Player player)//отправка сообщения со всеми данными
     {
-       
-            string message = JsonConvert.SerializeObject(player, Formatting.Indented);
+        System.Threading.Thread.Sleep(100);
+        string message = JsonConvert.SerializeObject(player, Formatting.Indented);
             byte[] buffer = Encoding.ASCII.GetBytes(message);
             myStream.Write(buffer, 0, buffer.Length);
-        
     }
 }

@@ -101,30 +101,38 @@ namespace Server
 
                     string message = builder.ToString();
 
-                Console.WriteLine("Клиент: " + message);
-
-                Player jsonData1 = JsonConvert.DeserializeObject<Player>(message);
-
+               Console.WriteLine("Клиент: " + message);
+                Player jsonData1 = new Player();
+                try
+                {
+                    jsonData1 = JsonConvert.DeserializeObject<Player>(message);
+                }
+                catch(Newtonsoft.Json.JsonReaderException)
+                {  }
                 try { 
                 if (jsonData1.ID == -1)
                 // отправляем обратно сообщение 
                 {
                     message = PlayerData1();
-                         Console.WriteLine("СЕРВЕР: " + message);
+                  //       Console.WriteLine("СЕРВЕР: " + message);
                     data = Encoding.UTF8.GetBytes(message);
                     stream.Write(data, 0, data.Length);
                 }
                 else
                 {
                     this.queue.Enqueue(jsonData1);
-                    Console.WriteLine(queue.Count);
+                   
                         try
                         {
-                            var mess = JsonConvert.SerializeObject(field, Formatting.Indented);
-                            Console.WriteLine("СЕРВЕР: " + mess);
-                            data = Encoding.UTF8.GetBytes(mess);
-                            stream.Write(data, 0, data.Length);
-                            stream.Flush();
+                            //Console.WriteLine(dataForSend.Count);
+                            if (this.dataForSend.TryDequeue(out Field f))
+                            {
+                                var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
+                            //    Console.WriteLine("СЕРВЕР: " + mess);
+                                data = Encoding.UTF8.GetBytes(mess);
+                                stream.Write(data, 0, data.Length);
+                                stream.Flush();
+                            }
                         }
                         catch
                         { }

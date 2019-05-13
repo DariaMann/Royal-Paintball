@@ -39,7 +39,7 @@ public class NetworkManager : MonoBehaviour {
     static public bool IsItFirstMessage = true;
     static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
     static public Dictionary<string, string> clientData = new Dictionary<string, string>();
-    public string mess;
+    string mess;
     public GameObject gun;
     public GameObject shotgun;
     public GameObject bomb;
@@ -281,6 +281,7 @@ public class NetworkManager : MonoBehaviour {
                     }
                     else
                     {
+                        if(field.Player.ContainsKey(my_ID))
                         field.Player[my_ID].Direction = "N";
                     }
                 }
