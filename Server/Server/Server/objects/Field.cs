@@ -16,7 +16,7 @@ namespace Server
         public List<Tree> Tree { get; set; }
         public List<Wall> Wall { get; set; }
         public List<Bullet> Bullet { get; set; }
-        public List<Item> Item { get; set; }
+        public Dictionary<int, Item> Item { get; set; }
         public Dictionary<int, Player> Player { get; set; }
         public Circle circle { get; set; }
 
@@ -66,12 +66,12 @@ namespace Server
                 Wall.Add(new Wall(x, y));
             }
             Bullet = new List<Bullet>();
-            Item = new List<Item>();
+            Item = new Dictionary<int,Item>();
             for (int i = 0; i < 10; i++)
             {
                 float x = rn.Next(-40, 40); //rn.Next(-8, 8);
                 float y = rn.Next(-40, 40);//rn.Next(-4, 4);
-                Item.Add(new Item("Kit", 5, x, y, Item.Count));
+                Item.Add(Item.Count,new Item("Kit", 5, x, y, Item.Count));
             }
             this.time = new TimeSpan();
             Player = new Dictionary<int, Player>();
@@ -118,11 +118,11 @@ namespace Server
         public void AllKit()
         {
             float[] cord = new float[] { 0, 0 };
-            Item = new List<Item>();
+            Item = new Dictionary<int, Item>();
             for (int i = 0; i < 3; i++)
             {
                 cord = chek();
-                Item.Add(
+                Item.Add(Item.Count,
                 new Item("Kit", 5, cord[0], cord[1], Item.Count));
                 Console.WriteLine("x: " + cord[0]);
                 Console.WriteLine("y: " + cord[1]);

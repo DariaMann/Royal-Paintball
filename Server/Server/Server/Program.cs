@@ -24,11 +24,16 @@ namespace Server
             ConcurrentQueue<Player> queue = new ConcurrentQueue<Player>();//data from client
             ConcurrentQueue<Field> dataForSend = new ConcurrentQueue<Field>();//data from server
             List<Producer> producers = new List<Producer>();
+            List<TcpClient> clientTSP = new List<TcpClient>();
             // устанавливаем метод обратного вызова
             Field f = new Field();
             // диалог сервера с клиентами
 
             Consumer consumer = new Consumer(f, queue,dataForSend);
+
+            Sender sender = new Sender( dataForSend, clientTSP);
+
+            sender.Start();
 
             consumer.Start();
 
@@ -41,6 +46,8 @@ namespace Server
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
                 
                 Producer producer = new Producer(client,f,queue,dataForSend);
+
+                clientTSP.Add(client);
 
                 producers.Add(producer);
 

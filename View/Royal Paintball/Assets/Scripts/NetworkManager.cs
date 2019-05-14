@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using Newtonsoft.Json;
+using System.Threading;
 using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviour {
@@ -56,16 +57,7 @@ public class NetworkManager : MonoBehaviour {
     public Field field = new Field();
 
     public Color[] Colors = new Color[8];
-
-    private void Awake()
-    {
-        //if (GameObject.FindGameObjectsWithTag("NetworkManager").Length == 1)
-        //    DontDestroyOnLoad(this);
-        //else
-        //    Destroy(this);
-
-    }
- 
+    
     void Start() {
         clientTCP.Connect();//коннект с сервером                                     
 
@@ -74,31 +66,41 @@ public class NetworkManager : MonoBehaviour {
         clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
 
         mess = clientTCP.GetPos();//данные с сервера  
-        
-        Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-        field = jsonData1;
+        Debug.Log(mess);
+
+        string[] words = mess.Split(new string[] { "}{" }, StringSplitOptions.RemoveEmptyEntries);
+        Debug.Log(words[0]);
+
+        Field jsonData1 = JsonConvert.DeserializeObject<Field>(words[0]+"}");
+            field = jsonData1;
 
         MyId();
         InstantiatePlayer();//создание играков
         InstantiateTree();
         InstantiateWall();
         InstantiateCircle();
-
+        
         offset = camera.transform.position - playerList[my_ID].transform.position;
 
         IsItFirstMessage = false;
     }
     private void Update()
     {
-
         if (!IsItFirstMessage)
         {
             if (field.Player.ContainsKey(my_ID))
             {
-                clientTCP.Send(field.Player[my_ID]);
-                mess = clientTCP.GetPos();//данные с сервера  
-
-                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess); 
+                clientTCP.Send(field.Player[my_ID]);//отправка данных на сервер
+              mess = clientTCP.GetPos();//данные с сервера  
+                Field jsonData1 = field;
+                
+                try
+                {
+                    jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+                }
+                catch (Newtonsoft.Json.JsonReaderException)
+                { }
+                catch (JsonSerializationException) { }
                 field = jsonData1;
             }
                 CamMove();
@@ -167,7 +169,7 @@ public class NetworkManager : MonoBehaviour {
         CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
         Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
         Lifes.text = Convert.ToString(field.Player[my_ID].Life);
-        Timer.text = field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
+        Timer.text = Convert.ToString(field.time);//field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
 
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -243,15 +245,59 @@ public class NetworkManager : MonoBehaviour {
     }
     public void DelMgazine()
     {
-        if (field.Item.Count < itemList.Count)
+        //int del = -1;
+        ////for(int i = 0;i< itemList.Count;i++)
+        //foreach(int i in itemList.Keys)
+        //{
+        //   // foreach(Item item in field.Item)
+        //    {
+        //        if(field.Item[i].Index != i)
+        //        {
+        //            del = i;
+
+        //        }
+        //    }
+        //}
+        //if (del != -1)
+        //{
+        //    Debug.Log(itemList.Count);
+        //    Debug.Log(del);
+        //    GameObject it = itemList[del];
+        //    itemList.Remove(del);
+        //    Destroy(it);
+        //}
+        //del = -1;
+        //  for (int i = 0; i < itemList.Count; i++)
+        int del = -1;
+        //  int[] itemIDs = new int[];
+        List<int> itemIDs = new List<int>();
+        foreach (int i in itemList.Keys)
         {
-            while (field.Item.Count != itemList.Count)
-            {
-                GameObject item = itemList[itemList.Count-1];
-                itemList.Remove(itemList.Count - 1);
-                Destroy(item);
-            }
+            itemIDs.Add(i);
         }
+            foreach(int i in itemIDs)
+        {
+            if (!field.Item.ContainsKey(i))
+            {
+                GameObject item = itemList[i];
+                itemList.Remove(i);
+                Destroy(item);
+                Debug.Log("!!!");
+                
+            }
+
+        }
+         
+       
+        //if (field.Item.Count < itemList.Count)
+        //{
+        //    while (field.Item.Count != itemList.Count)
+        //    {
+        //        GameObject item = itemList[itemList.Count - 1];
+        //        itemList.Remove(itemList.Count - 1);
+        //        Destroy(item);
+        //    }
+        //}
     }
    
     public void KeyMoveDown()//движение пользователя
@@ -440,7 +486,7 @@ public class NetworkManager : MonoBehaviour {
                     Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
                     cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
                     cur.name = Convert.ToString(i);
-                    Color(field.Bullet[i].Color, cur);
+                    Color(field.Bullet[i].Color, cur,"Bullet");
                     bulletList.Add(i, cur);
                 }
             }
@@ -450,7 +496,8 @@ public class NetworkManager : MonoBehaviour {
     {
         if(field.Item.Count>0)
         {
-            for (int i = 0; i < field.Item.Count; i++)
+            //for (int i = 0; i < field.Item.Count; i++)
+            foreach(int i in field.Item.Keys)
             {
                 if (!itemList.ContainsKey(i))
                 {
@@ -532,7 +579,7 @@ public class NetworkManager : MonoBehaviour {
 
                 temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                 temp.name = Convert.ToString(c);
-                Color(player.Color, temp);
+                Color(player.Color, temp,"Player");
                 Lifes.text = Convert.ToString(player.Life);
                 playerList.Add(c, temp);
             }
@@ -552,7 +599,7 @@ public class NetworkManager : MonoBehaviour {
             my_ID = field.Player[c].ID;
         }
     }
-    public void Color(string color, GameObject temp)
+    public void Color(string color, GameObject temp,string name)
     {
        // Destroy(temp.transform.FindChild("Player").transform.GetComponent<Renderer>().material);
         switch (color)
@@ -560,48 +607,65 @@ public class NetworkManager : MonoBehaviour {
            
             case "blue":
                 {
-
-                    // temp.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[0];
+                    if(name=="Player")
+                    temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[0];
+                   else
                     temp.transform.GetComponent<Renderer>().material.color = Colors[0];
                     break;
                 }
             case "red":
                 {
-                    //  temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[1];
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[1];
+                   else
                     temp.transform.GetComponent<Renderer>().material.color = Colors[1];
                     break;
                 }
             case "yellow":
                 {
-                    //   temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[2];
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[2];
+                    else
                     temp.transform.GetComponent<Renderer>().material.color = Colors[2];
                     break;
                 }
             case "orange":
                 {
-                    // temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[3];
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[3];
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[3];
+                   else
+                     temp.transform.GetComponent<Renderer>().material.color = Colors[3];
                     break;
                 }
             case "pink":
                 {
-                    //temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[4];
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[4];
+                   else
                     temp.transform.GetComponent<Renderer>().material.color = Colors[4];
                     break;
                 }
             case "green":
                 {
-                    //temp.transform.transform.FindChild("Player").transform.GetComponent<Renderer>().material.color = Colors[5];
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[5];
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[5];
+                    else
+                      temp.transform.GetComponent<Renderer>().material.color = Colors[5];
                     break;
                 }
             case "black":
                 {
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[6];
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[6];
+                    else
+                      temp.transform.GetComponent<Renderer>().material.color = Colors[6];
                     break;
                 }
             case "white":
                 {
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[7];
+                    else
                     temp.transform.GetComponent<Renderer>().material.color = Colors[7];
                     break;
                 }

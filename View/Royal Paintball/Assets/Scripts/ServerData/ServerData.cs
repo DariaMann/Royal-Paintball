@@ -10,7 +10,7 @@ public class Field
     public List<Tree> Tree { get; set; }
     public List<Wall> Wall { get; set; }
     public List<Bullet> Bullet { get; set; }
-    public List<Item> Item { get; set; }
+    public Dictionary<int, Item> Item { get; set; }
     public Dictionary<int, Player> Player { get; set; }
     public Circle circle { get; set; }
 

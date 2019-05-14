@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Collections.Concurrent;
 
+using System.Collections.Generic;
 namespace Server
 {
     public class Consumer: IPlayController//Consumer
@@ -44,7 +45,13 @@ namespace Server
         {
             foreach (int c in field.Player.Keys)
             {
-                for (int i = 0; i < field.Item.Count; i++)
+                //   for (int i = 0; i < field.Item.Count; i++)
+                List<int> list = new List<int>();
+                foreach (int i in list)
+                {
+                    list.Add(i);
+                }
+                foreach (int i in list)//field.Item.Keys)
                 {
                     float aX = field.Player[c].X - (field.Player[c].Size[0] + 2);
                     float aY = field.Player[c].Y  + (field.Player[c].Size[1] + 2);
@@ -88,7 +95,7 @@ namespace Server
                                         break;
                                     }
                             }
-                            field.Item.Remove(field.Item[i]);
+                            field.Item.Remove(i);
                         }
                     }
                 }
@@ -397,16 +404,16 @@ namespace Server
         {
             int pistol = field.Player[ID].P.CountBullets + field.Player[ID].P.CountMagazine;
             if (pistol != 0)
-            { field.Item.Add(new Item("Pistol", pistol, field.Player[ID].X, field.Player[ID].Y + 1.5f,field.Item.Count)); }
+            { field.Item.Add(field.Item.Count, new Item("Pistol", pistol, field.Player[ID].X, field.Player[ID].Y + 1.5f,field.Item.Count)); }
             int shotgun = field.Player[ID].S.CountBullets + field.Player[ID].S.CountMagazine;
             if (shotgun != 0)
-            { field.Item.Add(new Item("Shotgun", shotgun, field.Player[ID].X, field.Player[ID].Y - 1.5f, field.Item.Count)); }
+            { field.Item.Add(field.Item.Count,new Item("Shotgun", shotgun, field.Player[ID].X, field.Player[ID].Y - 1.5f, field.Item.Count)); }
             int gun = field.Player[ID].G.CountBullets + field.Player[ID].G.CountMagazine;
             if (gun != 0)
-            { field.Item.Add(new Item("Gun", gun, field.Player[ID].X - 1.5f, field.Player[ID].Y, field.Item.Count)); }
+            { field.Item.Add(field.Item.Count,new Item("Gun", gun, field.Player[ID].X - 1.5f, field.Player[ID].Y, field.Item.Count)); }
             int bomb = field.Player[ID].B.CountBullets + field.Player[ID].B.CountMagazine;
             if (bomb != 0)
-            { field.Item.Add(new Item("Bomb", bomb, field.Player[ID].X + 1.5f, field.Player[ID].Y, field.Item.Count)); }
+            { field.Item.Add(field.Item.Count,new Item("Bomb", bomb, field.Player[ID].X + 1.5f, field.Player[ID].Y, field.Item.Count)); }
             field.Player[ID].P.CountBullets = 0; field.Player[ID].P.CountMagazine = 0;
             field.Player[ID].S.CountBullets = 0; field.Player[ID].S.CountMagazine = 0;
             field.Player[ID].G.CountBullets = 0; field.Player[ID].G.CountMagazine = 0;
@@ -567,6 +574,9 @@ namespace Server
             
             while (!stopped)
             {
+                //Console.WriteLine("dataForSend: " + dataForSend.Count);
+                //Console.WriteLine("queue: " + queue.Count);
+
                 if (this.queue.TryDequeue(out Player pl))
                 {
                     Reaction(pl);
@@ -574,12 +584,18 @@ namespace Server
                     now = DateTime.Now;
                     interval = StartTime - now;
                     ReactionInTime(pl);
-                    this.dataForSend.Enqueue(field);
-                //Console.WriteLine(dataForSend.Count);
-                //if (dataForSend.Count > 1000)
+
+                if (dataForSend.Count < 100)
+                { this.dataForSend.Enqueue(field); }
+
+
+                //if (dataForSend.Count > 100000)
                 //{
-                //    for (int i = 0; i < 100; i++)
-                //    { this.dataForSend.TryDequeue(out Field f); }
+                //    while (dataForSend.Count != 100000)
+                //    {
+                //        this.dataForSend.TryDequeue(out Field f);
+                       
+                //    }
                 //}
             }
         }

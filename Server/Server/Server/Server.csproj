@@ -55,6 +55,7 @@
     <Compile Include="objects\Field.cs" />
     <Compile Include="objects\Wall.cs" />
     <Compile Include="objects\Tree.cs" />
+    <Compile Include="Sender.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Bomb.cs" />
     <Compile Include="Consumer.cs" />

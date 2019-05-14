@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using Newtonsoft.Json;
 using System;
 using System.Threading;
+using UnityEngine.SceneManagement;
 
 
 public class ClientTCP  {
@@ -72,6 +73,9 @@ public class ClientTCP  {
         }
         catch
         {
+            Debug.Log("Лег сервер");
+            Disconnect();
+            SceneManager.LoadScene("Play");
             return "0";
         }
     }
@@ -87,16 +91,29 @@ public class ClientTCP  {
         }
         catch
         {
-          
+            Debug.Log("Лег сервер");
+            Disconnect();
+            SceneManager.LoadScene("Play");
         }
     }
 
    
     public void Send(Player player)//отправка сообщения со всеми данными
     {
-        System.Threading.Thread.Sleep(100);
+        //System.Threading.Thread.Sleep(100);
+        
         string message = JsonConvert.SerializeObject(player, Formatting.Indented);
-            byte[] buffer = Encoding.ASCII.GetBytes(message);
+      //  Debug.Log(message);
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+        try
+        {
             myStream.Write(buffer, 0, buffer.Length);
+        }
+        catch//(SocketException)
+        {
+            Debug.Log("Лег сервер");
+            Disconnect();
+            SceneManager.LoadScene("Play");
+        }
     }
 }
