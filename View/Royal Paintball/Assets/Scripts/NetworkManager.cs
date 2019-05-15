@@ -268,7 +268,7 @@ public class NetworkManager : MonoBehaviour {
         //}
         //del = -1;
         //  for (int i = 0; i < itemList.Count; i++)
-        int del = -1;
+       // int del = -1;
         //  int[] itemIDs = new int[];
         List<int> itemIDs = new List<int>();
         foreach (int i in itemList.Keys)
