@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using Newtonsoft.Json;
-using System.Threading;
 using UnityEngine.SceneManagement;
 
-public class NetworkManager : MonoBehaviour {
+public class NetworkManager : MonoBehaviour
+{
 
     private ClientTCP clientTCP = new ClientTCP();
     [SerializeField]
@@ -57,8 +57,9 @@ public class NetworkManager : MonoBehaviour {
     public Field field = new Field();
 
     public Color[] Colors = new Color[8];
-    
-    void Start() {
+
+    void Start()
+    {
         clientTCP.Connect();//коннект с сервером                                     
 
         player.ID = -1;
@@ -66,51 +67,43 @@ public class NetworkManager : MonoBehaviour {
         clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
 
         mess = clientTCP.GetPos();//данные с сервера  
-        Debug.Log(mess);
 
-        string[] words = mess.Split(new string[] { "}{" }, StringSplitOptions.RemoveEmptyEntries);
-        Debug.Log(words[0]);
-
-        Field jsonData1 = JsonConvert.DeserializeObject<Field>(words[0]+"}");
-            field = jsonData1;
+        Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+        field = jsonData1;
 
         MyId();
         InstantiatePlayer();//создание играков
         InstantiateTree();
         InstantiateWall();
         InstantiateCircle();
-        
+
         offset = camera.transform.position - playerList[my_ID].transform.position;
 
         IsItFirstMessage = false;
     }
     private void Update()
     {
+
         if (!IsItFirstMessage)
         {
             if (field.Player.ContainsKey(my_ID))
             {
-                clientTCP.Send(field.Player[my_ID]);//отправка данных на сервер
-              mess = clientTCP.GetPos();//данные с сервера  
-                Field jsonData1 = field;
-                
-                try
-                {
-                    jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-                }
-                catch (Newtonsoft.Json.JsonReaderException)
-                { }
-                catch (JsonSerializationException) { }
+                clientTCP.Send(field.Player[my_ID]);
+                mess = clientTCP.GetPos();//данные с сервера  
+
+                Debug.Log(mess);
+
+                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
                 field = jsonData1;
             }
-                CamMove();
-                DelBull();
-                DelPlayer();
-                DelMgazine();
-            if (field.Bullet.Count>0)
+            CamMove();
+            DelBull();
+            DelPlayer();
+            DelMgazine();
+            if (field.Bullet.Count > 0)
             {
                 InBul();
-              MoveBull();
+                MoveBull();
             }
             if (field.Player.Count != 0)
             {
@@ -169,14 +162,14 @@ public class NetworkManager : MonoBehaviour {
         CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
         Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
         Lifes.text = Convert.ToString(field.Player[my_ID].Life);
-        Timer.text = Convert.ToString(field.time);//field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
+        Timer.text = field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
 
         if (Input.GetKeyDown(KeyCode.F))
         {
             field.Player[my_ID].LiftItem = true;
         }
         else { field.Player[my_ID].LiftItem = false; }
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }
@@ -198,7 +191,7 @@ public class NetworkManager : MonoBehaviour {
     public void ArrowRotation()
     {
         Vector3 circlePos = new Vector3(field.circle.X, field.circle.Y, 0);
-        var angle = Vector2.Angle(Vector2.left, circlePos- playerList[my_ID].transform.position );//угол между вектором от объекта 
+        var angle = Vector2.Angle(Vector2.left, circlePos - playerList[my_ID].transform.position);//угол между вектором от объекта 
         arrow.transform.eulerAngles = new Vector3(0f, 0f, playerList[my_ID].transform.position.y > circlePos.y ? angle : -angle);//немного магии на последок
     }
 
@@ -224,19 +217,20 @@ public class NetworkManager : MonoBehaviour {
                 foreach (int c in playerList.Keys)
                 {
                     if (!field.Player.ContainsKey(Convert.ToInt32(playerList[c].name)))
-                  {
+                    {
                         int name = Convert.ToInt32(playerList[c].name);
                         GameObject pl = playerList[c];
                         i = c;
                         Destroy(pl);
-                     
+
                         if (name == my_ID)
                         {
                             clientTCP.Disconnect();
                             Destroy(this);
+                            Debug.Log("I died");
                             SceneManager.LoadScene("Play");
                         }
-                  }
+                    }
                 }
                 playerList.Remove(i);
 
@@ -245,37 +239,12 @@ public class NetworkManager : MonoBehaviour {
     }
     public void DelMgazine()
     {
-        //int del = -1;
-        ////for(int i = 0;i< itemList.Count;i++)
-        //foreach(int i in itemList.Keys)
-        //{
-        //   // foreach(Item item in field.Item)
-        //    {
-        //        if(field.Item[i].Index != i)
-        //        {
-        //            del = i;
-
-        //        }
-        //    }
-        //}
-        //if (del != -1)
-        //{
-        //    Debug.Log(itemList.Count);
-        //    Debug.Log(del);
-        //    GameObject it = itemList[del];
-        //    itemList.Remove(del);
-        //    Destroy(it);
-        //}
-        //del = -1;
-        //  for (int i = 0; i < itemList.Count; i++)
-       // int del = -1;
-        //  int[] itemIDs = new int[];
         List<int> itemIDs = new List<int>();
         foreach (int i in itemList.Keys)
         {
             itemIDs.Add(i);
         }
-            foreach(int i in itemIDs)
+        foreach (int i in itemIDs)
         {
             if (!field.Item.ContainsKey(i))
             {
@@ -283,23 +252,13 @@ public class NetworkManager : MonoBehaviour {
                 itemList.Remove(i);
                 Destroy(item);
                 Debug.Log("!!!");
-                
+
             }
 
         }
-         
-       
-        //if (field.Item.Count < itemList.Count)
-        //{
-        //    while (field.Item.Count != itemList.Count)
-        //    {
-        //        GameObject item = itemList[itemList.Count - 1];
-        //        itemList.Remove(itemList.Count - 1);
-        //        Destroy(item);
-        //    }
-        //}
+
     }
-   
+
     public void KeyMoveDown()//движение пользователя
     {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
@@ -327,8 +286,8 @@ public class NetworkManager : MonoBehaviour {
                     }
                     else
                     {
-                        if(field.Player.ContainsKey(my_ID))
-                        field.Player[my_ID].Direction = "N";
+                        if (field.Player.ContainsKey(my_ID))
+                            field.Player[my_ID].Direction = "N";
                     }
                 }
             }
@@ -350,7 +309,7 @@ public class NetworkManager : MonoBehaviour {
             field.Player[my_ID].Shoot = true;
             InstantiateBullet();
         }
-        
+
     }
     public void MousePos()
     {
@@ -430,7 +389,7 @@ public class NetworkManager : MonoBehaviour {
             {
                 case "Oak":
                     {
-                       
+
                         GameObject temp = Instantiate(OakPref, vec, Quaternion.identity);
                         temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
                         treeList.Add(i, temp);
@@ -462,31 +421,31 @@ public class NetworkManager : MonoBehaviour {
             Vector2 vec = new Vector2(field.Wall[i].X, field.Wall[i].Y);
             GameObject temp = Instantiate(wallPref, vec, Quaternion.identity);
             temp.transform.rotation = Quaternion.Euler(-90, 0, 0);
-       //     treeList.Add(i, temp);
+            //     treeList.Add(i, temp);
         }
 
     }
     public void InstantiateBullet()
     {
-            Vector2 v = new Vector2(field.Player[my_ID].X, field.Player[my_ID].Y);
-            var pos = Input.mousePosition;
-            pos = Camera.main.ScreenToWorldPoint(pos);
+        Vector2 v = new Vector2(field.Player[my_ID].X, field.Player[my_ID].Y);
+        var pos = Input.mousePosition;
+        pos = Camera.main.ScreenToWorldPoint(pos);
 
-            field.Player[my_ID].End = new float[2] { pos.x, pos.y };
-            field.Player[my_ID].Start = new float[2] { v.x, v.y };
+        field.Player[my_ID].End = new float[2] { pos.x, pos.y };
+        field.Player[my_ID].Start = new float[2] { v.x, v.y };
     }
     public void InBul()
     {
-        if(field.Bullet.Count>0)
+        if (field.Bullet.Count > 0)
         {
-            for(int i = 0;i<field.Bullet.Count;i++)
+            for (int i = 0; i < field.Bullet.Count; i++)
             {
                 if (!bulletList.ContainsKey(i))
                 {
                     Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
                     cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
                     cur.name = Convert.ToString(i);
-                    Color(field.Bullet[i].Color, cur,"Bullet");
+                    Color(field.Bullet[i].Color, cur, "Bullet");
                     bulletList.Add(i, cur);
                 }
             }
@@ -494,10 +453,9 @@ public class NetworkManager : MonoBehaviour {
     }
     public void InstantiateMagazine()
     {
-        if(field.Item.Count>0)
+        if (field.Item.Count > 0)
         {
-            //for (int i = 0; i < field.Item.Count; i++)
-            foreach(int i in field.Item.Keys)
+            foreach (int i in field.Item.Keys)
             {
                 if (!itemList.ContainsKey(i))
                 {
@@ -553,17 +511,17 @@ public class NetworkManager : MonoBehaviour {
                     }
                 }
             }
-           
+
         }
-       
+
     }
     public void InstantiateCircle()//Создание 
     {
-        Vector2 v = new Vector2(field.circle.X,field.circle.Y);
+        Vector2 v = new Vector2(field.circle.X, field.circle.Y);
         GameObject temp = Instantiate(circlePref, v, Quaternion.identity);
 
-        temp.transform.rotation = Quaternion.Euler(90,180, 0);
-        temp.transform.localScale = new Vector3(Convert.ToSingle(field.circle.Size[0]),1, Convert.ToSingle(field.circle.Size[1]));
+        temp.transform.rotation = Quaternion.Euler(90, 180, 0);
+        temp.transform.localScale = new Vector3(Convert.ToSingle(field.circle.Size[0]), 1, Convert.ToSingle(field.circle.Size[1]));
 
     }
     public void InstantiatePlayer()//Создание игроков
@@ -579,7 +537,7 @@ public class NetworkManager : MonoBehaviour {
 
                 temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                 temp.name = Convert.ToString(c);
-                Color(player.Color, temp,"Player");
+                Color(player.Color, temp, "Player");
                 Lifes.text = Convert.ToString(player.Life);
                 playerList.Add(c, temp);
             }
@@ -599,26 +557,25 @@ public class NetworkManager : MonoBehaviour {
             my_ID = field.Player[c].ID;
         }
     }
-    public void Color(string color, GameObject temp,string name)
+    public void Color(string color, GameObject temp, string name)
     {
-       // Destroy(temp.transform.FindChild("Player").transform.GetComponent<Renderer>().material);
         switch (color)
         {
-           
+
             case "blue":
                 {
-                    if(name=="Player")
-                    temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[0];
-                   else
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[0];
+                    if (name == "Player")
+                        temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[0];
+                    else
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[0];
                     break;
                 }
             case "red":
                 {
                     if (name == "Player")
                         temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[1];
-                   else
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[1];
+                    else
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[1];
                     break;
                 }
             case "yellow":
@@ -626,23 +583,23 @@ public class NetworkManager : MonoBehaviour {
                     if (name == "Player")
                         temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[2];
                     else
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[2];
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[2];
                     break;
                 }
             case "orange":
                 {
                     if (name == "Player")
                         temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[3];
-                   else
-                     temp.transform.GetComponent<Renderer>().material.color = Colors[3];
+                    else
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[3];
                     break;
                 }
             case "pink":
                 {
                     if (name == "Player")
                         temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[4];
-                   else
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[4];
+                    else
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[4];
                     break;
                 }
             case "green":
@@ -650,7 +607,7 @@ public class NetworkManager : MonoBehaviour {
                     if (name == "Player")
                         temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[5];
                     else
-                      temp.transform.GetComponent<Renderer>().material.color = Colors[5];
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[5];
                     break;
                 }
             case "black":
@@ -658,7 +615,7 @@ public class NetworkManager : MonoBehaviour {
                     if (name == "Player")
                         temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[6];
                     else
-                      temp.transform.GetComponent<Renderer>().material.color = Colors[6];
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[6];
                     break;
                 }
             case "white":
@@ -666,37 +623,37 @@ public class NetworkManager : MonoBehaviour {
                     if (name == "Player")
                         temp.transform.Find("Player").transform.GetComponent<SkinnedMeshRenderer>().materials[1].color = Colors[7];
                     else
-                    temp.transform.GetComponent<Renderer>().material.color = Colors[7];
+                        temp.transform.GetComponent<Renderer>().material.color = Colors[7];
                     break;
                 }
         }
     }
     public void CamMove()
     {
-       camera.transform.position = playerList[my_ID].transform.position + offset;
+        camera.transform.position = playerList[my_ID].transform.position + offset;
     }
 
     public void MovePlayer()//двжение игрока
     {
 
-            foreach (int c in field.Player.Keys)
-            {
+        foreach (int c in field.Player.Keys)
+        {
 
-                GameObject player = GameObject.Find(Convert.ToString(field.Player[c].ID));
-                Vector2 v = new Vector2(field.Player[c].X, field.Player[c].Y);
-                player.transform.position = v;
-                player.transform.rotation = Quaternion.Euler(field.Player[c].XRot, field.Player[c].YRot, 0);
+            GameObject player = GameObject.Find(Convert.ToString(field.Player[c].ID));
+            Vector2 v = new Vector2(field.Player[c].X, field.Player[c].Y);
+            player.transform.position = v;
+            player.transform.rotation = Quaternion.Euler(field.Player[c].XRot, field.Player[c].YRot, 0);
 
-            }
-        
+        }
+
     }
     public void MoveBull()
     {
         foreach (int i in bulletList.Keys)
-            {
-                Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
-               
-                bulletList[i].transform.position = v;
-            }
+        {
+            Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
+
+            bulletList[i].transform.position = v;
+        }
     }
 }

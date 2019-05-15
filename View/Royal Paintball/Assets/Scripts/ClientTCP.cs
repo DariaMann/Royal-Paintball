@@ -3,12 +3,10 @@ using UnityEngine;
 using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json;
-using System;
-using System.Threading;
 using UnityEngine.SceneManagement;
 
-
-public class ClientTCP  {
+public class ClientTCP
+{
 
     public TcpClient playerSocket;
     private bool connecting;
@@ -16,33 +14,22 @@ public class ClientTCP  {
     public static NetworkStream myStream;
     private byte[] asyncBuff;
 
-    //private Thread thread;
-    //public void Start()
-    //{
-    //    thread = new Thread(clientTCP.SendFirstMessage(player));
-
-    //    thread.Start();
-
-    //}
-
     public void Connect()
     {
         try
         {
-           Debug.Log("connect");
+            Debug.Log("connect");
             playerSocket = new TcpClient();
             playerSocket.ReceiveBufferSize = 4096;//размер буфера приема
             playerSocket.SendBufferSize = 4096;//размер буфера отправки
             playerSocket.NoDelay = false;
             asyncBuff = new byte[8192];
             playerSocket.Connect("127.0.0.1", 904);
-            
-          //  playerSocket.Connect("52.14.61.47", 904);
 
             connecting = true;
         }
         catch { };
-        
+
     }
     public void Disconnect()
     {
@@ -56,9 +43,10 @@ public class ClientTCP  {
         catch { };
 
     }
-    public string GetPos ()//получение данных с сервера
+    public string GetPos()//получение данных с сервера
     {
-        try{
+        try
+        {
             byte[] data = new byte[256];
             StringBuilder response = new StringBuilder();
             myStream = playerSocket.GetStream();
@@ -79,7 +67,7 @@ public class ClientTCP  {
             return "0";
         }
     }
-    
+
     public void SendFirstMessage(Player clientData)//отправка сообщения со всеми данными
     {
         try
@@ -96,20 +84,15 @@ public class ClientTCP  {
             SceneManager.LoadScene("Play");
         }
     }
-
-   
     public void Send(Player player)//отправка сообщения со всеми данными
     {
-        //System.Threading.Thread.Sleep(100);
-        
         string message = JsonConvert.SerializeObject(player, Formatting.Indented);
-      //  Debug.Log(message);
         byte[] buffer = Encoding.ASCII.GetBytes(message);
         try
         {
             myStream.Write(buffer, 0, buffer.Length);
         }
-        catch//(SocketException)
+        catch
         {
             Debug.Log("Лег сервер");
             Disconnect();
@@ -117,3 +100,5 @@ public class ClientTCP  {
         }
     }
 }
+
+

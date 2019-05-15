@@ -1,6 +1,6 @@
 WindowsStandalone
 PlayerPath?
-C:/Users/Daria/Desktop/Game/Royal Paintball.exe
+C:/Users/Daria/Desktop/Build/Royal Paintball.exe
 SceneListBegin?
 Assets/Scenes/Play.unity
 Assets/Scenes/Game.unity
