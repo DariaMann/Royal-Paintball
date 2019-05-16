@@ -21,6 +21,7 @@ public class NetworkManager : MonoBehaviour
     public GameObject circlePref;
     public GameObject camera;
     public GameObject kitPref;
+    public GameObject Finish;
     public GameObject cur;
     public Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
@@ -31,7 +32,9 @@ public class NetworkManager : MonoBehaviour
     public Text CountBul;
     public Text Magazine;
     public Text Timer;
+    public Text FinishMess;
     public int my_ID;
+
 
     public string weapon = "Pistol";
 
@@ -57,7 +60,21 @@ public class NetworkManager : MonoBehaviour
     public Field field = new Field();
 
     public Color[] Colors = new Color[8];
+    public void Exit()
+    {
+        Destroy(playerList[my_ID]);
+        playerList.Remove(my_ID);
+        Debug.Log("Лег сервер");
+        clientTCP.Disconnect();
+        SceneManager.LoadScene("Play");
 
+        //SceneManager.UnloadScene();
+        Application.Quit();
+    }
+    public void Menu()
+    {
+        SceneManager.LoadScene("Play");
+    }
     void Start()
     {
         clientTCP.Connect();//коннект с сервером                                     
@@ -90,8 +107,6 @@ public class NetworkManager : MonoBehaviour
             {
                 clientTCP.Send(field.Player[my_ID]);
                 mess = clientTCP.GetPos();//данные с сервера  
-
-                Debug.Log(mess);
 
                 Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
                 field = jsonData1;
@@ -142,21 +157,25 @@ public class NetworkManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             field.Player[my_ID].Weapon = "Pistol";
+            field.Player[my_ID].Weap = field.Player[my_ID].P;
             InstantiateWeapon(pistol, field.Player[my_ID].Weapon);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             field.Player[my_ID].Weapon = "Shotgun";
+            field.Player[my_ID].Weap = field.Player[my_ID].S;
             InstantiateWeapon(shotgun, field.Player[my_ID].Weapon);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             field.Player[my_ID].Weapon = "Gun";
+            field.Player[my_ID].Weap = field.Player[my_ID].G;
             InstantiateWeapon(gun, field.Player[my_ID].Weapon);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             field.Player[my_ID].Weapon = "Bomb";
+            field.Player[my_ID].Weap = field.Player[my_ID].B;
             InstantiateWeapon(bomb, field.Player[my_ID].Weapon);
         }
         CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
@@ -225,10 +244,9 @@ public class NetworkManager : MonoBehaviour
 
                         if (name == my_ID)
                         {
+                            Finish.SetActive(true);
                             clientTCP.Disconnect();
                             Destroy(this);
-                            Debug.Log("I died");
-                            SceneManager.LoadScene("Play");
                         }
                     }
                 }

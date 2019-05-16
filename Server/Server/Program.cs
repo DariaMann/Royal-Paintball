@@ -43,10 +43,6 @@ namespace Server
                 Producer producer = new Producer(client,f,queue, dataForSend);//Producer
 
                  producer.Start();
-                ////// создаем новый поток для обслуживания нового клиента
-                //Thread clientThread = new Thread(new ThreadStart(producer.Process));
-                //clientThread.Start();
-
             }
         }
         

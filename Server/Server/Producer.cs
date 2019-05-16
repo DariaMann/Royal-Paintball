@@ -99,9 +99,19 @@ namespace Server
                 string message = builder.ToString();
 
                 //    Console.WriteLine("Клиент: " + message);
-                // try {
-                Player jsonData1 = JsonConvert.DeserializeObject<Player>(message);
+                Player jsonData1 = new Player();
                 try
+                {
+                     jsonData1 = JsonConvert.DeserializeObject<Player>(message);
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+          //      try
+          if(jsonData1 == null)
+                {
+                    Stop();
+                }
                 {
                     if (jsonData1.ID == -1)
                 // отправляем обратно сообщение 
@@ -113,23 +123,26 @@ namespace Server
                 }
                 else
                 {
-                    this.queue.Enqueue(jsonData1);
-                    Console.WriteLine(queue.Count);
-                    if (this.dataForSend.TryDequeue(out Field f))
+                        Console.WriteLine("! " + jsonData1.Weap.CountBullets);
+                        this.queue.Enqueue(jsonData1);
+                        //  Console.WriteLine(queue.Count);
+                         Console.WriteLine("1: "+dataForSend.Count);
+                        if (this.dataForSend.TryDequeue(out Field f))
                     {
-                        var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
-                        // Console.WriteLine("СЕРВЕР: " + mess);
+                             Console.WriteLine("2: " + dataForSend.Count);
+                            var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
+                        Console.WriteLine("СЕРВЕР: " + mess);
                         data = Encoding.UTF8.GetBytes(mess);
                         stream.Write(data, 0, data.Length);
                         stream.Flush();
                     }
                 }
                 }
-                catch
-                {
-                    Console.WriteLine("Провал.");
-                    Stop();
-                }
+                //catch
+                //{
+                //    Console.WriteLine("Провал.");
+                //    Stop();
+                //}
             }
 
         }

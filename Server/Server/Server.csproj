@@ -47,7 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="objects\MedicineKit.cs" />
     <Compile Include="objects\Circle.cs" />
     <Compile Include="objects\Item.cs" />
     <Compile Include="objects\Bullet.cs" />

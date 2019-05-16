@@ -138,8 +138,6 @@ namespace Server
 
         private void Woundd(int ID,int takenLifes)//ранение
         {
-            
-
             if (field.Player[ID].Life > 0)
             {
                 field.Player[ID].Life -= takenLifes;
@@ -166,6 +164,7 @@ namespace Server
                         {
                             if (field.Player[c].X + 1 > bX)
                             {
+                                if(!field.Player[ID].StopIn.ContainsKey("A"))
                                 field.Player[ID].StopIn.Add("A", "A");
                                 Console.WriteLine("RIGHT");
                             }
@@ -173,21 +172,24 @@ namespace Server
                             {
                                 if (field.Player[c].X + 1 < bX)
                                 {
-                                    field.Player[ID].StopIn.Add("D", "D");
+                                    if (!field.Player[ID].StopIn.ContainsKey("D"))
+                                        field.Player[ID].StopIn.Add("D", "D");
                                     Console.WriteLine("LEFT");
                                 }
                             }
 
                             if (field.Player[c].Y + 1 > bY)
                             {
-                                field.Player[ID].StopIn.Add("S", "S");
+                                if (!field.Player[ID].StopIn.ContainsKey("S"))
+                                    field.Player[ID].StopIn.Add("S", "S");
                                 Console.WriteLine("UP");
                             }
                             else
                             {
                                 if (field.Player[c].Y + 1 < bY)
                                 {
-                                    field.Player[ID].StopIn.Add("W", "W");
+                                    if (!field.Player[ID].StopIn.ContainsKey("W"))
+                                        field.Player[ID].StopIn.Add("W", "W");
                                     Console.WriteLine("DOWN");
                                     Console.WriteLine("bX: " + bX);
                                     Console.WriteLine("field.Player[c].Y + 1: " + field.Player[c].Y + 1);
@@ -422,7 +424,7 @@ namespace Server
         {
             if (field.circle.go == true)
             {
-                if (Math.Abs(field.circle.X) < Math.Abs(field.circle.endX))
+                if (field.circle.X < field.circle.endX-3 || field.circle.X > field.circle.endX+3) //(Math.Abs(field.circle.X) > Math.Abs(field.circle.endX)+1&&Math.Abs(field.circle.X) < Math.Abs(field.circle.endX-1))
                 {
                     field.circle.X += field.circle.a;
                     field.circle.Y += field.circle.b;
@@ -606,6 +608,7 @@ namespace Server
 
         private void Reaction(Player player)//метод реакции сервера на сообщения клиента
         {
+            
             if (field.Player.ContainsKey(player.ID))
             {
                 Hit(player.ID);
@@ -613,8 +616,8 @@ namespace Server
                 {
                     MovePlayer(player.ID, player.Direction);
                 }
-
-                ChangeWeapon(player.ID, player.Weapon);
+                 ChangeWeapon(player.ID, player.Weapon);
+             
                 if (player.Shoot == true)//выстрел
                 {
                     Shoott(player.ID, player);
@@ -672,7 +675,7 @@ namespace Server
                 interval = StartTime - now;
                 ReactionInTime(pl);
 
-                if (dataForSend.Count < 100)
+                if (dataForSend.Count < 10)
                 { this.dataForSend.Enqueue(field); }
             }
         }
