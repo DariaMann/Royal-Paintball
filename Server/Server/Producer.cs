@@ -5,6 +5,7 @@ using System.Threading;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using GameLibrary;
 
 namespace Server
 {
@@ -15,12 +16,12 @@ namespace Server
         public Field field;//поле игры
 
         private readonly ConcurrentQueue<Player> queue;
-        private readonly ConcurrentQueue<Field> dataForSend;
+        private readonly ConcurrentQueue<string> dataForSend;
 
         private Thread thread;
         private volatile bool stopped;
 
-        public Producer(TcpClient tcpClient, Field Field, ConcurrentQueue<Player> queue, ConcurrentQueue<Field> dataForSend)
+        public Producer(TcpClient tcpClient, Field Field, ConcurrentQueue<Player> queue, ConcurrentQueue<string> dataForSend)
         {
             this.dataForSend = dataForSend;
             this.queue = queue;
@@ -98,51 +99,42 @@ namespace Server
 
                 string message = builder.ToString();
 
-                //    Console.WriteLine("Клиент: " + message);
+                    Console.WriteLine("Клиент: " + message);
                 Player jsonData1 = new Player();
                 try
                 {
                      jsonData1 = JsonConvert.DeserializeObject<Player>(message);
+
                 }catch(Exception e)
                 {
                     Console.WriteLine(e);
                 }
-          //      try
-          if(jsonData1 == null)
+
+                if(jsonData1 == null)
                 {
                     Stop();
                 }
                 {
                     if (jsonData1.ID == -1)
-                // отправляем обратно сообщение 
-                {
-                    message = PlayerData1();
-                    //  Console.WriteLine("СЕРВЕР: " + message);
-                    data = Encoding.UTF8.GetBytes(message);
-                    stream.Write(data, 0, data.Length);
-                }
-                else
-                {
-                        Console.WriteLine("! " + jsonData1.Weap.CountBullets);
-                        this.queue.Enqueue(jsonData1);
-                        //  Console.WriteLine(queue.Count);
-                         Console.WriteLine("1: "+dataForSend.Count);
-                        if (this.dataForSend.TryDequeue(out Field f))
+                    // отправляем обратно сообщение 
                     {
-                             Console.WriteLine("2: " + dataForSend.Count);
-                            var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
-                        Console.WriteLine("СЕРВЕР: " + mess);
-                        data = Encoding.UTF8.GetBytes(mess);
+                        message = PlayerData1();
+                        Console.WriteLine("СЕРВЕР: " + message);
+                        data = Encoding.UTF8.GetBytes(message);
                         stream.Write(data, 0, data.Length);
-                        stream.Flush();
+                    }
+                    else
+                    {
+                        this.queue.Enqueue(jsonData1);
+                        if (this.dataForSend.TryDequeue(out string mess))
+                        {
+                            Console.WriteLine("СЕРВЕР: " + mess);
+                            data = Encoding.UTF8.GetBytes(mess);
+                            stream.Write(data, 0, data.Length);
+                            stream.Flush();
+                        }
                     }
                 }
-                }
-                //catch
-                //{
-                //    Console.WriteLine("Провал.");
-                //    Stop();
-                //}
             }
 
         }

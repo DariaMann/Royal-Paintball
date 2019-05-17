@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Collections.Concurrent;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using GameLibrary;
 
 namespace Server
 {
@@ -22,13 +24,21 @@ namespace Server
 
             ConcurrentQueue<Player> queue = new ConcurrentQueue<Player>();
 
-            ConcurrentQueue<Field> dataForSend = new ConcurrentQueue<Field>();//data from server
+            ConcurrentQueue<string> dataForSend = new ConcurrentQueue<string>();//data from server
+
+            List<TcpClient> clientTSP = new List<TcpClient>();
+
+            ConcurrentQueue<TcpClient> Wishing = new ConcurrentQueue<TcpClient>();//data from server
 
             // устанавливаем метод обратного вызова
             Field f = new Field();
             // диалог сервера с клиентами
 
             Consumer consumer = new Consumer(f, queue, dataForSend);
+
+            Sender sender = new Sender(dataForSend, clientTSP);
+
+        //    sender.Start();
 
             consumer.Start();
 
@@ -42,7 +52,11 @@ namespace Server
                 
                 Producer producer = new Producer(client,f,queue, dataForSend);//Producer
 
-                 producer.Start();
+                clientTSP.Add(client);
+
+                Wishing.Enqueue(client);
+
+                producer.Start();
             }
         }
         

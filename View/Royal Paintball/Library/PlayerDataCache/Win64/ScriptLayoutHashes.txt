@@ -3,6 +3,7 @@ PlayerPath?
 C:/Users/Daria/Desktop/Build/Royal Paintball.exe
 SceneListBegin?
 Assets/Scenes/Play.unity
+Assets/Scenes/Waiting.unity
 Assets/Scenes/Game.unity
 SceneListEnd?
 c422dd62785a6d0afa870fbd111886ce Unity.TextMeshPro.dll:TMPro.TMP_SelectionCaret
@@ -320,3 +321,4 @@ aa5e3523afd7fd907d3f99da4b777fdc Vuforia.UnityExtensions.dll:Vuforia.VuforiaConf
 c8a41ce4eea7677f6dd2aa0e422a2f04 Vuforia.UnityExtensions.dll:Vuforia.VuMarkBehaviour
 c31ff9acb65f7a15b5c6fd77c3314d83 Vuforia.UnityExtensions.dll:Vuforia.WireframeBehaviour
 486cd95c82d8305219c352c06b776e1f Vuforia.UnityExtensions.dll:Vuforia.WireframeTrackableEventHandler
+64ed13bf46a7900e71bec1cc0dbac465 Assembly-CSharp.dll:.Waiting

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Concurrent;
+using Newtonsoft.Json;
+using GameLibrary;
 
 namespace Server
 {
@@ -13,7 +15,7 @@ namespace Server
         public Field field;//поле игры
 
         private readonly ConcurrentQueue<Player> queue;
-        private readonly ConcurrentQueue<Field> dataForSend;
+        private readonly ConcurrentQueue<string> dataForSend;
 
         DateTime StartTime;
         DateTime now;
@@ -22,7 +24,7 @@ namespace Server
         private Thread thread;
         private volatile bool stopped;
 
-        public Consumer(Field field, ConcurrentQueue<Player> queue, ConcurrentQueue<Field> dataForSend)
+        public Consumer(Field field, ConcurrentQueue<Player> queue, ConcurrentQueue<string> dataForSend)
         {
             this.dataForSend = dataForSend;
             this.queue = queue;
@@ -42,8 +44,7 @@ namespace Server
                 thread.Start();
             }
         }
-
-
+        
         private void LiftItem(int ID)//поднятие вещей
         {
 
@@ -105,7 +106,6 @@ namespace Server
 
             }
         }
-
 
         private int WeapWound(string weapon, int ID)
         {
@@ -675,8 +675,12 @@ namespace Server
                 interval = StartTime - now;
                 ReactionInTime(pl);
 
-                if (dataForSend.Count < 10)
-                { this.dataForSend.Enqueue(field); }
+                string mess = JsonConvert.SerializeObject(field, Formatting.Indented);
+                if (field.Player.Count != 0)
+                {
+                    if (dataForSend.Count < 1)
+                    { this.dataForSend.Enqueue(mess); }
+                }
             }
         }
     }

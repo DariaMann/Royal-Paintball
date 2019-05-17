@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System;
 using Newtonsoft.Json;
 using UnityEngine.SceneManagement;
+using GameLibrary;
 
 public class NetworkManager : MonoBehaviour
 {
@@ -41,8 +42,7 @@ public class NetworkManager : MonoBehaviour
     private Vector3 offset;
 
     static public bool IsItFirstMessage = true;
-    static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
-    static public Dictionary<string, string> clientData = new Dictionary<string, string>();
+
     string mess;
     public GameObject gun;
     public GameObject shotgun;
@@ -98,43 +98,48 @@ public class NetworkManager : MonoBehaviour
 
         IsItFirstMessage = false;
     }
+    
     private void Update()
     {
 
         if (!IsItFirstMessage)
         {
-            if (field.Player.ContainsKey(my_ID))
-            {
-                clientTCP.Send(field.Player[my_ID]);
-                mess = clientTCP.GetPos();//данные с сервера  
+            clientTCP.Send(field.Player[my_ID]);
+            mess = clientTCP.GetPos();//данные с сервера  
 
-                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-                field = jsonData1;
+            Field jsonData1 = new Field();
+            try
+            {
+                jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
             }
-            CamMove();
-            DelBull();
-            DelPlayer();
-            DelMgazine();
-            if (field.Bullet.Count > 0)
-            {
-                InBul();
-                MoveBull();
-            }
-            if (field.Player.Count != 0)
-            {
-                Actoin();//метод отслеживающий нажатие клавишь 
-                InstantiatePlayer();
-                MovePlayer();//движение
-                PlayerRotation();
-                ArrowRotation();
-                InstantiateMagazine();
+            catch { }
+            field = jsonData1;
 
-
-                if (field.Player.Count > 1)//для других играков
+                CamMove();
+                DelBull();
+                DelPlayer();
+                DelMgazine();
+                if (field.Bullet.Count > 0)
                 {
-                    InstantiateWeaponOther();
+                    InBul();
+                    MoveBull();
                 }
-            }
+                if (field.Player.Count != 0)
+                {
+                    Actoin();//метод отслеживающий нажатие клавишь 
+                    InstantiatePlayer();
+                    MovePlayer();//движение
+                    PlayerRotation();
+                    ArrowRotation();
+                    InstantiateMagazine();
+
+
+                    if (field.Player.Count > 1)//для других играков
+                    {
+                        InstantiateWeaponOther();
+                    }
+                }
+            
         }
     }
     public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя

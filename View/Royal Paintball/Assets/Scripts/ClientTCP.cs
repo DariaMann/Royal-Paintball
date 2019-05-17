@@ -4,6 +4,7 @@ using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using UnityEngine.SceneManagement;
+using GameLibrary;
 
 public class ClientTCP
 {

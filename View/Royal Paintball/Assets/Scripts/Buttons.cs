@@ -6,7 +6,8 @@ public class Buttons : MonoBehaviour {
     ClientTCP clientTCP = new ClientTCP();
     public void PlayButton()
     {
-        SceneManager.LoadScene("Game");
+        // SceneManager.LoadScene("Game");
+        SceneManager.LoadScene("Waiting");
     }
     public void Exit()
     {

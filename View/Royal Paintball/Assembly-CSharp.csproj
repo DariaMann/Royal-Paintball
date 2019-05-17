@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\ClientTCP.cs" />
     <Compile Include="Assets\Scripts\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\ServerData\ServerData.cs" />
+    <Compile Include="Assets\Scripts\Waiting.cs" />
     <Compile Include="Assets\StarNestSkybox\Scripts\CameraScroll.cs" />
     <Compile Include="Assets\StarNestSkybox\Scripts\SkyboxSwitcher.cs" />
     <Compile Include="Assets\Stylized Astronaut\Character\Player.cs" />
@@ -313,6 +314,9 @@
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/Daria/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="GameLibrary">
+      <HintPath>C:/Users/Daria/Desktop/Competiton/View/Royal Paintball/Assets/Plugins/GameLibrary.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
