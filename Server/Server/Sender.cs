@@ -2,18 +2,14 @@
 using System.Threading;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using GameLibrary;
 
 namespace Server
 {
     class Sender
     {
         private readonly ConcurrentQueue<string> dataForSend;
-
         private Thread thread;
         private volatile bool stopped;
         List<TcpClient> clientTSP;
@@ -36,27 +32,25 @@ namespace Server
                 thread.Start();
             }
         }
+
         public void Process()
         {
-
             while (!stopped)
             {
-                    if (this.dataForSend.TryDequeue(out string mess))
+                if (this.dataForSend.TryDequeue(out string mess))
+                {
+                    for (int i = 0; i < clientTSP.Count; i++)
                     {
-                        for (int i = 0; i < clientTSP.Count; i++)
-                        {
-                            NetworkStream stream = null;
-                            stream = clientTSP[i].GetStream();
-                            byte[] data = new byte[256];
-                       
-                             Console.WriteLine("СЕРВЕР: " + mess);
-                            data = Encoding.UTF8.GetBytes(mess);
-                            stream.Write(data, 0, data.Length);
-                            stream.Flush();
-                        }
+                        NetworkStream stream = null;
+                        stream = clientTSP[i].GetStream();
+                        byte[] data = new byte[256];
 
+                        Console.WriteLine("СЕРВЕР: " + mess);
+                        data = Encoding.UTF8.GetBytes(mess);
+                        stream.Write(data, 0, data.Length);
+                        stream.Flush();
                     }
-                
+                }
             }
         }
     }

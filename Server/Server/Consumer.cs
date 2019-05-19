@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Concurrent;
 using Newtonsoft.Json;
@@ -10,7 +7,7 @@ using GameLibrary;
 
 namespace Server
 {
-    public class Consumer: IPlayController//Consumer
+    public class Consumer : IPlayController
     {
         public Field field;//поле игры
 
@@ -44,7 +41,7 @@ namespace Server
                 thread.Start();
             }
         }
-        
+
         private void LiftItem(int ID)//поднятие вещей
         {
 
@@ -136,7 +133,7 @@ namespace Server
             return countLife;
         }
 
-        private void Woundd(int ID,int takenLifes)//ранение
+        private void Woundd(int ID, int takenLifes)//ранение
         {
             if (field.Player[ID].Life > 0)
             {
@@ -164,8 +161,8 @@ namespace Server
                         {
                             if (field.Player[c].X + 1 > bX)
                             {
-                                if(!field.Player[ID].StopIn.ContainsKey("A"))
-                                field.Player[ID].StopIn.Add("A", "A");
+                                if (!field.Player[ID].StopIn.ContainsKey("A"))
+                                    field.Player[ID].StopIn.Add("A", "A");
                                 Console.WriteLine("RIGHT");
                             }
                             else
@@ -350,6 +347,7 @@ namespace Server
                 double a = Math.Abs(field.Player[c].X - field.circle.X);
                 double b = Math.Abs(field.Player[c].Y - field.circle.Y);
                 double gep = Math.Abs(Math.Sqrt(a * a + b * b));
+                //  DateTime dt = new DateTime(now.Year, now.Month, now.Month, now.Day, now.Hour, now.Minute, now.Second + 1);
                 if (gep > field.circle.Radius)
                 {
                     Woundd(c, 1);
@@ -360,7 +358,7 @@ namespace Server
             }
         }
 
-        private void ChangeWeapon(int ID,string weapon)//смена оружия
+        private void ChangeWeapon(int ID, string weapon)//смена оружия
         {
             if (weapon == "Pistol")
             {
@@ -378,8 +376,8 @@ namespace Server
             {
                 field.Player[ID].Weap = field.Player[ID].B;
             }
-            field.Player[ID].Weapon =weapon;
-           
+            field.Player[ID].Weapon = weapon;
+
         }
 
         private void ReloadCall(int ID)
@@ -424,7 +422,7 @@ namespace Server
         {
             if (field.circle.go == true)
             {
-                if (field.circle.X < field.circle.endX-3 || field.circle.X > field.circle.endX+3) //(Math.Abs(field.circle.X) > Math.Abs(field.circle.endX)+1&&Math.Abs(field.circle.X) < Math.Abs(field.circle.endX-1))
+                if (field.circle.X < field.circle.endX - 3 || field.circle.X > field.circle.endX + 3) //(Math.Abs(field.circle.X) > Math.Abs(field.circle.endX)+1&&Math.Abs(field.circle.X) < Math.Abs(field.circle.endX-1))
                 {
                     field.circle.X += field.circle.a;
                     field.circle.Y += field.circle.b;
@@ -552,9 +550,9 @@ namespace Server
 
             for (int i = 0; i < field.Bullet.Count; i++)
             {
-                    field.Bullet[i].X += field.Bullet[i].a;
-                    field.Bullet[i].Y += field.Bullet[i].b;
-                    field.Bullet[i].time = now;
+                field.Bullet[i].X += field.Bullet[i].a;
+                field.Bullet[i].Y += field.Bullet[i].b;
+                field.Bullet[i].time = now;
             }
         }
 
@@ -606,39 +604,72 @@ namespace Server
             }
         }
 
+        private void FirstMessage(Player player)
+        {
+            Random rn = new Random(); // объявление переменной для генерации чисел
+            bool difer = true;
+            int id = rn.Next(0, 1000);
+            while (difer)
+            {
+                if(!field.Player.ContainsKey(id))
+                {
+                    difer = false;
+                }
+                else id = rn.Next(0, 1000);
+            }
+            int col = rn.Next(0, field.Colors.Count);
+            string color = field.Colors[col];
+            field.Colors.Remove(color);
+            field.Player.Add(
+               id,
+               new Player()
+               {
+                   Name = player.Name,
+                   ID = id,
+                   Color = color
+               });
+        }
+
         private void Reaction(Player player)//метод реакции сервера на сообщения клиента
         {
-            
-            if (field.Player.ContainsKey(player.ID))
+            if (player.ID == -1)
             {
-                Hit(player.ID);
-                if (!(player.Direction == "N"))//движение игрока
+                Console.WriteLine("--------------------------------------------------------------");
+                FirstMessage(player);
+            }
+            else
+            {
+                if (field.Player.ContainsKey(player.ID))
                 {
-                    MovePlayer(player.ID, player.Direction);
-                }
-                 ChangeWeapon(player.ID, player.Weapon);
-             
-                if (player.Shoot == true)//выстрел
-                {
-                    Shoott(player.ID, player);
-                }
+                    Hit(player.ID);
+                    if (!(player.Direction == "N"))//движение игрока
+                    {
+                        MovePlayer(player.ID, player.Direction);
+                    }
+                    ChangeWeapon(player.ID, player.Weapon);
 
-                if (player.Life <= 0)
-                {
-                    FinishGame(player.ID);
-                }
-                if (player.LiftItem == true)//поднятие вещей
-                {
-                    LiftItem(player.ID);
-                }
-                Reload(player.ID, player);
-                if (player.Reload == true)//перезарядка
-                {
-                    ReloadCall(player.ID);
+                    if (player.Shoot == true)//выстрел
+                    {
+                        Shoott(player.ID, player);
+                    }
 
+                    if (player.Life <= 0)
+                    {
+                        FinishGame(player.ID);
+                    }
+                    if (player.LiftItem == true)//поднятие вещей
+                    {
+                        LiftItem(player.ID);
+                    }
+                    Reload(player.ID, player);
+                    if (player.Reload == true)//перезарядка
+                    {
+                        ReloadCall(player.ID);
+
+                    }
+                    BulFlight();
+                    SmallCircleMove();
                 }
-                BulFlight();
-                SmallCircleMove();
             }
         }
 
@@ -674,7 +705,7 @@ namespace Server
                 now = DateTime.Now;
                 interval = StartTime - now;
                 ReactionInTime(pl);
-
+              //  Console.WriteLine(dataForSend.Count);
                 string mess = JsonConvert.SerializeObject(field, Formatting.Indented);
                 if (field.Player.Count != 0)
                 {

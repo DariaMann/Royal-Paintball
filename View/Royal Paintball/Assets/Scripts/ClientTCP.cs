@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json;
@@ -8,7 +7,6 @@ using GameLibrary;
 
 public class ClientTCP
 {
-
     public TcpClient playerSocket;
     private bool connecting;
     private bool connected;
@@ -26,11 +24,9 @@ public class ClientTCP
             playerSocket.NoDelay = false;
             asyncBuff = new byte[8192];
             playerSocket.Connect("127.0.0.1", 904);
-
             connecting = true;
         }
         catch { };
-
     }
     public void Disconnect()
     {
@@ -42,7 +38,6 @@ public class ClientTCP
             connecting = false;
         }
         catch { };
-
     }
     public string GetPos()//получение данных с сервера
     {
@@ -85,10 +80,26 @@ public class ClientTCP
             SceneManager.LoadScene("Play");
         }
     }
+    public void Send(string name)//отправка сообщения со всеми данными
+    {
+        string message = JsonConvert.SerializeObject(name, Formatting.Indented);
+        Debug.Log(message);
+        myStream = playerSocket.GetStream();
+        byte[] buffer = Encoding.ASCII.GetBytes(message);
+       // try
+        {
+            myStream.Write(buffer, 0, buffer.Length);
+        }
+        //catch
+        //{
+        //    Debug.Log("Лег сервер");
+        //    Disconnect();
+        //    SceneManager.LoadScene("Play");
+        //}
+    }
     public void Send(Player player)//отправка сообщения со всеми данными
     {
         string message = JsonConvert.SerializeObject(player, Formatting.Indented);
-     //   Debug.Log(message);
         byte[] buffer = Encoding.ASCII.GetBytes(message);
         try
         {

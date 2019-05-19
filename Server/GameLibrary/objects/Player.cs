@@ -8,6 +8,7 @@ namespace GameLibrary
 {
     public class Player
     {
+        public string Name { get; set; }
         public int Life { get; set; }
         public int ID { get; set; }
         public string Direction { get; set; }

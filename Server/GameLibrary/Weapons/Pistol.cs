@@ -10,7 +10,7 @@ namespace GameLibrary
     {
         public Pistol()
         {
-            this.CountBullets = 5;
+            this.CountBullets = 6;
             this.TakenLives = 2;
             this.CountMagazine = 24;
             this.MaxCountMag = 12;

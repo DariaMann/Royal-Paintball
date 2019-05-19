@@ -23,6 +23,11 @@ public class NetworkManager : MonoBehaviour
     public GameObject camera;
     public GameObject kitPref;
     public GameObject Finish;
+    public GameObject Waiting;
+    public GameObject audio;
+    public GameObject Reloading;
+    public GameObject GameCabvas;
+    public GameObject WaitingCanvas;
     public GameObject cur;
     public Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
@@ -34,6 +39,7 @@ public class NetworkManager : MonoBehaviour
     public Text Magazine;
     public Text Timer;
     public Text FinishMess;
+    public Text CountOfWaiters;
     public int my_ID;
 
 
@@ -42,6 +48,8 @@ public class NetworkManager : MonoBehaviour
     private Vector3 offset;
 
     static public bool IsItFirstMessage = true;
+    public bool ChooseName = false;
+    public bool StartGame = false;
 
     string mess;
     public GameObject gun;
@@ -54,10 +62,17 @@ public class NetworkManager : MonoBehaviour
     public GameObject magazineG;
     public GameObject magazineB;
 
+    public GameObject SingIn;
+
+    public InputField inputField;
     public Image arrow;
+    static public string Name;
 
     public Player player = new Player();
     public Field field = new Field();
+
+    public Waiter waiter;
+    public List<Waiter> Waiters = new List<Waiter>();
 
     public Color[] Colors = new Color[8];
     public void Exit()
@@ -75,46 +90,81 @@ public class NetworkManager : MonoBehaviour
     {
         SceneManager.LoadScene("Play");
     }
+    public void StartWithName()
+    {
+        Name = inputField.text;
+        SingIn.SetActive(false);
+        ChooseName = true;
+    }
     void Start()
     {
-        clientTCP.Connect();//коннект с сервером                                     
-
-        player.ID = -1;
-
-        clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
-
-        mess = clientTCP.GetPos();//данные с сервера  
-
-        Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-        field = jsonData1;
-
-        MyId();
-        InstantiatePlayer();//создание играков
-        InstantiateTree();
-        InstantiateWall();
-        InstantiateCircle();
-
-        offset = camera.transform.position - playerList[my_ID].transform.position;
-
-        IsItFirstMessage = false;
+        clientTCP.Connect();//коннект с сервером  
     }
-    
+    public void Audio()
+    {
+        audio.GetComponent<AudioSource>().Play();
+    }
     private void Update()
     {
+        if (ChooseName)
+        {
+            if (StartGame == false)
+            {
+                if (IsItFirstMessage)
+                {
+                    clientTCP.Send(Name);
+                    mess = clientTCP.GetPos();//данные с сервера 
+                    Debug.Log("1: " + mess);
+                    Waiters = JsonConvert.DeserializeObject<List<Waiter>>(mess);
+                    CountOfWaiters.text = Convert.ToString(Waiters.Count);
+                }
+            }
+        }
+        if (Waiters.Count >= 2)
+        { StartGame = true; }
+        if (StartGame)
+        {
+            GameCabvas.SetActive(true);
+            WaitingCanvas.SetActive(false);
+            player.ID = -1;
+            player.Name = Name;
+            clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
 
+            mess = clientTCP.GetPos();//данные с сервера  
+            Debug.Log("2: " + mess);
+
+            Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+            field = jsonData1;
+
+            MyId();
+            InstantiatePlayer();//создание играков
+            InstantiateTree();
+            InstantiateWall();
+            InstantiateCircle();
+
+            offset = camera.transform.position - playerList[my_ID].transform.position;
+
+            IsItFirstMessage = false;
+            StartGame = false;
+            Waiters.Clear();
+        }
         if (!IsItFirstMessage)
         {
+            Debug.Log("firld: " + field.Player.Count);
             clientTCP.Send(field.Player[my_ID]);
             mess = clientTCP.GetPos();//данные с сервера  
-
+            Debug.Log("3: " + mess);
             Field jsonData1 = new Field();
             try
             {
                 jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
             }
-            catch { }
+            catch
+            {
+                Debug.Log("LOX");
+            }
             field = jsonData1;
-
+            {
                 CamMove();
                 DelBull();
                 DelPlayer();
@@ -139,12 +189,11 @@ public class NetworkManager : MonoBehaviour
                         InstantiateWeaponOther();
                     }
                 }
-            
+            }
         }
     }
     public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
     {
-
         KeyMoveDown();
         if (Input.GetKey(KeyCode.F))//поднятие предметов
         {
@@ -153,6 +202,10 @@ public class NetworkManager : MonoBehaviour
         if (Input.GetKey(KeyCode.R))//перезарядка оружия
         {
             field.Player[my_ID].Reload = true;
+            if (field.Player[my_ID].Weap.CountMagazine != 0)
+            {
+                Reloading.GetComponent<AudioSource>().Play();
+            }
         }
         else
         {
@@ -249,6 +302,7 @@ public class NetworkManager : MonoBehaviour
 
                         if (name == my_ID)
                         {
+                            Debug.Log("-------------------------");
                             Finish.SetActive(true);
                             clientTCP.Disconnect();
                             Destroy(this);
@@ -329,6 +383,7 @@ public class NetworkManager : MonoBehaviour
     {
         if (field.Player[my_ID].Weap.CountBullets > 0)
         {
+            Audio();
             field.Player[my_ID].Shoot = true;
             InstantiateBullet();
         }

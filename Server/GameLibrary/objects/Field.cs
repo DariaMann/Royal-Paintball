@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace GameLibrary
 {
@@ -36,8 +32,8 @@ namespace GameLibrary
             for (int i = 0; i < 60; i++)
             {
 
-                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
-                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                float x = rn.Next(-40, 40);
+                float y = rn.Next(-40, 40);
                 int tree = rn.Next(1, 3);
                 string type = "";
                 if (tree == 1)
@@ -60,23 +56,23 @@ namespace GameLibrary
             Wall = new List<Wall>();
             for (int i = 0; i < 30; i++)
             {
-                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
-                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                float x = rn.Next(-40, 40); 
+                float y = rn.Next(-40, 40);
                 Wall.Add(new Wall(x, y));
             }
             Bullet = new List<Bullet>();
             Item = new Dictionary<int, Item>();
             for (int i = 0; i < 10; i++)
             {
-                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
-                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                float x = rn.Next(-40, 40);
+                float y = rn.Next(-40, 40);
                 Item.Add(Item.Count, new Item("Kit", 5, x, y, Item.Count));
             }
             
             for (int i = 0; i < 10; i++)
             {
-                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
-                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                float x = rn.Next(-40, 40); 
+                float y = rn.Next(-40, 40);
                 Item.Add(Item.Count, new Item("Pistol", 5, x, y, Item.Count));
             }
             this.time = new TimeSpan();
@@ -84,70 +80,5 @@ namespace GameLibrary
             circle = new Circle();
             Colors = new List<string> { "blue", "red", "yellow", "orange", "pink", "green", "black", "white" };
         }
-        public float[] chek()
-        {
-            Random rn = new Random();
-            bool good = false;
-            float[] cord = new float[] { 0, 0 };
-            while (good != true)
-            {
-                float x = rn.Next(-40, 40);
-                float y = rn.Next(-40, 40);
-                for (int i = 0; i < Tree.Count; i++)
-                {
-                    float aX = Tree[i].X - Tree[i].Size[0];
-                    float aY = Tree[i].Y + Tree[i].Size[1];
-                    float bX = Tree[i].X + Tree[i].Size[0];
-                    float bY = Tree[i].Y + Tree[i].Size[1];
-                    float cX = Tree[i].X + Tree[i].Size[0];
-                    float cY = Tree[i].Y - Tree[i].Size[1];
-                    float dX = Tree[i].X - Tree[i].Size[0];
-                    float dY = Tree[i].Y - Tree[i].Size[1];
-                    if (x < aX || x > bX)
-                    {
-                        if (y < dY || y > aY)
-                        {
-                            good = true;
-                            cord = new float[] { x, y };
-                            return cord;
-                        }
-                        else { i = Tree.Count - 1; }
-                    }
-                    else
-                    {
-                        i = Tree.Count - 1;
-                    }
-                }
-            }
-            return cord;
-        }
-        public void AllKit()
-        {
-            float[] cord = new float[] { 0, 0 };
-            Item = new Dictionary<int, Item>();
-            for (int i = 0; i < 3; i++)
-            {
-                cord = chek();
-                Item.Add(Item.Count,
-                new Item("Kit", 5, cord[0], cord[1], Item.Count));
-                Console.WriteLine("x: " + cord[0]);
-                Console.WriteLine("y: " + cord[1]);
-            }
-        }
-        public void AllWalls()
-        {
-            float[] cord = new float[] { 0, 0 };
-            Wall = new List<Wall>();
-            for (int i = 0; i < 3; i++)
-            {
-                cord = chek();
-                Wall.Add(new Wall(cord[0], cord[1]));
-                Console.WriteLine("x: " + cord[0]);
-                Console.WriteLine("y: " + cord[1]);
-            }
-
-        }
-
-
     }
 }

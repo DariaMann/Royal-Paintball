@@ -7,7 +7,7 @@ public class Buttons : MonoBehaviour {
     public void PlayButton()
     {
         // SceneManager.LoadScene("Game");
-        SceneManager.LoadScene("Waiting");
+        SceneManager.LoadScene("Game");
     }
     public void Exit()
     {
