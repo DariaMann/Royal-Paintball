@@ -52,28 +52,50 @@ namespace Server
 
         }
 
-        public string AcceptMessage(NetworkStream stream)
+        private byte[] ReadBytes(int count)
         {
-            byte[] data = new byte[256]; // буфер для получаемых данных
-            StringBuilder builder = new StringBuilder(); // получаем сообщение
-            int bytes = 0;
-            do
+            NetworkStream networkStream = client.GetStream();
+
+            byte[] bytes = new byte[count]; // buffer to fill (and later return)
+            int readCount = 0; // bytes is empty at the start
+
+            // while the buffer is not full
+            while (readCount < count)
             {
-                bytes = stream.Read(data, 0, data.Length);
-                builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                // ask for no-more than the number of bytes left to fill our byte[]
+                int left = count - readCount; // we will ask for `left` bytes
+                int r = networkStream.Read(bytes, readCount, left); // but we are given `r` bytes (`r` <= `left`)
+
+                if (r == 0)
+                { // I lied, in the default configuration, a read of 0 can be taken to indicate a lost connection
+                    throw new Exception("Lost Connection during read");
+                }
+
+                readCount += r; // advance by however many bytes we read
             }
-            while (stream.DataAvailable);
-            string message = builder.ToString();
-            Console.WriteLine("Клиент: " + message);
-            return message;
+
+            return bytes;
         }
 
-        public void SendMessage(NetworkStream stream, string mess)
+        private string ReadMessage()
         {
-            byte[] data = new byte[256]; // буфер для получаемых данных
-            Console.WriteLine("СЕРВЕР: " + mess);
-            data = Encoding.UTF8.GetBytes(mess);
-            stream.Write(data, 0, data.Length);
+            // read length bytes, and flip if necessary
+            byte[] lengthBytes = ReadBytes(sizeof(int)); // int is 4 bytes
+            if (System.BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(lengthBytes);
+            }
+
+            // decode length
+            int length = System.BitConverter.ToInt32(lengthBytes, 0);
+
+            // read message bytes
+            byte[] messageBytes = ReadBytes(length);
+
+            // decode the message
+            string message = System.Text.Encoding.ASCII.GetString(messageBytes);
+
+            return message;
         }
 
         public void Process()
@@ -82,11 +104,12 @@ namespace Server
             stream = client.GetStream();
             while (true)
             {
-                string message = AcceptMessage(stream);
+                string message = ReadMessage();
+                string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
                 Player jsonData1 = new Player();
                 try
                 {
-                    jsonData1 = JsonConvert.DeserializeObject<Player>(message);
+                    jsonData1 = JsonConvert.DeserializeObject<Player>(command);
 
                 }
                 catch (Exception e)

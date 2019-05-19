@@ -28,13 +28,6 @@ namespace Server
             this.f = new Field();
             this.consumer = new Consumer(f, queue, dataForSend);
             this.sender = new Sender(dataForSend, clients);
-
-            //foreach (TcpClient c in Waiters.Keys)
-            //{
-            //    Producer producer = new Producer(c, Waiters[c], queue, dataForSend);//Producer
-            //    producer.Start();
-
-            //}
         }
 
         public void Process()

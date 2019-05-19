@@ -114,7 +114,6 @@ public class NetworkManager : MonoBehaviour
                 {
                     clientTCP.Send(Name);
                     mess = clientTCP.GetPos();//данные с сервера 
-                    Debug.Log("1: " + mess);
                     Waiters = JsonConvert.DeserializeObject<List<Waiter>>(mess);
                     CountOfWaiters.text = Convert.ToString(Waiters.Count);
                 }
@@ -131,8 +130,6 @@ public class NetworkManager : MonoBehaviour
             clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
 
             mess = clientTCP.GetPos();//данные с сервера  
-            Debug.Log("2: " + mess);
-
             Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
             field = jsonData1;
 
@@ -150,19 +147,10 @@ public class NetworkManager : MonoBehaviour
         }
         if (!IsItFirstMessage)
         {
-            Debug.Log("firld: " + field.Player.Count);
             clientTCP.Send(field.Player[my_ID]);
             mess = clientTCP.GetPos();//данные с сервера  
-            Debug.Log("3: " + mess);
             Field jsonData1 = new Field();
-            try
-            {
-                jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-            }
-            catch
-            {
-                Debug.Log("LOX");
-            }
+            jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
             field = jsonData1;
             {
                 CamMove();
@@ -329,11 +317,8 @@ public class NetworkManager : MonoBehaviour
                 itemList.Remove(i);
                 Destroy(item);
                 Debug.Log("!!!");
-
             }
-
         }
-
     }
 
     public void KeyMoveDown()//движение пользователя

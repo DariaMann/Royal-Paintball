@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using Newtonsoft.Json;
 using UnityEngine.SceneManagement;
 using GameLibrary;
+using System;
 
 public class ClientTCP
 {
@@ -28,6 +29,7 @@ public class ClientTCP
         }
         catch { };
     }
+
     public void Disconnect()
     {
         try
@@ -39,39 +41,62 @@ public class ClientTCP
         }
         catch { };
     }
-    public string GetPos()//получение данных с сервера
-    {
-        try
-        {
-            byte[] data = new byte[256];
-            StringBuilder response = new StringBuilder();
-            myStream = playerSocket.GetStream();
-            do
-            {
-                int bytes = myStream.Read(data, 0, data.Length);
-                response.Append(Encoding.UTF8.GetString(data, 0, bytes));
-            }
-            while (myStream.DataAvailable); // пока данные есть в потоке
 
-            return response.ToString();
-        }
-        catch
+    private byte[] ReadBytes(int count)
+    {
+        myStream = playerSocket.GetStream();
+
+        byte[] bytes = new byte[count]; // buffer to fill (and later return)
+        int readCount = 0; // bytes is empty at the start
+        while (readCount < count)// while the buffer is not full
         {
-            Debug.Log("Лег сервер");
-            Disconnect();
-            SceneManager.LoadScene("Play");
-            return "0";
+            int left = count - readCount;// ask for no-more than the number of bytes left to fill our byte[] // we will ask for `left` bytes
+            int r = myStream.Read(bytes, readCount, left); // but we are given `r` bytes (`r` <= `left`)
+            if (r == 0)
+            { 
+                throw new Exception("Lost Connection during read");// I lied, in the default configuration, a read of 0 can be taken to indicate a lost connection
+            }
+            readCount += r; // advance by however many bytes we read
         }
+        return bytes;
     }
 
+    private string ReadMessage()
+    {
+        byte[] lengthBytes = ReadBytes(sizeof(int));// read length bytes, and flip if necessary // int is 4 bytes
+        if (System.BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(lengthBytes);
+        }
+        int length = System.BitConverter.ToInt32(lengthBytes, 0);// decode length
+        byte[] messageBytes = ReadBytes(length);// read message bytes
+        string message = System.Text.Encoding.ASCII.GetString(messageBytes);// decode the message
+
+        return message;
+    }
+
+    public string GetPos()//получение данных с сервера
+    {
+        string message = ReadMessage();
+        string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
+        return command;
+    }
+   
     public void SendFirstMessage(Player clientData)//отправка сообщения со всеми данными
     {
         try
         {
             string message = JsonConvert.SerializeObject(clientData, Formatting.Indented);
-            byte[] buffer = Encoding.ASCII.GetBytes(message);
-            myStream = playerSocket.GetStream();
-            myStream.Write(buffer, 0, buffer.Length);
+            string msg = "%" + message + "&"; 
+            byte[] messageBytes = Encoding.ASCII.GetBytes(msg); // a UTF-8 encoder would be 'better', as this is the standard for network communications
+            int length = messageBytes.Length;// determine length of message
+            byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
+            if (System.BitConverter.IsLittleEndian)// flip the bytes if we are a little-endian system: reverse the bytes in lengthBytes to do so
+            {
+                Array.Reverse(lengthBytes);
+            }
+            myStream.Write(lengthBytes, 0, lengthBytes.Length);// send length
+            myStream.Write(messageBytes, 0, length);// send message
         }
         catch
         {
@@ -80,37 +105,42 @@ public class ClientTCP
             SceneManager.LoadScene("Play");
         }
     }
+
     public void Send(string name)//отправка сообщения со всеми данными
     {
-        string message = JsonConvert.SerializeObject(name, Formatting.Indented);
-        Debug.Log(message);
         myStream = playerSocket.GetStream();
-        byte[] buffer = Encoding.ASCII.GetBytes(message);
-       // try
+        string message = JsonConvert.SerializeObject(name, Formatting.Indented);
+        string msg = "%" + message + "&";
+        byte[] messageBytes = Encoding.ASCII.GetBytes(msg); // a UTF-8 encoder would be 'better', as this is the standard for network communications
+        int length = messageBytes.Length;// determine length of message
+        byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
+        if (System.BitConverter.IsLittleEndian)// flip the bytes if we are a little-endian system: reverse the bytes in lengthBytes to do so
         {
-            myStream.Write(buffer, 0, buffer.Length);
+            Array.Reverse(lengthBytes);
         }
-        //catch
-        //{
+        myStream.Write(lengthBytes, 0, lengthBytes.Length);// send length
+        myStream.Write(messageBytes, 0, length);// send message
         //    Debug.Log("Лег сервер");
         //    Disconnect();
         //    SceneManager.LoadScene("Play");
-        //}
     }
+
     public void Send(Player player)//отправка сообщения со всеми данными
     {
         string message = JsonConvert.SerializeObject(player, Formatting.Indented);
-        byte[] buffer = Encoding.ASCII.GetBytes(message);
-        try
+        string msg = "%" + message + "&";
+        byte[] messageBytes = Encoding.ASCII.GetBytes(msg); // a UTF-8 encoder would be 'better', as this is the standard for network communications
+        int length = messageBytes.Length;  // determine length of message
+        byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
+        if (System.BitConverter.IsLittleEndian)// flip the bytes if we are a little-endian system: reverse the bytes in lengthBytes to do so
         {
-            myStream.Write(buffer, 0, buffer.Length);
+            Array.Reverse(lengthBytes);
         }
-        catch
-        {
-            Debug.Log("Лег сервер");
-            Disconnect();
-            SceneManager.LoadScene("Play");
-        }
+        myStream.Write(lengthBytes, 0, lengthBytes.Length);// send length
+        myStream.Write(messageBytes, 0, length);// send message
+        //    Debug.Log("Лег сервер");
+        //    Disconnect();
+        //    SceneManager.LoadScene("Play");
     }
 }
 

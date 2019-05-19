@@ -634,7 +634,6 @@ namespace Server
         {
             if (player.ID == -1)
             {
-                Console.WriteLine("--------------------------------------------------------------");
                 FirstMessage(player);
             }
             else
@@ -680,6 +679,17 @@ namespace Server
                 SmallCircleCall();
             }
             field.time = interval.Negate();
+            //if(field.time.Seconds == field.inpulse.Second)
+            //{
+            //    foreach(int id in field.Player.Keys)
+            //    {
+            //        if(field.Player[id].OutCircle)
+            //        {
+            //            field.Player[id].Life -= 1;
+            //        }
+            //    }
+            //    field.inpulse = new DateTime(field.time.Minutes, field.time.Seconds + 1, field.time.Milliseconds);
+            //}
         }
 
         public void Stop()
@@ -704,7 +714,9 @@ namespace Server
                 }
                 now = DateTime.Now;
                 interval = StartTime - now;
+                
                 ReactionInTime(pl);
+               
               //  Console.WriteLine(dataForSend.Count);
                 string mess = JsonConvert.SerializeObject(field, Formatting.Indented);
                 if (field.Player.Count != 0)
