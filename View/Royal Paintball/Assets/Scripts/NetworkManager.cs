@@ -24,8 +24,11 @@ public class NetworkManager : MonoBehaviour
     public GameObject kitPref;
     public GameObject Finish;
     public GameObject Waiting;
+
     public GameObject audio;
     public GameObject Reloading;
+    public GameObject TheEnd;
+
     public GameObject GameCabvas;
     public GameObject WaitingCanvas;
     public GameObject cur;
@@ -40,8 +43,9 @@ public class NetworkManager : MonoBehaviour
     public Text Timer;
     public Text FinishMess;
     public Text CountOfWaiters;
-    public int my_ID;
-
+    public Text MyName;
+    public int my_ID=-1;
+    public int CountPlayers= 2;
 
     public string weapon = "Pistol";
 
@@ -63,6 +67,7 @@ public class NetworkManager : MonoBehaviour
     public GameObject magazineB;
 
     public GameObject SingIn;
+    public GameObject CanvasWaiting;
 
     public InputField inputField;
     public Image arrow;
@@ -94,6 +99,7 @@ public class NetworkManager : MonoBehaviour
     {
         Name = inputField.text;
         SingIn.SetActive(false);
+        CanvasWaiting.SetActive(true);
         ChooseName = true;
     }
     void Start()
@@ -108,6 +114,7 @@ public class NetworkManager : MonoBehaviour
     {
         if (ChooseName)
         {
+            
             if (StartGame == false)
             {
                 if (IsItFirstMessage)
@@ -129,52 +136,57 @@ public class NetworkManager : MonoBehaviour
             player.Name = Name;
             clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
 
-            mess = clientTCP.GetPos();//данные с сервера  
-            Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-            field = jsonData1;
+                mess = clientTCP.GetPos();//данные с сервера  
+                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+                field = jsonData1;
 
-            MyId();
-            InstantiatePlayer();//создание играков
-            InstantiateTree();
-            InstantiateWall();
-            InstantiateCircle();
+                MyId();
+                    InstantiatePlayer();//создание играков
+                    InstantiateTree();
+                    InstantiateWall();
+                    InstantiateCircle();
 
-            offset = camera.transform.position - playerList[my_ID].transform.position;
+                    offset = camera.transform.position - playerList[my_ID].transform.position;
 
-            IsItFirstMessage = false;
-            StartGame = false;
-            Waiters.Clear();
+                    IsItFirstMessage = false;
+                    StartGame = false;
+                    Waiters.Clear();
+            Debug.Log("ALL");
         }
         if (!IsItFirstMessage)
         {
-            clientTCP.Send(field.Player[my_ID]);
-            mess = clientTCP.GetPos();//данные с сервера  
-            Field jsonData1 = new Field();
-            jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-            field = jsonData1;
+            if (my_ID != -1)
             {
-                CamMove();
-                DelBull();
-                DelPlayer();
-                DelMgazine();
-                if (field.Bullet.Count > 0)
+                clientTCP.Send(field.Player[my_ID]);
+                mess = clientTCP.GetPos();//данные с сервера  
+                Field jsonData1 = new Field();
+                jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+                field = jsonData1;
                 {
-                    InBul();
-                    MoveBull();
-                }
-                if (field.Player.Count != 0)
-                {
-                    Actoin();//метод отслеживающий нажатие клавишь 
-                    InstantiatePlayer();
-                    MovePlayer();//движение
-                    PlayerRotation();
-                    ArrowRotation();
-                    InstantiateMagazine();
-
-
-                    if (field.Player.Count > 1)//для других играков
+                    CamMove();
+                    DelBull();
+                    DelPlayer();
+                    DelMgazine();
+                    if (field.Bullet.Count > 0)
                     {
-                        InstantiateWeaponOther();
+                        InBul();
+                        MoveBull();
+                    }
+                    if (field.Player.Count != 0)
+                    {
+                        Actoin();//метод отслеживающий нажатие клавишь 
+                        InstantiatePlayer();
+                        MovePlayer();//движение
+                        PlayerRotation();
+                        ArrowRotation();
+                        InstantiateMagazine();
+                        FinishGame();
+
+
+                        if (field.Player.Count > 1)//для других играков
+                        {
+                            InstantiateWeaponOther();
+                        }
                     }
                 }
             }
@@ -228,6 +240,7 @@ public class NetworkManager : MonoBehaviour
         Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
         Lifes.text = Convert.ToString(field.Player[my_ID].Life);
         Timer.text = field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
+        MyName.text = field.Player[my_ID].Name;
 
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -292,6 +305,7 @@ public class NetworkManager : MonoBehaviour
                         {
                             Debug.Log("-------------------------");
                             Finish.SetActive(true);
+                            TheEnd.GetComponent<AudioSource>().Play();
                             clientTCP.Disconnect();
                             Destroy(this);
                         }
@@ -617,7 +631,8 @@ public class NetworkManager : MonoBehaviour
     {
         foreach (int c in field.Player.Keys)
         {
-            my_ID = field.Player[c].ID;
+           // if (field.Player[c].Name == Name)
+            { my_ID = field.Player[c].ID; }
         }
     }
     public void Color(string color, GameObject temp, string name)
@@ -694,6 +709,16 @@ public class NetworkManager : MonoBehaviour
     public void CamMove()
     {
         camera.transform.position = playerList[my_ID].transform.position + offset;
+    }
+    public void FinishGame()
+    {
+        if(field.Player.Count == 1)
+        {
+            Finish.SetActive(true);
+            FinishMess.text = "You won!";
+            clientTCP.Disconnect();
+            Destroy(this);
+        }
     }
 
     public void MovePlayer()//двжение игрока

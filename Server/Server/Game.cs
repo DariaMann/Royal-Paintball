@@ -36,9 +36,8 @@ namespace Server
             sender.Start();
             foreach (TcpClient c in Waiters.Keys)
             {
-                Producer producer = new Producer(c, Waiters[c], queue, dataForSend);//Producer
+                Producer producer = new Producer(c, Waiters[c], queue, dataForSend, clients);//Producer
                 producer.Start();
-
             }
         }
     }

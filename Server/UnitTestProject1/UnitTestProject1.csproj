@@ -56,6 +56,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GameLibrary\GameLibrary.csproj">
+      <Project>{bb94cdc5-bc41-4b03-8176-7e51cb530de9}</Project>
+      <Name>GameLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Server\Server.csproj">
       <Project>{c9da85e0-dc73-4654-bc70-49b89d6c3ca1}</Project>
       <Name>Server</Name>

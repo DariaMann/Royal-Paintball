@@ -53,7 +53,7 @@ public class ClientTCP
             int left = count - readCount;// ask for no-more than the number of bytes left to fill our byte[] // we will ask for `left` bytes
             int r = myStream.Read(bytes, readCount, left); // but we are given `r` bytes (`r` <= `left`)
             if (r == 0)
-            { 
+            {
                 throw new Exception("Lost Connection during read");// I lied, in the default configuration, a read of 0 can be taken to indicate a lost connection
             }
             readCount += r; // advance by however many bytes we read
@@ -81,13 +81,13 @@ public class ClientTCP
         string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
         return command;
     }
-   
+
     public void SendFirstMessage(Player clientData)//отправка сообщения со всеми данными
     {
         try
         {
             string message = JsonConvert.SerializeObject(clientData, Formatting.Indented);
-            string msg = "%" + message + "&"; 
+            string msg = "%" + message + "&";
             byte[] messageBytes = Encoding.ASCII.GetBytes(msg); // a UTF-8 encoder would be 'better', as this is the standard for network communications
             int length = messageBytes.Length;// determine length of message
             byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
@@ -136,11 +136,17 @@ public class ClientTCP
         {
             Array.Reverse(lengthBytes);
         }
-        myStream.Write(lengthBytes, 0, lengthBytes.Length);// send length
-        myStream.Write(messageBytes, 0, length);// send message
-        //    Debug.Log("Лег сервер");
-        //    Disconnect();
-        //    SceneManager.LoadScene("Play");
+        try
+        {
+            myStream.Write(lengthBytes, 0, lengthBytes.Length);// send length
+            myStream.Write(messageBytes, 0, length);// send message
+        }
+        catch
+        {
+            Debug.Log("Лег сервер");
+            Disconnect();
+            SceneManager.LoadScene("Play");
+        }
     }
 }
 

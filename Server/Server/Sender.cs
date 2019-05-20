@@ -39,30 +39,31 @@ namespace Server
             {
                 if (this.dataForSend.TryDequeue(out string mess))
                 {
+                   // Console.WriteLine(mess);
                     string msg = "%" +mess+ "&";
                     for (int i = 0; i < clientTSP.Count; i++)
                     {
                         NetworkStream stream = null;
-                        stream = clientTSP[i].GetStream();;
+                        stream = clientTSP[i].GetStream();
                         byte[] messageBytes = Encoding.ASCII.GetBytes(msg); // a UTF-8 encoder would be 'better', as this is the standard for network communications
-
-                        // determine length of message
-                        int length = messageBytes.Length;
-
-                        // convert the length into bytes using BitConverter (encode)
-                        byte[] lengthBytes = System.BitConverter.GetBytes(length);
-
-                        // flip the bytes if we are a little-endian system: reverse the bytes in lengthBytes to do so
-                        if (System.BitConverter.IsLittleEndian)
+                        int length = messageBytes.Length;// determine length of message
+                        byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
+                        if (System.BitConverter.IsLittleEndian)// flip the bytes if we are a little-endian system: reverse the bytes in lengthBytes to do so
                         {
                             Array.Reverse(lengthBytes);
                         }
-
-                        // send length
-                        stream.Write(lengthBytes, 0, lengthBytes.Length);
-
-                        // send message
-                        stream.Write(messageBytes, 0, length);
+                        try {
+                            stream.Write(lengthBytes, 0, lengthBytes.Length);// send length
+                            stream.Write(messageBytes, 0, length);// send message
+                        }
+                        catch
+                        {
+                            //if (clientTSP.Count != 0)
+                            //{
+                            //    clientTSP.Remove(clientTSP[i]);
+                            //    clientTSP[i].Close();
+                            //}
+                        }
                     }
                 }
             }

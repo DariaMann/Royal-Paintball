@@ -143,109 +143,47 @@ namespace Server
 
         private void Hit(int ID)//ранение
         {
-            foreach (int c in field.Player.Keys)
-            {
-                foreach (Wall w in field.Wall)
-                {
-                    float aX = w.X - w.Size[0];
-                    float aY = w.Y + w.Size[1];
-                    float bX = w.X + w.Size[0];
-                    float bY = w.Y + w.Size[1];
-                    float cX = w.X + w.Size[0];
-                    float cY = w.Y - w.Size[1];
-                    float dX = w.X - w.Size[0];
-                    float dY = w.Y - w.Size[1];
-                    if (field.Player[c].X > aX && field.Player[c].X < bX)
-                    {
-                        if (field.Player[c].Y > dY && field.Player[c].Y < aY)
-                        {
-                            if (field.Player[c].X + 1 > bX)
-                            {
-                                if (!field.Player[ID].StopIn.ContainsKey("A"))
-                                    field.Player[ID].StopIn.Add("A", "A");
-                                Console.WriteLine("RIGHT");
-                            }
-                            else
-                            {
-                                if (field.Player[c].X + 1 < bX)
-                                {
-                                    if (!field.Player[ID].StopIn.ContainsKey("D"))
-                                        field.Player[ID].StopIn.Add("D", "D");
-                                    Console.WriteLine("LEFT");
-                                }
-                            }
-
-                            if (field.Player[c].Y + 1 > bY)
-                            {
-                                if (!field.Player[ID].StopIn.ContainsKey("S"))
-                                    field.Player[ID].StopIn.Add("S", "S");
-                                Console.WriteLine("UP");
-                            }
-                            else
-                            {
-                                if (field.Player[c].Y + 1 < bY)
-                                {
-                                    if (!field.Player[ID].StopIn.ContainsKey("W"))
-                                        field.Player[ID].StopIn.Add("W", "W");
-                                    Console.WriteLine("DOWN");
-                                    Console.WriteLine("bX: " + bX);
-                                    Console.WriteLine("field.Player[c].Y + 1: " + field.Player[c].Y + 1);
-
-                                }
-                            }
-                            break;
-                        }
-                        else
-                        {
-                            field.Player[ID].StopIn.Clear();
-                        }
-                    }
-                    else
-                    {
-                        field.Player[ID].StopIn.Clear();
-                    }
-                }
-            }
             //foreach (int c in field.Player.Keys)
             //{
-            //    float aX = field.X - field.Size[0];
-            //    float aY = field.Y + field.Size[1];
-            //    float bX = field.X + field.Size[0];
-            //    float bY = field.Y + field.Size[1];
-            //    float cX = field.X + field.Size[0];
-            //    float cY = field.Y - field.Size[1];
-            //    float dX = field.X - field.Size[0];
-            //    float dY = field.Y - field.Size[1];
-            //    if (field.Player[c].X < aX || field.Player[c].X > bX || field.Player[c].Y < dY || field.Player[c].Y > aY)
+            //    foreach (Wall w in field.Wall)
             //    {
-            //                if (field.Player[c].X + 2 < bX)
+            //        float aX = w.X - w.Size[0];
+            //        float aY = w.Y + w.Size[1];
+            //        float bX = w.X + w.Size[0];
+            //        float bY = w.Y + w.Size[1];
+            //        float cX = w.X + w.Size[0];
+            //        float cY = w.Y - w.Size[1];
+            //        float dX = w.X - w.Size[0];
+            //        float dY = w.Y - w.Size[1];
+            //        if (field.Player[c].X > aX && field.Player[c].X < bX)
+            //        {
+            //            if (field.Player[c].Y > dY && field.Player[c].Y < aY)
+            //            {
+            //                if (field.Player[c].X + 1 > bX)
             //                {
-            //                    field.Player[ID].StopIn.Add("A", "A");
-            //                    Console.WriteLine("RIGHT");
+            //                    if (!field.Player[ID].StopIn.ContainsKey("A"))
+            //                        field.Player[ID].StopIn.Add("A", "A");
             //                }
             //                else
             //                {
-            //                    if (field.Player[c].X + 1 > bX)
+            //                    if (field.Player[c].X + 1 < bX)
             //                    {
-            //                        field.Player[ID].StopIn.Add("D", "D");
-            //                        Console.WriteLine("LEFT");
+            //                        if (!field.Player[ID].StopIn.ContainsKey("D"))
+            //                            field.Player[ID].StopIn.Add("D", "D");
             //                    }
             //                }
 
-            //                if (field.Player[c].Y + 1 < bY)
+            //                if (field.Player[c].Y + 1 > bY)
             //                {
-            //                    field.Player[ID].StopIn.Add("S", "S");
-            //                    Console.WriteLine("UP");
+            //                    if (!field.Player[ID].StopIn.ContainsKey("S"))
+            //                        field.Player[ID].StopIn.Add("S", "S");
             //                }
             //                else
             //                {
-            //                    if (field.Player[c].Y + 1 > bY)
+            //                    if (field.Player[c].Y + 1 < bY)
             //                    {
-            //                        field.Player[ID].StopIn.Add("W", "W");
-            //                        Console.WriteLine("DOWN");
-            //                        Console.WriteLine("bX: " + bX);
-            //                        Console.WriteLine("field.Player[c].Y + 1: " + field.Player[c].Y + 1);
-
+            //                        if (!field.Player[ID].StopIn.ContainsKey("W"))
+            //                            field.Player[ID].StopIn.Add("W", "W");
             //                    }
             //                }
             //                break;
@@ -254,7 +192,55 @@ namespace Server
             //            {
             //                field.Player[ID].StopIn.Clear();
             //            }
+            //        }
+            //        else
+            //        {
+            //            field.Player[ID].StopIn.Clear();
+            //        }
+            //    }
             //}
+            foreach (int c in field.Player.Keys)
+            {
+                float aX = field.X - field.Size[0];
+                float aY = field.Y + field.Size[1];
+                float bX = field.X + field.Size[0];
+                float bY = field.Y + field.Size[1];
+                float cX = field.X + field.Size[0];
+                float cY = field.Y - field.Size[1];
+                float dX = field.X - field.Size[0];
+                float dY = field.Y - field.Size[1];
+                if (field.Player[c].X < aX || field.Player[c].X > bX || field.Player[c].Y < dY || field.Player[c].Y > aY)
+                {
+                    if (field.Player[c].X + 2 < bX)
+                    {
+                        field.Player[ID].StopIn.Add("A", "A");
+                    }
+                    else
+                    {
+                        if (field.Player[c].X + 1 > bX)
+                        {
+                            field.Player[ID].StopIn.Add("D", "D");
+                        }
+                    }
+
+                    if (field.Player[c].Y + 1 < bY)
+                    {
+                        field.Player[ID].StopIn.Add("S", "S");
+                    }
+                    else
+                    {
+                        if (field.Player[c].Y + 1 > bY)
+                        {
+                            field.Player[ID].StopIn.Add("W", "W");
+                        }
+                    }
+                    break;
+                }
+                else
+                {
+                    field.Player[ID].StopIn.Clear();
+                }
+            }
             for (int i = 0; i < field.Bullet.Count; i++)
             {
                 foreach (Wall c in field.Wall)
@@ -347,10 +333,8 @@ namespace Server
                 double a = Math.Abs(field.Player[c].X - field.circle.X);
                 double b = Math.Abs(field.Player[c].Y - field.circle.Y);
                 double gep = Math.Abs(Math.Sqrt(a * a + b * b));
-                //  DateTime dt = new DateTime(now.Year, now.Month, now.Month, now.Day, now.Hour, now.Minute, now.Second + 1);
                 if (gep > field.circle.Radius)
                 {
-                    Woundd(c, 1);
                     field.Player[c].OutCircle = true;
                 }
                 else
@@ -384,24 +368,17 @@ namespace Server
         {
             field.Player[ID].Weap.CamShot = false;
             int second = now.Second;
+            if (now.Second == 59)
             {
-                if (now.Second == 59)
-                {
-                    second = 1;
+                second = 1;
 
-                }
-                else
+            }
+            else
+            {
+                if (now.Second == 58)
                 {
-                    if (now.Second == 60)
-                    {
-                        second = 2;
-                    }
-                    else
-                    {
-                        second = now.Second + 2;
-                    }
+                    second = 0;
                 }
-
             }
             DateTime dt = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, second, now.Millisecond);
             field.Player[ID].Weap.time = dt;
@@ -604,6 +581,39 @@ namespace Server
             }
         }
 
+        private void DecreaseInLives()
+        {
+            if (field.time.Seconds == field.inpulse.Second)
+            {
+                foreach (int id in field.Player.Keys)
+                {
+                    if (field.Player[id].OutCircle)
+                    {
+                        field.Player[id].Life -= 1;
+                    }
+                }
+            }
+            int second = field.time.Seconds;
+            if (field.time.Seconds == 59)
+            {
+                second = 1;
+
+            }
+            else
+            {
+                if (field.time.Seconds == 58)
+                {
+                    second = 0;
+                }
+                else
+                {
+                    second += 1;
+                }
+            }
+
+            field.inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, field.time.Minutes, second, field.time.Milliseconds);
+        }
+
         private void FirstMessage(Player player)
         {
             Random rn = new Random(); // объявление переменной для генерации чисел
@@ -611,7 +621,7 @@ namespace Server
             int id = rn.Next(0, 1000);
             while (difer)
             {
-                if(!field.Player.ContainsKey(id))
+                if (!field.Player.ContainsKey(id))
                 {
                     difer = false;
                 }
@@ -679,18 +689,8 @@ namespace Server
                 SmallCircleCall();
             }
             field.time = interval.Negate();
-            //if(field.time.Seconds == field.inpulse.Second)
-            //{
-            //    foreach(int id in field.Player.Keys)
-            //    {
-            //        if(field.Player[id].OutCircle)
-            //        {
-            //            field.Player[id].Life -= 1;
-            //        }
-            //    }
-            //    field.inpulse = new DateTime(field.time.Minutes, field.time.Seconds + 1, field.time.Milliseconds);
-            //}
-        }
+            DecreaseInLives();
+             }
 
         public void Stop()
         {
@@ -714,10 +714,9 @@ namespace Server
                 }
                 now = DateTime.Now;
                 interval = StartTime - now;
-                
+
                 ReactionInTime(pl);
-               
-              //  Console.WriteLine(dataForSend.Count);
+                
                 string mess = JsonConvert.SerializeObject(field, Formatting.Indented);
                 if (field.Player.Count != 0)
                 {

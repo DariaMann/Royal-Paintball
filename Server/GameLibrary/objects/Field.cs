@@ -25,7 +25,7 @@ namespace GameLibrary
         {
             X = 0;
             Y = 0;
-           // inpulse = new DateTime(0,1, 0);
+            inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute,1);
             Size = new int[2] { 50, 50 };
 
             Tree = new List<Tree>();
