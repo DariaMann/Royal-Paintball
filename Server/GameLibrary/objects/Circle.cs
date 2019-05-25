@@ -56,5 +56,40 @@ namespace GameLibrary
                 this.b = speed * sin;
             }
         }
+
+        public void SmallCircleCall()
+        {
+            go = true;
+            Random rn = new Random(); // объявление переменной для генерации чисел
+            int x = rn.Next(-40, 40); //rn.Next(-8, 8);
+            int y = rn.Next(-40, 40);//rn.Next(-4, 4);
+            float speed = 0.3f;
+            Move(x, y, speed);
+
+        }
+
+        public void SmallCircleMove()
+        {
+            if (go == true)
+            {
+                if (X < endX - 3 || X > endX + 3)
+                {
+                    X += a;
+                    Y += b;
+                    if (Size[0] > 3)
+                    {
+                        double i = Size[0];
+                        Size[0] -= 0.01;
+                        Size[1] -= 0.01;
+                        Radius = Convert.ToSingle((Radius * Size[0]) / i);
+                    }
+                }
+                else
+                {
+                    go = false;
+                }
+
+            }
+        }
     }
 }

@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 34507747}
   - component: {fileID: 34507746}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -145,8 +145,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -330.1, y: 107}
-  m_SizeDelta: {x: 105.8, y: 81.1}
+  m_AnchoredPosition: {x: -63.92, y: 179.2}
+  m_SizeDelta: {x: 633.36, y: 81.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &34507746
 MonoBehaviour:
@@ -2344,7 +2344,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 97.8, y: 176}
+  m_AnchoredPosition: {x: 97.8, y: 115}
   m_SizeDelta: {x: 868.8, y: 65.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1575821649
@@ -3204,7 +3204,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 34.399994, y: -32.399994}
+  m_AnchoredPosition: {x: 34.399994, y: -94}
   m_SizeDelta: {x: 35, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1934673396
@@ -3553,6 +3553,7 @@ MonoBehaviour:
   kitPref: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}
   Finish: {fileID: 491977658}
   Waiting: {fileID: 1807296475}
+  Explosion: {fileID: 1000010608846784, guid: 6747b1742d70743a8aff8594e708b2f7, type: 2}
   audio: {fileID: 1294933897}
   Reloading: {fileID: 501787400}
   TheEnd: {fileID: 1810874338}
@@ -3567,9 +3568,9 @@ MonoBehaviour:
   CountOfWaiters: {fileID: 1144066162}
   MyName: {fileID: 34507746}
   my_ID: 0
+  CountPlayers: 2
   weapon: Pistol
   ChooseName: 0
-  StartGame: 0
   gun: {fileID: 1768196200222138, guid: 3f09cdc7bf43f874fa093056af1afc62, type: 2}
   shotgun: {fileID: 1700715487831334, guid: ce7eb5aec97cd8d458d7d3eb28130550, type: 2}
   bomb: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}
@@ -3583,6 +3584,7 @@ MonoBehaviour:
   CanvasWaiting: {fileID: 950348939}
   inputField: {fileID: 638212139}
   arrow: {fileID: 1332267039}
+  countClient: 0
   Colors:
   - {r: 0, g: 0.22655034, b: 1, a: 0}
   - {r: 1, g: 0, b: 0, a: 0}

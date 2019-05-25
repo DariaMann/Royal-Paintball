@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
@@ -9,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Server
 {
-    public class Producer//Producer
+    public class Producer
     {
         static public int ID = 555;
         public TcpClient client;
@@ -22,14 +21,11 @@ namespace Server
         private volatile bool stopped;
         List<TcpClient> clients;
 
-        public Producer(TcpClient tcpClient, Waiter waiter, ConcurrentQueue<Player> queue, ConcurrentQueue<string> dataForSend, List<TcpClient> clients)
+        public Producer(TcpClient tcpClient, ConcurrentQueue<Player> queue)
         {
-            this.dataForSend = dataForSend;
             this.queue = queue;
             this.client = tcpClient;
             this.stopped = true;
-            this.waiter = waiter;
-            this.clients = clients;
         }
 
         public void Start()
@@ -119,25 +115,6 @@ namespace Server
                     jsonData1 = JsonConvert.DeserializeObject<Player>(command);
                 }
                 catch(Exception e) { Console.WriteLine(e); }
-                //if (jsonData1.ID == -1)
-                //// отправляем обратно сообщение 
-                //{
-                //    if (this.dataForSend.TryDequeue(out string mess))
-                //    {
-                //        string msg = "%" + mess + "&";
-                //        byte[] messageBytes = Encoding.ASCII.GetBytes(msg); // a UTF-8 encoder would be 'better', as this is the standard for network communications
-                //        int length = messageBytes.Length;// determine length of message
-                //        byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
-                //        if (System.BitConverter.IsLittleEndian)// flip the bytes if we are a little-endian system: reverse the bytes in lengthBytes to do so
-                //        {
-                //            Array.Reverse(lengthBytes);
-                //        }
-                //        stream.Write(lengthBytes, 0, lengthBytes.Length);// send length
-                //        stream.Write(messageBytes, 0, length);// send message
-                //    }
-                //}
-               // Console.WriteLine("Сообщение от " + jsonData1.Name);
-               // Console.WriteLine(command);
                 this.queue.Enqueue(jsonData1);
             }
 

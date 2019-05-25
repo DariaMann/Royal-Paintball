@@ -15,6 +15,7 @@ namespace GameLibrary
         public int MaxCountMag { get; set; }
         public bool CamShot { get; set; }
         public DateTime time { get; set; }
+        public int range { get; set; }
 
         public void ChangeWeap(Field f, string weap, int ID)
         {

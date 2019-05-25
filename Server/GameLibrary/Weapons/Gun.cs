@@ -17,6 +17,7 @@ namespace GameLibrary
             this.CamShot = true;
             this.time = new DateTime();
             time = DateTime.Now;
+            range = 5;
         }
         public override void Shoot()
         {

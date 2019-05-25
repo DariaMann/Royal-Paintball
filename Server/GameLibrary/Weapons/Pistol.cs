@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameLibrary
 {
@@ -17,6 +13,7 @@ namespace GameLibrary
             this.CamShot = true;
             this.time = new DateTime();
             time = DateTime.Now;
+            range = 4;
         }
         public override void Shoot()
         {

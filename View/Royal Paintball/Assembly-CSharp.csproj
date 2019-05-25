@@ -70,11 +70,16 @@
     <Compile Include="Assets\Scripts\ClientTCP.cs" />
     <Compile Include="Assets\Scripts\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\ServerData\ServerData.cs" />
+    <Compile Include="Assets\Simple Explosion\Demo\Script (for Demo)\ExplosionControl.cs" />
+    <Compile Include="Assets\Simple Explosion\Scripts\GraphicExplosion.cs" />
+    <Compile Include="Assets\Simple Explosion\Scripts\light_control.cs" />
+    <Compile Include="Assets\Simple Explosion\Scripts\PhysicalExplosion.cs" />
     <Compile Include="Assets\StarNestSkybox\Scripts\CameraScroll.cs" />
     <Compile Include="Assets\StarNestSkybox\Scripts\SkyboxSwitcher.cs" />
     <Compile Include="Assets\Stylized Astronaut\Character\Player.cs" />
     <Compile Include="Assets\Stylized Astronaut\Character\ThirdPersonCamera.cs" />
     <None Include="Assets\StarNestSkybox\StarNestSkyboxReadme.txt" />
+    <None Include="Assets\Simple Explosion\Shader\Exposion.shader" />
     <None Include="Assets\read me.txt" />
     <None Include="Assets\Particlecollection_Free samples\Plugins\Effect\Shader\effect_distortion_mask.shader" />
     <None Include="Assets\StarNestSkybox\StarNestSkybox_HSV.shader" />

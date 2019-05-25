@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace GameLibrary
 {
-    public class Tree
+    public class Tree:Objects
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public int[] Size { get; set; }
+        //public float X { get; set; }
+        //public float Y { get; set; }
+        //public int[] Size { get; set; }
         public string Type;
 
         public Tree(float x, float y, string type)

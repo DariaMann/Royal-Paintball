@@ -2,42 +2,42 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using GameLibrary;
+using System;
 
 namespace Server
 {
     class Game
     {
-        private readonly Dictionary<TcpClient, Waiter> Waiters;
         private ConcurrentQueue<Player> queue;
-        ConcurrentQueue<string> dataForSend;
+        ConcurrentQueue<Field> dataForSend;
         Field f;
         Consumer consumer;
         Sender sender;
-        List<TcpClient> clients;
+        private List<Client> clients;
+        public List<FirstPlayerData> Data;
 
-        public Game(Dictionary<TcpClient, Waiter> waiters)
+        public Game(List<Client> clients)
         {
-            this.Waiters = waiters;
-            this.clients = new List<TcpClient>();
-            foreach (TcpClient tcp in Waiters.Keys)
+            this.clients = clients;
+            this.Data = new List<FirstPlayerData>();
+            foreach(Client cl in clients)
             {
-                clients.Add(tcp);
+                Data.Add(new FirstPlayerData(cl.Name, cl.ID));
             }
             this.queue = new ConcurrentQueue<Player>();
-            this.dataForSend = new ConcurrentQueue<string>();
-            this.f = new Field();
+            this.dataForSend = new ConcurrentQueue<Field>();
+            this.f = new Field(Data);
             this.consumer = new Consumer(f, queue, dataForSend);
             this.sender = new Sender(dataForSend, clients);
         }
-
         public void Process()
         {
             consumer.Start();
             sender.Start();
-            foreach (TcpClient c in Waiters.Keys)
+            foreach (Client c in clients)
             {
-                Producer producer = new Producer(c, Waiters[c], queue, dataForSend, clients);//Producer
-                producer.Start();
+                c.Game = true;
+                c.queue = queue;
             }
         }
     }

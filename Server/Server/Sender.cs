@@ -4,21 +4,23 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using Newtonsoft.Json;
+using GameLibrary;
 
 namespace Server
 {
     class Sender
     {
-        private readonly ConcurrentQueue<string> dataForSend;
+        private readonly ConcurrentQueue<Field> dataForSend;
         private Thread thread;
         private volatile bool stopped;
-        List<TcpClient> clientTSP;
+        List<Client> clients;
 
-        public Sender(ConcurrentQueue<string> dataForSend, List<TcpClient> clientTSP)
+        public Sender(ConcurrentQueue<Field> dataForSend, List<Client> clients)
         {
             this.stopped = true;
             this.dataForSend = dataForSend;
-            this.clientTSP = clientTSP;
+            this.clients = clients;
         }
 
         public void Start()
@@ -37,14 +39,25 @@ namespace Server
         {
             while (!stopped)
             {
-                if (this.dataForSend.TryDequeue(out string mess))
+                Thread.Sleep(50);
+                if (this.dataForSend.TryDequeue(out Field mess))
                 {
-                   // Console.WriteLine(mess);
-                    string msg = "%" +mess+ "&";
-                    for (int i = 0; i < clientTSP.Count; i++)
+                    for (int i = 0; i < clients.Count; i++)
                     {
+                        foreach (Player player in mess.Player.Values)
+                        {
+                            if (player.ID == clients[i].ID)
+                            {
+                                player.Me = true;
+                            }
+                            else player.Me = false;
+                        }
+                        string meesage = JsonConvert.SerializeObject(mess, Formatting.Indented);
+                        //Console.WriteLine(meesage);
+                        string msg = "%" + meesage + "&";
+                        //Console.WriteLine("Sender: " + msg);
                         NetworkStream stream = null;
-                        stream = clientTSP[i].GetStream();
+                        stream = clients[i].client.GetStream();
                         byte[] messageBytes = Encoding.ASCII.GetBytes(msg); // a UTF-8 encoder would be 'better', as this is the standard for network communications
                         int length = messageBytes.Length;// determine length of message
                         byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
