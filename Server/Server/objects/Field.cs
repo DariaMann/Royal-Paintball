@@ -1,0 +1,305 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
+
+namespace Server
+{
+    public class Field : ICloneable
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public int[] Size { get; set; }
+        public List<Tree> Tree { get; set; }
+        public List<Wall> Wall { get; set; }
+        public List<Bullet> Bullet { get; set; }
+        public Dictionary<int, Item> Item { get; set; }
+        public Dictionary<int, Player> Player { get; set; }
+        public Circle circle { get; set; }
+
+        public List<string> Colors { get; set; }
+        public TimeSpan time { get; set; }
+
+        public DateTime inpulse { get; set; }
+
+        public Field()
+        {
+            X = 0;
+            Y = 0;
+            inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, DateTime.Now.Millisecond);
+            Size = new int[2] { 50, 50 };
+
+            Tree = new List<Tree>();
+            Random rn = new Random(); // объявление переменной для генерации чисел
+            for (int i = 0; i < 60; i++)
+            {
+
+                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
+                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                int tree = rn.Next(1, 3);
+                string type = "";
+                if (tree == 1)
+                {
+                    type = "Oak";
+                }
+                else
+                {
+                    if (tree == 2)
+                    {
+                        type = "Fir";
+                    }
+                    else
+                    {
+                        type = "Poplar";
+                    }
+                }
+                Tree.Add(new Tree(x, y, type));
+            }
+            Wall = new List<Wall>();
+            for (int i = 0; i < 30; i++)
+            {
+                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
+                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                Wall.Add(new Wall(x, y));
+            }
+            Bullet = new List<Bullet>();
+            Item = new Dictionary<int, Item>();
+            for (int i = 0; i < 10; i++)
+            {
+                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
+                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                Item.Add(Item.Count, new Item("Kit", 5, x, y, Item.Count));
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                float x = rn.Next(-40, 40); //rn.Next(-8, 8);
+                float y = rn.Next(-40, 40);//rn.Next(-4, 4);
+                Item.Add(Item.Count, new Item("Pistol", 5, x, y, Item.Count));
+            }
+            this.time = new TimeSpan();
+            Player = new Dictionary<int, Player>();
+            circle = new Circle();
+            Colors = new List<string> { "blue", "red", "yellow", "orange", "pink", "green", "black", "white" };
+        }
+        public float[] chek()
+        {
+            Random rn = new Random();
+            bool good = false;
+            float[] cord = new float[] { 0, 0 };
+            while (good != true)
+            {
+                float x = rn.Next(-40, 40);
+                float y = rn.Next(-40, 40);
+                for (int i = 0; i < Tree.Count; i++)
+                {
+                    float aX = Tree[i].X - Tree[i].Size[0];
+                    float aY = Tree[i].Y + Tree[i].Size[1];
+                    float bX = Tree[i].X + Tree[i].Size[0];
+                    float bY = Tree[i].Y + Tree[i].Size[1];
+                    float cX = Tree[i].X + Tree[i].Size[0];
+                    float cY = Tree[i].Y - Tree[i].Size[1];
+                    float dX = Tree[i].X - Tree[i].Size[0];
+                    float dY = Tree[i].Y - Tree[i].Size[1];
+                    if (x < aX || x > bX)
+                    {
+                        if (y < dY || y > aY)
+                        {
+                            good = true;
+                            cord = new float[] { x, y };
+                            return cord;
+                        }
+                        else { i = Tree.Count - 1; }
+                    }
+                    else
+                    {
+                        i = Tree.Count - 1;
+                    }
+                }
+            }
+            return cord;
+        }
+        public void AllKit()
+        {
+            float[] cord = new float[] { 0, 0 };
+            Item = new Dictionary<int, Item>();
+            for (int i = 0; i < 3; i++)
+            {
+                cord = chek();
+                Item.Add(Item.Count,
+                new Item("Kit", 5, cord[0], cord[1], Item.Count));
+                Console.WriteLine("x: " + cord[0]);
+                Console.WriteLine("y: " + cord[1]);
+            }
+        }
+        public void AllWalls()
+        {
+            float[] cord = new float[] { 0, 0 };
+            Wall = new List<Wall>();
+            for (int i = 0; i < 3; i++)
+            {
+                cord = chek();
+                Wall.Add(new Wall(cord[0], cord[1]));
+                Console.WriteLine("x: " + cord[0]);
+                Console.WriteLine("y: " + cord[1]);
+            }
+
+        }
+
+        public object Clone()
+        {
+            return new Field
+            {
+                X = this.X,
+            Y = this.Y,
+            Size = this.Size,
+            Tree = new List<Tree>(this.Tree),
+            Wall = new List<Wall>(this.Wall),
+            Bullet = new List<Bullet>(this.Bullet),
+            Item = new Dictionary<int, Item>(this.Item),
+            Player = new Dictionary<int, Player>(this.Player),
+            circle = this.circle,
+            Colors = new List<string>(this.Colors),
+            time = this.time,
+            inpulse = this.inpulse
+            };
+        }
+
+        public void PlayerOutOfCircle(Player player)
+        {
+            double a = Math.Abs(player.X - circle.X);
+            double b = Math.Abs(player.Y - circle.Y);
+            double gep = Math.Abs(Math.Sqrt(a * a + b * b));
+            if (gep > circle.Radius)
+            {
+                player.OutCircle = true;
+            }
+            else
+            { player.OutCircle = false; }
+        }
+        
+        public void DecreaseInLives()
+        {
+            if (time.Seconds == inpulse.Second)
+            {
+                foreach (int id in Player.Keys)
+                {
+                    if (Player[id].OutCircle)
+                    {
+                        Player[id].Wound(1);
+                    }
+                }
+            }
+            int second = time.Seconds;
+            if (time.Seconds == 59)
+            {
+                second = 1;
+
+            }
+            else
+            {
+                if (time.Seconds == 58)
+                {
+                    second = 0;
+                }
+                else
+                {
+                    second += 1;
+                }
+            }
+            inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, time.Minutes, second, time.Milliseconds);
+        }
+
+        public void PlayerInFrontOfObject(Player player)
+        {
+            float aX = X - Size[0];
+            float aY = Y + Size[1];
+            float bX = X + Size[0];
+            float bY = Y + Size[1];
+            float cX = X + Size[0];
+            float cY = Y - Size[1];
+            float dX = X - Size[0];
+            float dY = Y - Size[1];
+            if (player.X < aX || player.X > bX || player.Y < dY || player.Y > aY)
+            //{
+            //    if (player.X + 2 < bX)
+            //    {
+            //        if (!player.StopIn.ContainsKey("A"))
+            //            player.StopIn.Add("A", "A");
+            //    }
+            //    else
+            //    {
+            //        if (player.X + 1 > bX)
+            //        {
+            //            if (!player.StopIn.ContainsKey("D"))
+            //                player.StopIn.Add("D", "D");
+            //        }
+            //        else
+            //        {
+            //            if (player.Y + 1 < bY)
+            //            {
+            //                if (!player.StopIn.ContainsKey("S"))
+            //                    player.StopIn.Add("S", "S");
+            //            }
+            //            else
+            //            {
+            //                if (player.Y + 1 > bY)
+            //                {
+            //                    if (!player.StopIn.ContainsKey("W"))
+            //                        player.StopIn.Add("W", "W");
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    player.StopIn.Clear();
+            //}
+        
+            {
+                if (player.X + 2 < bX)
+                {
+                    if (!player.StopIn.ContainsKey("A"))
+
+                        player.StopIn.Add("A", "A");
+                    Console.WriteLine("RIGHT");
+                }
+                else
+                {
+                    if (player.X + 1 > bX)
+                    {
+                        if (!player.StopIn.ContainsKey("D"))
+
+                            player.StopIn.Add("D", "D");
+                        Console.WriteLine("LEFT");
+                    }
+                }
+
+                if (player.Y + 1 < bY)
+                {
+                    if (!player.StopIn.ContainsKey("S"))
+
+                        player.StopIn.Add("S", "S");
+                    Console.WriteLine("UP");
+                }
+                else
+                {
+                    if (player.Y + 1 > bY)
+                    {
+                        if (!player.StopIn.ContainsKey("W"))
+
+                            player.StopIn.Add("W", "W");
+
+                    }
+                }
+            }
+            else
+            {
+                player.StopIn.Clear();
+            }
+        }
+    }
+}

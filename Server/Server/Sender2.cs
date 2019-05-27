@@ -5,7 +5,6 @@ using System.Net.Sockets;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
-using GameLibrary;
 
 namespace Server
 {
@@ -27,8 +26,8 @@ namespace Server
 
         public void SendMessage(NetworkStream stream, string readyMess)
         {
-            
-            byte[] messageBytes = Encoding.ASCII.GetBytes(readyMess); 
+
+            byte[] messageBytes = Encoding.ASCII.GetBytes(readyMess);
             int length = messageBytes.Length;// определение длины сообщения
             byte[] lengthBytes = System.BitConverter.GetBytes(length);// преобразование длины в байты с помощью BitConverter (закодировать)
             if (System.BitConverter.IsLittleEndian)// переворот байтов, если это little-endian система с прямым порядком байтов: для этого обращаем байты в lengthBytes
@@ -65,7 +64,6 @@ namespace Server
         {
             while (!stopped)
             {
-                Thread.Sleep(50);
                 if (this.queue.TryDequeue(out Client clientTcp))
                 {
                     client.Add(clientTcp);
@@ -76,10 +74,7 @@ namespace Server
                     int countNamedClient = 0;
                     for (int j = 0; j < client.Count; j++)
                     {
-                        if (client[j].Name != null)
-                        {
                             countNamedClient++;
-                        }
                     }
                     var mess = JsonConvert.SerializeObject(countNamedClient, Formatting.Indented);
                     string readyMess = "%" + mess + "&";

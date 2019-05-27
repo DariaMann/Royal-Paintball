@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
-using GameLibrary;
-using System.Collections.Generic;
 
 namespace Server
 {
-    public class Producer
+    public class Producer//Producer
     {
         static public int ID = 555;
         public TcpClient client;
+        public Field field;//поле игры
 
         private readonly ConcurrentQueue<Player> queue;
-        private readonly ConcurrentQueue<string> dataForSend;
+        private readonly ConcurrentQueue<Field> dataForSend;
 
         private Thread thread;
         private volatile bool stopped;
-        List<TcpClient> clients;
 
-        public Producer(TcpClient tcpClient, ConcurrentQueue<Player> queue)
+        public Producer(TcpClient tcpClient, Field Field, ConcurrentQueue<Player> queue, ConcurrentQueue<Field> dataForSend)
         {
+            this.dataForSend = dataForSend;
             this.queue = queue;
+            this.field = Field;
             this.client = tcpClient;
             this.stopped = true;
         }
@@ -38,7 +40,6 @@ namespace Server
                 thread.Start();
             }
         }
-
         public void Stop()
         {
             if (!stopped)
@@ -50,76 +51,91 @@ namespace Server
 
         }
 
-        private byte[] ReadBytes(int count)
+        public string PlayerData1()//создание игрока 
         {
-            NetworkStream networkStream = client.GetStream();
-            byte[] bytes = new byte[count]; // buffer to fill (and later return)
-            int readCount = 0; // bytes is empty at the start
-            while (readCount < count)// while the buffer is not full
-            {
-                int left = count - readCount; // ask for no-more than the number of bytes left to fill our byte[]// we will ask for `left` bytes
-                try
+            string color = First();//генерация ID игрока
+            field.Player.Add(
+                ID,
+                new Player()
                 {
-                    int r = networkStream.Read(bytes, readCount, left); // but we are given `r` bytes (`r` <= `left`)
-                    if (r == 0)// lost connection
-                    {
-                        //  throw new Exception("Lost Connection during read");
-                        clients.Remove(client);
-                        Stop();
-                    }
-                
-                readCount += r; // advance by however many bytes we read
-                }
-                catch
-                {
-                    clients.Remove(client);
-                    Stop();
-                }
-            }
-            return bytes;
+                    ID = ID,
+                    Color = color
+                });
+
+            string json = JsonConvert.SerializeObject(field, Formatting.Indented);
+            return json;
         }
-
-        private string ReadMessage()
+        public string First()
         {
-            // read length bytes, and flip if necessary
-            byte[] lengthBytes = ReadBytes(sizeof(int)); // int is 4 bytes
-            if (System.BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(lengthBytes);
-            }
-
-            // decode length
-            int length = System.BitConverter.ToInt32(lengthBytes, 0);
-
-            // read message bytes
-            byte[] messageBytes = ReadBytes(length);
-
-            // decode the message
-            string message = System.Text.Encoding.ASCII.GetString(messageBytes);
-
-            return message;
+            Random rn = new Random(); // объявление переменной для генерации чисел
+            int id = rn.Next(0, 1000);
+            ID = id;
+            int col = rn.Next(0, field.Colors.Count);
+            string color = field.Colors[col];
+            field.Colors.Remove(color);
+            return color;
         }
 
         public void Process()
         {
             NetworkStream stream = null;
+
             stream = client.GetStream();
+            byte[] data = new byte[256]; // буфер для получаемых данных
             while (true)
             {
-                string message = ReadMessage();
-                string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
-                Player jsonData1 = new Player();
+                // получаем сообщение
+                StringBuilder builder = new StringBuilder();
+                int bytes = 0;
+
+                do
+                {
+                    bytes = stream.Read(data, 0, data.Length);
+                    builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                }
+                while (stream.DataAvailable);
+
+
+                string message = builder.ToString();
+
+                //    Console.WriteLine("Клиент: " + message);
+                // try {
+                Player jsonData1 = JsonConvert.DeserializeObject<Player>(message);
                 try
                 {
-                    jsonData1 = JsonConvert.DeserializeObject<Player>(command);
+                    if (jsonData1.ID == -1)
+                // отправляем обратно сообщение 
+                {
+                    message = PlayerData1();
+                    //  Console.WriteLine("СЕРВЕР: " + message);
+                    data = Encoding.UTF8.GetBytes(message);
+                    stream.Write(data, 0, data.Length);
                 }
-                catch(Exception e) { Console.WriteLine(e); }
-                this.queue.Enqueue(jsonData1);
+                else
+                {
+                    this.queue.Enqueue(jsonData1);
+                    Console.WriteLine(queue.Count);
+                    if (this.dataForSend.TryDequeue(out Field f))
+                    {
+                        var mess = JsonConvert.SerializeObject(f, Formatting.Indented);
+                        // Console.WriteLine("СЕРВЕР: " + mess);
+                        data = Encoding.UTF8.GetBytes(mess);
+                        stream.Write(data, 0, data.Length);
+                        stream.Flush();
+                    }
+                }
+                }
+                catch
+                {
+                    Console.WriteLine("Провал.");
+                    Stop();
+                }
             }
+
+        }
 
         }
 
     }
 
-}
-
+    

@@ -2,12 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
-public class FirstPlayerData
-{
-    public string Name { get; set; }
-    public int ID { get; set; }
-}
 public class Field
 {
     public float X { get; set; }
@@ -19,15 +13,11 @@ public class Field
     public Dictionary<int, Item> Item { get; set; }
     public Dictionary<int, Player> Player { get; set; }
     public Circle circle { get; set; }
+
     public List<string> Colors { get; set; }
     public TimeSpan time { get; set; }
+
     public DateTime inpulse { get; set; }
-
-    public float[] LT { get; private set; }
-    public float[] RT { get; private set; }
-    public float[] LD { get; private set; }
-    public float[] RD { get; private set; }
-
 }
 public class Circle
 {
@@ -46,7 +36,6 @@ public class Bullet
 {
     public int ID { get; set; }
     public string Weapon { get; set; }
-    public Weapons weapon { get; set; }
 
     public float X { get; set; }
     public float Y { get; set; }
@@ -58,16 +47,13 @@ public class Bullet
     public float[] StartPos { get; set; }
 
     public string Color { get; set; }
+
 }
-public class Objects
+public class Wall
 {
     public float X { get; set; }
     public float Y { get; set; }
     public int[] Size { get; set; }
-
-}
-public class Wall : Objects
-{
 
 }
 public class Item
@@ -77,35 +63,34 @@ public class Item
     public float X { get; set; }
     public float Y { get; set; }
     public int Index { get; set; }
-
 }
-public class Tree : Objects
+public class Tree
 {
+    public float X { get; set; }
+    public float Y { get; set; }
+    public int[] Size { get; set; }
     public string Type;
 
 }
-public class Player : Objects
+public class Player
 {
-    public string Name { get; set; }
     public int Life { get; set; }
     public int ID { get; set; }
     public string Direction { get; set; }
-    public bool Me { get; set; }
-
-    //public float X { get; set; }
-    //public float Y { get; set; }
+    public string Weapon { get; set; }
+    public float X { get; set; }
+    public float Y { get; set; }
     public float XRot { get; set; }
     public float YRot { get; set; }
     public bool Shoot { get; set; }
     public bool Reload { get; set; }
     public bool LiftItem { get; set; }
     public float[] MousePos { get; set; }
-    //public int[] Size { get; set; }
-
+    public int[] Size { get; set; }
+    public bool Me { get; set; }
     public float[] Start { get; set; }
     public float[] End { get; set; }
 
-    public string Weapon { get; set; }
     public Weapons Weap { get; set; }
     public Pistol P { get; set; }
     public Shotgun S { get; set; }
@@ -114,13 +99,8 @@ public class Player : Objects
 
     public string Color { get; set; }
 
-    public bool OutCircle { get; set; }
-    public bool Death { get; set; }
-
-    public Dictionary<string, string> StopIn { get; set; }
-
 }
-public abstract class Weapons
+public class Weapons
 {
     public int CountBullets { get; set; }//количество пуль за один выстрел
     public int TakenLives { get; set; }//количество отнятых жизней за попадание
@@ -128,7 +108,6 @@ public abstract class Weapons
     public int MaxCountMag { get; set; }
     public bool CamShot { get; set; }
     public DateTime time { get; set; }
-    public int range { get; set; }
 }
 
 public class Bomb : Weapons
@@ -142,7 +121,7 @@ public class Bomb : Weapons
         this.CamShot = true;
         this.time = new DateTime();
         time = DateTime.Now;
-        range = 2;
+
     }
 }
 public class Gun : Weapons
@@ -156,14 +135,12 @@ public class Gun : Weapons
         this.CamShot = true;
         this.time = new DateTime();
         time = DateTime.Now;
-        range = 5;
     }
 }
 public class Shotgun : Weapons
 {
     public Shotgun()
     {
-
         this.CountBullets = 7;
         this.TakenLives = 4;
         this.CountMagazine = 0;
@@ -171,20 +148,18 @@ public class Shotgun : Weapons
         this.CamShot = true;
         this.time = new DateTime();
         time = DateTime.Now;
-        range = 3;
     }
 }
 public class Pistol : Weapons
 {
     public Pistol()
     {
-        this.CountBullets = 6;
+        this.CountBullets = 5;
         this.TakenLives = 2;
         this.CountMagazine = 24;
         this.MaxCountMag = 12;
         this.CamShot = true;
         this.time = new DateTime();
         time = DateTime.Now;
-        range = 4;
     }
 }
