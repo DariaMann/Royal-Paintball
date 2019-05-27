@@ -29,7 +29,7 @@ namespace GameLibrary
             go = false;
         }
 
-        public void Move(int endX, int endY, float speed)
+        public void CircleDitection(int endX, int endY, float speed)
         {
             float cos;
             float sin;
@@ -64,7 +64,7 @@ namespace GameLibrary
             int x = rn.Next(-40, 40); //rn.Next(-8, 8);
             int y = rn.Next(-40, 40);//rn.Next(-4, 4);
             float speed = 0.3f;
-            Move(x, y, speed);
+            CircleDitection(x, y, speed);
 
         }
 

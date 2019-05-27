@@ -5,19 +5,20 @@ using Server;
 using GameLibrary;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using System.Net;
 
-namespace UnitTestProject1
+namespace ServerTests
 {
     [TestClass]
-    public class UnitTest1
+    public class LogicTests
     {
         [TestMethod]
         public void MovePlayerTest_1()
         {
-            Player player = new Player() {X = 0,Y=0};
+            Player player = new Player() { X = 0, Y = 0 };
             player.MovePlayer("W");
             float expected = 0.4f;
-            Assert.AreEqual(expected,player.Y);
+            Assert.AreEqual(expected, player.Y);
         }
         [TestMethod]
         public void MovePlayerTest_2()
@@ -27,7 +28,6 @@ namespace UnitTestProject1
             float expected = 0.4f;
             Assert.AreNotEqual(expected, player.Y);
         }
-
         [TestMethod]
         public void ChangeWeaponTest()
         {
@@ -50,13 +50,12 @@ namespace UnitTestProject1
         public void PlayerOutOfCircleTest_1()
         {
             Field f = new Field();
-            Player player = new Player() { X=70,Y=70 };
+            Player player = new Player() { X = 70, Y = 70 };
             f.PlayerOutOfCircle(player);
             bool actual = player.OutCircle;
             bool expected = true;
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void PlayerOutOfCircleTest_2()
         {
@@ -67,29 +66,26 @@ namespace UnitTestProject1
             bool expected = false;
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void BulletInObjectTest_1()
         {
             Player player = new Player() { X = 5, Y = 5 };
             Bullet bullet = new Bullet(0, 0, 1, 0, "Gun", 1, 0.1f, "black", player.Weap);
-            Wall wall = new Wall(0,0);
-            bool actual =  bullet.BulletInObject(wall);
+            Wall wall = new Wall(0, 0);
+            bool actual = bullet.BulletInObject(wall);
             bool expected = true;
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void BulletInObjectTest_2()
         {
             Player player = new Player() { X = 5, Y = 5 };
-            Bullet bullet = new Bullet(0,0, 5, 0, "Gun", 1, 0.1f, "black", player.Weap);
+            Bullet bullet = new Bullet(0, 0, 5, 0, "Gun", 1, 0.1f, "black", player.Weap);
             Wall wall = new Wall(0, 0);
             bool actual = bullet.BulletInObject(wall);
             bool expected = false;
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void BulletInObjectTest_3()
         {
@@ -99,7 +95,6 @@ namespace UnitTestProject1
             bool expected = true;
             Assert.AreEqual(expected, actual);
         }
-
         [TestMethod]
         public void PlayerInFrontOfObjectTest_1()
         {
@@ -207,7 +202,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void LifeTest_1()
         {
-            Player player = new Player() { ID=0,X = 5, Y = 5, Life = 1};
+            Player player = new Player() { ID = 0, X = 5, Y = 5, Life = 1 };
             Field f = new Field();
             f.Player.Add(0, player);
             f.time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
@@ -215,8 +210,69 @@ namespace UnitTestProject1
             f.DecreaseInLives();
             int actual = f.Player[player.ID].Life;
             int expected = 0;
-            Assert.AreEqual(f.time.Seconds, f.inpulse.Second-1);
+            Assert.AreEqual(f.time.Seconds, f.inpulse.Second - 1);
             Assert.AreEqual(expected, actual);
         }
     }
+
+    [TestClass]
+    public class CommunicationTests
+    {
+        [TestMethod]
+        public void CloneTest_1()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Bullet, f1.Bullet);
+        }
+        [TestMethod]
+        public void CloneTest_2()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Player, f1.Player);
+        }
+        [TestMethod]
+        public void CloneTest_3()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Wall, f1.Wall);
+        }
+        [TestMethod]
+        public void CloneTest_4()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.circle, f1.circle);
+        }
+        [TestMethod]
+        public void CloneTest_5()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Colors, f1.Colors);
+        }
+        [TestMethod]
+        public void SendTest_1()
+        {
+            int port = 904; // порт для прослушивания подключений
+            TcpListener server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            server.Start();
+            TcpClient tcpClient = server.AcceptTcpClient();
+            Client client = new Client(tcpClient);
+            ConcurrentQueue<Client> queue = new ConcurrentQueue<Client>();
+            queue.Enqueue(client);
+            Sender2 sender = new Sender2(queue);
+        }
+        [TestMethod]
+        public void ConnectTest()
+        {
+            int port = 904; // порт для прослушивания подключений
+            TcpListener server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            server.Start();
+            TcpClient tcpClient = server.AcceptTcpClient();
+        }
+    }
+
 }

@@ -11,9 +11,9 @@ namespace Server
         private ConcurrentQueue<Player> queue;
         ConcurrentQueue<Field> dataForSend;
         Field f;
-        Consumer consumer;
+        Logic consumer;
         Sender sender;
-        private List<Client> clients;
+        List<Client> clients;
         public List<FirstPlayerData> Data;
 
         public Game(List<Client> clients)
@@ -27,7 +27,7 @@ namespace Server
             this.queue = new ConcurrentQueue<Player>();
             this.dataForSend = new ConcurrentQueue<Field>();
             this.f = new Field(Data);
-            this.consumer = new Consumer(f, queue, dataForSend);
+            this.consumer = new Logic(f, queue, dataForSend);
             this.sender = new Sender(dataForSend, clients);
         }
         public void Process()

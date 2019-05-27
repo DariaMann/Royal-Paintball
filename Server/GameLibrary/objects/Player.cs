@@ -49,7 +49,7 @@ namespace GameLibrary
             S = new Shotgun();
             G = new Gun();
             B = new Bomb();
-            Weap = P;
+            Weap = B;
             Random rn = new Random(); // объявление переменной для генерации чисел
             this.X = rn.Next(-2, 5);
             this.Y = rn.Next(-2, 5);
@@ -101,28 +101,29 @@ namespace GameLibrary
             }
         }
 
-        public void ChangeWeapon(string weapon)//смена оружия
+        public void ChangeWeapon(string weapon, Weapons weap)//смена оружия
         {
-            if (weapon == "Pistol")
-            {
-                Weap = P;
-            }
-            if (weapon == "Shotgun")
-            {
-                Weap = S;
-            }
-            if (weapon == "Gun")
-            {
-                Weap = G;
-            }
-            if (weapon == "Bomb")
-            {
-                Weap = B;
-            }
-            Weapon = weapon;
+            //if (weapon == "Pistol")
+            //{
+            //    Weap = P;
+            //}
+            //if (weapon == "Shotgun")
+            //{
+            //    Weap = S;
+            //}
+            //if (weapon == "Gun")
+            //{
+            //    Weap = G;
+            //}
+            //if (weapon == "Bomb")
+            //{
+            //    Weap = B;
+            //}
+            //Weapon = weapon;
+            Weap = weap;
         }
 
-        public void Woundd(int ID, int takenLifes)//ранение
+        public void Woundd(int takenLifes)//ранение
         {
             if (Life > 0)
             {

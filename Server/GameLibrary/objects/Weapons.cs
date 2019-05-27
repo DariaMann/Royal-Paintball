@@ -17,25 +17,7 @@ namespace GameLibrary
         public DateTime time { get; set; }
         public int range { get; set; }
 
-        public void ChangeWeap(Field f, string weap, int ID)
-        {
-            if (weap == "Pistol")
-            {
-                f.Player[ID].Weap = f.Player[ID].P;
-            }
-            if (weap == "Shotgun")
-            {
-                f.Player[ID].Weap = f.Player[ID].S;
-            }
-            if (weap == "Gun")
-            {
-                f.Player[ID].Weap = f.Player[ID].G;
-            }
-            if (weap == "Bumb")
-            {
-                f.Player[ID].Weap = f.Player[ID].B;
-            }
-        }
+       
 
     }
 

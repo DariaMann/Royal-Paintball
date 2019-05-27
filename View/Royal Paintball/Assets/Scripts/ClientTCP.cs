@@ -3,11 +3,12 @@ using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using UnityEngine.SceneManagement;
-using GameLibrary;
 using System;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using GameLibrary;
+
 
 public class Sender
 {
@@ -179,6 +180,7 @@ public class Recipient
             message = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
             if (Game == false)
             {
+                Debug.Log("wail");
                 try
                 {
                     int count = JsonConvert.DeserializeObject<int>(message);
@@ -187,12 +189,13 @@ public class Recipient
                 }
                 catch (Newtonsoft.Json.JsonReaderException e)
                 {
-                    Console.WriteLine(e);
+                    Debug.Log(e);
                     Game = true;
                 }
             }
             else
             {
+                Debug.Log("play");
                 Field field = JsonConvert.DeserializeObject<Field>(message);
 
                 if (queue.Count < 1)

@@ -5,8 +5,10 @@ using UnityEngine.UI;
 using System;
 using Newtonsoft.Json;
 using UnityEngine.SceneManagement;
-using GameLibrary;
 using System.Collections.Concurrent;
+using UnityEngine.Profiling;
+using GameLibrary;
+
 
 public class NetworkManager : MonoBehaviour
 {
@@ -89,13 +91,8 @@ public class NetworkManager : MonoBehaviour
     public Color[] Colors = new Color[8];
     public void Exit()
     {
-        Destroy(playerList[my_ID]);
-        playerList.Remove(my_ID);
-        Debug.Log("Лег сервер");
+        field.Player[my_ID].Death = true;
         clientTCP.Disconnect();
-        SceneManager.LoadScene("Play");
-
-        //SceneManager.UnloadScene();
         Application.Quit();
     }
     public void Menu()
@@ -118,16 +115,19 @@ public class NetworkManager : MonoBehaviour
         this.dataForSendName = new ConcurrentQueue<string>();
         this.sender = new Sender(dataForSend, clientTCP.playerSocket, dataForSendName);
         this.recipient = new Recipient(queue, clientTCP.playerSocket, queueCount);
+        recipient.Start();
     }
     private void Update()
     {
         //Debug.Log("queueCount: " + queueCount.Count);
         // Debug.Log("queue: " + queue.Count);
-        recipient.Start();
-        sender.Start();
+        
+       // sender.Start();
         int count;
         if (this.queueCount.TryDequeue(out count))
         {
+            Debug.Log("WAITING");
+            clientTCP.Send(Name);
             countClient = count;
             CountOfWaiters.text = Convert.ToString(countClient);
             if (dataForSendName.Count < 1)
@@ -136,9 +136,11 @@ public class NetworkManager : MonoBehaviour
         Field f;
         if (this.queue.TryDequeue(out f))
         {
-            field = f;
+            Debug.Log("GAME");
             if (StartGame)
             {
+                field = f;
+                clientTCP.Send(field.Player[my_ID]);
                 GameCabvas.SetActive(true);
                 WaitingCanvas.SetActive(false);
                 MyId();
@@ -149,6 +151,10 @@ public class NetworkManager : MonoBehaviour
                 offset = camera.transform.position - playerList[my_ID].transform.position;
                 StartGame = false;
             }
+
+           
+            field = f;
+            Profiler.BeginSample("check");
             //MyId();
             CamMove();
             DelBull();
@@ -164,102 +170,19 @@ public class NetworkManager : MonoBehaviour
             InstantiateMagazine();
             FinishGame();
             InstantiateWeaponOther();
-            // clientTCP.Send(field.Player[my_ID]);
+            Profiler.EndSample();
+
+            clientTCP.Send(field.Player[my_ID]);
         }
         try
         {
             if (dataForSend.Count < 1)
             { this.dataForSend.Enqueue(field.Player[my_ID]); }
-            // Debug.Log("dataForSend: " + dataForSend.Count);
         }
         catch
         {
-            //  Debug.Log("loshara");
+             Debug.Log("loshara");
         }
-        //  clientTCP.Send(field.Player[my_ID]);
-
-
-
-
-
-        //if (StartGame == false)
-        //    {
-        //        if (IsItFirstMessage)
-        //        {
-        //            clientTCP.Send(Name);
-        //            mess = clientTCP.GetPos();//данные с сервера 
-        //            countClient = JsonConvert.DeserializeObject<int>(mess);
-        //            CountOfWaiters.text = Convert.ToString(countClient);
-        //        }
-        //}
-        //if (countClient >= 3)
-        //{ StartGame = true; }
-        //if (StartGame)
-        //{
-        //    GameCabvas.SetActive(true);
-        //    WaitingCanvas.SetActive(false);
-        //    player.ID = -1;
-        //    player.Name = Name;
-        //    clientTCP.SendFirstMessage(player);//отправка первого сообщения серверу            
-
-        //        mess = clientTCP.GetPos();//данные с сервера  
-        //    try
-        //    {
-        //        Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-        //        field = jsonData1;
-        //    }
-        //    catch { }
-        //            MyId();
-        //            InstantiatePlayer();//создание играков
-        //            InstantiateTree();
-        //            InstantiateWall();
-        //            InstantiateCircle();
-
-        //            offset = camera.transform.position - playerList[my_ID].transform.position;
-
-        //            IsItFirstMessage = false;
-        //            StartGame = false;
-        //    countClient = 0;
-        //    Debug.Log("ALL");
-        //}
-        //if (!IsItFirstMessage)
-        //{
-        //    if (my_ID != -1)
-        //    {
-        //        clientTCP.Send(field.Player[my_ID]);
-        //        mess = clientTCP.GetPos();//данные с сервера  
-        //       // Field jsonData1 = new Field();
-        //        field = JsonConvert.DeserializeObject<Field>(mess);
-        //       // field = jsonData1;
-        //        {
-        //            CamMove();
-        //            DelBull();
-        //            DelPlayer();
-        //            DelMgazine();
-        //            if (field.Bullet.Count > 0)
-        //            {
-        //                InBul();
-        //                MoveBull();
-        //            }
-        //            if (field.Player.Count != 0)
-        //            {
-        //                Actoin();//метод отслеживающий нажатие клавишь 
-        //                InstantiatePlayer();
-        //                MovePlayer();//движение
-        //                PlayerRotation();
-        //                ArrowRotation();
-        //                InstantiateMagazine();
-        //                FinishGame();
-
-
-        //                if (field.Player.Count > 1)//для других играков
-        //                {
-        //                    InstantiateWeaponOther();
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
     }
     public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
     {
@@ -280,7 +203,6 @@ public class NetworkManager : MonoBehaviour
         {
             field.Player[my_ID].Reload = false;
         }
-
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             field.Player[my_ID].Weapon = "Pistol";
@@ -290,25 +212,25 @@ public class NetworkManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             field.Player[my_ID].Weapon = "Shotgun";
-            field.Player[my_ID].Weap = field.Player[my_ID].S;
+           field.Player[my_ID].Weap = field.Player[my_ID].S;
             InstantiateWeapon(shotgun, field.Player[my_ID].Weapon);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             field.Player[my_ID].Weapon = "Gun";
-            field.Player[my_ID].Weap = field.Player[my_ID].G;
+           field.Player[my_ID].Weap = field.Player[my_ID].G;
             InstantiateWeapon(gun, field.Player[my_ID].Weapon);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             field.Player[my_ID].Weapon = "Bomb";
-            field.Player[my_ID].Weap = field.Player[my_ID].B;
+          //  field.Player[my_ID].Weap = field.Player[my_ID].B;
             InstantiateWeapon(bomb, field.Player[my_ID].Weapon);
         }
         CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
         Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
         Lifes.text = Convert.ToString(field.Player[my_ID].Life);
-        Timer.text = field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
+        Timer.text = field.time.ToString();//field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
         MyName.text = field.Player[my_ID].Name;
 
         if (Input.GetKeyDown(KeyCode.F))
@@ -389,21 +311,27 @@ public class NetworkManager : MonoBehaviour
     }
     public void DelMgazine()
     {
-        List<int> itemIDs = new List<int>();
-        foreach (int i in itemList.Keys)
+        Profiler.BeginSample("DelMagazine");
+        if (field.Item.Count < itemList.Count)
         {
-            itemIDs.Add(i);
-        }
-        foreach (int i in itemIDs)
-        {
-            if (!field.Item.ContainsKey(i))
+            List<int> itemIDs = new List<int>();
+            foreach (int i in itemList.Keys)
             {
-                GameObject item = itemList[i];
-                itemList.Remove(i);
-                Destroy(item);
-                Debug.Log("!!!");
+                itemIDs.Add(i);
+            }
+            foreach (int i in itemIDs)
+            {
+                Debug.Log(field.Item.Count);
+                if (!field.Item.ContainsKey(i))
+                {
+                    GameObject item = itemList[i];
+                    itemList.Remove(i);
+                    Destroy(item);
+                    Debug.Log("!!!");
+                }
             }
         }
+        Profiler.EndSample();
     }
 
     public void KeyMoveDown()//движение пользователя
@@ -443,7 +371,14 @@ public class NetworkManager : MonoBehaviour
     }
     private void OnMouseUp()
     {
-        field.Player[my_ID].Shoot = false;
+        if (field.Player[my_ID].Weap.CountBullets > 0)
+        {
+            Debug.Log("Shoot");
+            audio.GetComponent<AudioSource>().Play();
+            field.Player[my_ID].Shoot = true;
+            InstantiateBullet(field.Player[my_ID]);
+        }
+        // field.Player[my_ID].Shoot = false;
     }
     private void OnMouseDrag()
     {
@@ -466,7 +401,7 @@ public class NetworkManager : MonoBehaviour
             Debug.Log("Shoot");
             audio.GetComponent<AudioSource>().Play();
             field.Player[my_ID].Shoot = true;
-            InstantiateBullet();
+            InstantiateBullet(field.Player[my_ID]);
         }
 
     }
@@ -482,7 +417,7 @@ public class NetworkManager : MonoBehaviour
     public void InstantiateWeapon(GameObject weap, string nameWeap)
     {
         GameObject Player = GameObject.Find(Convert.ToString(my_ID));
-        Transform w = Player.transform.Find("Weapon"); //Player.transform.GetChild(0);
+        Transform w = Player.transform.Find("Weapon"); 
         weaponPref = w.gameObject;
         Vector2 v = w.position;
         Destroy(weaponPref);
@@ -493,6 +428,7 @@ public class NetworkManager : MonoBehaviour
     }
     public void InstantiateWeaponOther()
     {
+        Profiler.BeginSample("InstantiateWeaponOther");
         GameObject weap = pistol;
         foreach (int c in field.Player.Keys)
         {
@@ -537,6 +473,7 @@ public class NetworkManager : MonoBehaviour
                 weaponPref.transform.parent = GameObject.Find(Convert.ToString(field.Player[c].ID)).transform;
             }
         }
+        Profiler.EndSample();
     }
     public void InstantiateTree()
     {
@@ -583,14 +520,14 @@ public class NetworkManager : MonoBehaviour
         }
 
     }
-    public void InstantiateBullet()
+    public void InstantiateBullet(Player player)
     {
-        Vector2 v = new Vector2(field.Player[my_ID].X, field.Player[my_ID].Y);
+        Vector2 v = new Vector2(player.X, player.Y);
         var pos = Input.mousePosition;
         pos = Camera.main.ScreenToWorldPoint(pos);
 
-        field.Player[my_ID].End = new float[2] { pos.x, pos.y };
-        field.Player[my_ID].Start = new float[2] { v.x, v.y };
+        player.End = new float[2] { pos.x, pos.y };
+        player.Start = new float[2] { v.x, v.y };
     }
     public void InBul()
     {
@@ -608,6 +545,7 @@ public class NetworkManager : MonoBehaviour
     }
     public void InstantiateMagazine()
     {
+        Profiler.BeginSample("InstantiateMagazine");
         if (field.Item.Count > 0)
         {
             foreach (int i in field.Item.Keys)
@@ -668,7 +606,7 @@ public class NetworkManager : MonoBehaviour
             }
 
         }
-
+        Profiler.EndSample();
     }
     public void InstantiateCircle()//Создание 
     {
@@ -681,6 +619,7 @@ public class NetworkManager : MonoBehaviour
     }
     public void InstantiatePlayer()//Создание игроков
     {
+        Profiler.BeginSample("InstantiatePlayer");
         foreach (int c in field.Player.Keys)
         {
             if (!playerList.ContainsKey(c))
@@ -695,6 +634,7 @@ public class NetworkManager : MonoBehaviour
                 playerList.Add(c, temp);
             }
         }
+        Profiler.EndSample();
     }
 
     public void SizeCircle()
@@ -799,15 +739,13 @@ public class NetworkManager : MonoBehaviour
 
     public void MovePlayer()//двжение игрока
     {
-
         foreach (int c in field.Player.Keys)
         {
-            GameObject player = GameObject.Find(Convert.ToString(field.Player[c].ID));
+            GameObject player = /*playerList[field.Player[c].ID];*/GameObject.Find(Convert.ToString(field.Player[c].ID));
             Vector2 v = new Vector2(field.Player[c].X, field.Player[c].Y);
             player.transform.position = v;
             player.transform.rotation = Quaternion.Euler(field.Player[c].XRot, field.Player[c].YRot, 0);
         }
-
     }
     public void MoveBull()
     {

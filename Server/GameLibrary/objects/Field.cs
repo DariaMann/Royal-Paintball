@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GameLibrary
 {
-    public class Field
+    public class Field : ICloneable
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -14,19 +14,21 @@ namespace GameLibrary
         public Dictionary<int, Item> Item { get; set; }
         public Dictionary<int, Player> Player { get; set; }
         public Circle circle { get; set; }
-
         public List<string> Colors { get; set; }
-
         public TimeSpan time { get; set; }
-
         public DateTime inpulse { get; set; }
+
+        public float[] LT { get; private set; }
+        public float[] RT { get; private set; }
+        public float[] LD { get; private set; }
+        public float[] RD { get; private set; }
 
         public Field(List<FirstPlayerData> Waiters)
         {
             Colors = new List<string> { "blue", "red", "yellow", "orange", "pink", "green", "black", "white" };
             X = 0;
             Y = 0;
-            inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute,1);
+            inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, 1);
             Size = new int[2] { 50, 50 };
 
             Tree = new List<Tree>();
@@ -47,7 +49,7 @@ namespace GameLibrary
             Wall = new List<Wall>();
             for (int i = 0; i < 30; i++)
             {
-                float x = rn.Next(-40, 40); 
+                float x = rn.Next(-40, 40);
                 float y = rn.Next(-40, 40);
                 Wall.Add(new Wall(x, y));
             }
@@ -59,10 +61,10 @@ namespace GameLibrary
                 float y = rn.Next(-40, 40);
                 Item.Add(Item.Count, new Item("Kit", 5, x, y, Item.Count));
             }
-            
+
             for (int i = 0; i < 10; i++)
             {
-                float x = rn.Next(-40, 40); 
+                float x = rn.Next(-40, 40);
                 float y = rn.Next(-40, 40);
                 Item.Add(Item.Count, new Item("Pistol", 5, x, y, Item.Count));
             }
@@ -77,7 +79,7 @@ namespace GameLibrary
                     Name = Waiters[i].Name,
                     ID = Waiters[i].ID,
                     Color = CreateColor()
-               });
+                });
             }
             circle = new Circle();
         }
@@ -141,7 +143,7 @@ namespace GameLibrary
             this.time = new TimeSpan();
             Player = new Dictionary<int, Player>();
             circle = new Circle();
-           
+
         }
 
         private string CreateColor()
@@ -222,7 +224,7 @@ namespace GameLibrary
                 {
                     if (Player[id].OutCircle)
                     {
-                        Player[id].Life -= 1;
+                        Player[id].Woundd(1);
                     }
                 }
             }
@@ -243,7 +245,25 @@ namespace GameLibrary
                     second += 1;
                 }
             }
-            inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour,time.Minutes, second, time.Milliseconds);
+            inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, time.Minutes, second, time.Milliseconds);
+        }
+
+        public object Clone()
+        {
+            return new Field {
+                X = this.X,
+                Y = this.Y,
+                Size = this.Size,
+                Tree = new List<Tree>(this.Tree),
+                Wall =  new List<Wall>(this.Wall),
+                Bullet = new List<Bullet>(this.Bullet),
+                Item = new Dictionary<int, Item>(this.Item),
+                Player = new Dictionary<int, Player>(this.Player),
+                circle = this.circle,
+                Colors = new List<string>(this.Colors),
+                time = this.time,
+                inpulse = this.inpulse
+            };
         }
     }
 }

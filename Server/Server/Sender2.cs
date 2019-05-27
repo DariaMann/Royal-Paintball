@@ -9,7 +9,7 @@ using GameLibrary;
 
 namespace Server
 {
-    class Sender2
+    public class Sender2
     {
         public List<Client> client;
         private Thread thread;
@@ -27,7 +27,7 @@ namespace Server
 
         public void SendMessage(NetworkStream stream, string readyMess)
         {
-            //Console.WriteLine("Sender2: " + readyMess);
+            
             byte[] messageBytes = Encoding.ASCII.GetBytes(readyMess); 
             int length = messageBytes.Length;// определение длины сообщения
             byte[] lengthBytes = System.BitConverter.GetBytes(length);// преобразование длины в байты с помощью BitConverter (закодировать)
@@ -83,6 +83,7 @@ namespace Server
                     }
                     var mess = JsonConvert.SerializeObject(countNamedClient, Formatting.Indented);
                     string readyMess = "%" + mess + "&";
+                    Console.WriteLine("Sender2: " + readyMess);
                     SendMessage(stream, readyMess);
                 }
             }

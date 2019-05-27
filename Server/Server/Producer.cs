@@ -12,7 +12,6 @@ namespace Server
     {
         static public int ID = 555;
         public TcpClient client;
-        public Waiter waiter;
 
         private readonly ConcurrentQueue<Player> queue;
         private readonly ConcurrentQueue<string> dataForSend;

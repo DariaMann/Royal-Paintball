@@ -7,7 +7,7 @@ using GameLibrary;
 
 namespace Server
 {
-    public class Consumer : IPlayController
+    public class Logic : IPlayController
     {
         public Field field;//поле игры
         private readonly ConcurrentQueue<Player> queue;
@@ -18,7 +18,7 @@ namespace Server
         private Thread thread;
         private volatile bool stopped;
 
-        public Consumer(Field field, ConcurrentQueue<Player> queue, ConcurrentQueue<Field> dataForSend)
+        public Logic(Field field, ConcurrentQueue<Player> queue, ConcurrentQueue<Field> dataForSend)
         {
             this.dataForSend = dataForSend;
             this.queue = queue;
@@ -263,7 +263,7 @@ namespace Server
                         {
                             if (field.Player[c].ID != field.Bullet[i].ID)
                             {
-                                int countTakenLife = WeapWound(field.Bullet[i].Weapon, c);
+                                int countTakenLife = 1;//WeapWound(field.Bullet[i].Weapon, c);
                                 Woundd(c, countTakenLife);
                                 DelBul(field.Bullet[i]);
                                 break;
@@ -350,6 +350,7 @@ namespace Server
                     float speed = 0.1f;
                     field.Bullet.Add(new Bullet(player.End[0], player.End[1], player.Start[0], player.Start[1], player.Weapon, ID, speed, player.Color, field.Player[ID].Weap));
                     field.Player[ID].Weap.Shoot();
+                    Console.WriteLine("Count"+field.Bullet.Count);
                 }
             }
         }
@@ -436,14 +437,20 @@ namespace Server
             {
                 field.Player[player.ID].MovePlayer(player.Direction);
             }
-            field.Player[player.ID].ChangeWeapon(player.Weapon);
+            field.Player[player.ID].ChangeWeapon(player.Weapon,player.Weap);
             if (player.Shoot == true)//выстрел
             {
+                Console.WriteLine("SHOOT");
                 Shoott(player.ID, player);
             }
             if (player.Death)
             {
                 FinishGame(player.ID);
+            }
+            if (player.Life == 0)
+            {
+                field.Player[player.ID].Death = true;
+                //FinishGame(player.ID);
             }
             if (player.LiftItem == true)//поднятие вещей
             {
@@ -468,6 +475,7 @@ namespace Server
             Hit2();
             // Hit();
             field.time = interval.Negate();
+           // Console.WriteLine(interval.Negate().Seconds);
             field.DecreaseInLives();
         }
 
@@ -486,17 +494,15 @@ namespace Server
         {
             while (!stopped)
             {
-                Thread.Sleep(50);
+                //Thread.Sleep(50);
                 if (this.queue.TryDequeue(out Player pl))
                 {
                     Reaction(pl);
                 }
                 now = DateTime.Now;
                 interval = StartTime - now;
-
                 ReactionInTime(pl);
-
-                Field f = field;
+                Field f = (Field)field.Clone();
                 if (field.Player.Count != 0)
                 {
                     if (dataForSend.Count < 1)

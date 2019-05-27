@@ -9,7 +9,7 @@ using GameLibrary;
 
 namespace Server
 {
-    class Waiting
+    class Waiting 
     {
         private ConcurrentQueue<TcpClient> Wishing;
         private Thread thread;

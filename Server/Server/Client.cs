@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 namespace Server
 {
-    class Client
+    public class Client
     {
         public TcpClient client { get; set; }
         public string Name { get; set; }
@@ -49,12 +49,12 @@ namespace Server
 
         private byte[] ReadBytes(int count, NetworkStream networkStream)
         {
-
             byte[] bytes = new byte[count]; // буфер для заполнения (и позже вернуть)
             int readCount = 0; // байты пуст в начале
             while (readCount < count)// пока буфер не заполнен
             {
                 int left = count - readCount;// просить не больше, чем количество оставшихся байтов для заполнения нашего byte[]//мы будем запрашивать байты `left`
+                try { 
                 int r = networkStream.Read(bytes, readCount, left); // но нам даются байты` r` (`r` <=` left`)
                 if (r == 0)
                 {
@@ -63,11 +63,13 @@ namespace Server
                    // Stop();
                 }
                 readCount += r; // advance by however many bytes we read
+                }
+                catch { Stop(); }
             }
             return bytes;
         }
 
-        private string ReadMessage(NetworkStream networkStream)
+        public string ReadMessage(NetworkStream networkStream)
         {
             byte[] lengthBytes = ReadBytes(sizeof(int), networkStream);// чтение длины байтов и переворот, если необходимо
             if (System.BitConverter.IsLittleEndian)
@@ -94,7 +96,7 @@ namespace Server
                     {
                         string msg = JsonConvert.DeserializeObject<string>(message);
                    
-                 //   Console.WriteLine("CLIENT: " + message);
+                    Console.WriteLine("CLIENT: " + message);
                     Name = msg;//message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
                     }
                     catch(Newtonsoft.Json.JsonReaderException e)
@@ -107,7 +109,7 @@ namespace Server
                 {
                     string message = ReadMessage(stream);
                     string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
-                    //command = JsonConvert.DeserializeObject<Player>(message);
+                 //   Console.WriteLine("CLIENT: " + command);
                     Player player;
                     try
                     {
@@ -122,6 +124,10 @@ namespace Server
                     }
                     if (queue.Count < 1)
                     { this.queue.Enqueue(player); }
+                    if(player.Death)
+                    {
+                        Stop();
+                    }
                 }
             }
         }
