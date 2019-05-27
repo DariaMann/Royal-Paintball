@@ -1,7 +1,10 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Server;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 
 namespace ServerTest
 {
@@ -207,5 +210,132 @@ namespace ServerTest
             Assert.AreEqual(f.time.Seconds, f.inpulse.Second - 1);
             Assert.AreEqual(expected, actual);
         }
+        [TestMethod]
+        public void WoundTest_1()
+        {
+            Player player = new Player();
+            player.Wound(5);
+            int actual = player.Life;
+            float expected = 45;
+            Assert.AreEqual(expected, actual);
+        }
     }
+
+    [TestClass]
+    public class CommunicationTests
+    {
+        [TestMethod]
+        public void CloneTest_1()
+        {
+            Field f1 = new Field();
+            Field f2 = f1.Clone();
+            Assert.AreNotSame(f2.Bullet, f1.Bullet);
+            Assert.AreNotSame(f2.Tree[0], f1.Tree[0]);
+        }
+        [TestMethod]
+        public void CloneTest_2()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Player, f1.Player);
+        }
+        [TestMethod]
+        public void CloneTest_3()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Wall, f1.Wall);
+        }
+        [TestMethod]
+        public void CloneTest_4()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.circle, f1.circle);
+        }
+        [TestMethod]
+        public void CloneTest_5()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Colors, f1.Colors);
+        }
+        [TestMethod]
+        public void CloneTest_6()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Size, f1.Size);
+        }
+        [TestMethod]
+        public void CloneTest_7()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.time, f1.time);
+        }
+        [TestMethod]
+        public void CloneTest_8()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.inpulse, f1.inpulse);
+        }
+        [TestMethod]
+        public void CloneTest_9()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.X, f1.X);
+        }
+        [TestMethod]
+        public void CloneTest_10()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Y, f1.Y);
+        }
+        [TestMethod]
+        public void CloneTest_11()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2, f1);
+        }
+        [TestMethod]
+        public void CloneTest_12()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Item, f1.Item);
+        }
+        [TestMethod]
+        public void CloneTest_13()
+        {
+            Field f1 = new Field();
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Tree, f1.Tree);
+        }
+        //[TestMethod]
+        //public void SendTest_1()
+        //{
+        //    int port = 904; // порт для прослушивания подключений
+        //    TcpListener server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+        //    server.Start();
+        //    TcpClient tcpClient = server.AcceptTcpClient();
+        //    Client client = new Client(tcpClient);
+        //    ConcurrentQueue<Client> queue = new ConcurrentQueue<Client>();
+        //    queue.Enqueue(client);
+        //    Sender2 sender = new Sender2(queue);
+        //}
+        [TestMethod]
+        public void ConnectTest()
+        {
+            int port = 904; // порт для прослушивания подключений
+            TcpListener server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            server.Start();
+            TcpClient tcpClient = server.AcceptTcpClient();
+        }
+    }
+
 }

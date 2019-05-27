@@ -35,26 +35,28 @@ namespace Server
         public string Color { get; set; }
         public bool Me { get; set; }
         public bool OutCircle { get; set; }
+        public bool Death { get; set; }
 
         public Dictionary<string, string> StopIn { get; set; }
 
         public Player()
         {
+            Death = false;
             Me = false;
             P = new Pistol();
             S = new Shotgun();
             G = new Gun();
             B = new Bomb();
-            Weap = P;
+            Weap = B;
             Random rn = new Random(); // объявление переменной для генерации чисел
             this.X = rn.Next(-2, 5);
             this.Y = rn.Next(-2, 5);
             XRot = -90;
             YRot = 0;
-            Life = 50;
+            Life = 10;
             Direction = "N";
             Shoot = false;
-            Weapon = "Pistol";
+            Weapon = "Bomb";
             LiftItem = false;
             Start = new float[2];
             End = new float[2];
@@ -67,7 +69,7 @@ namespace Server
 
         public void MovePlayer(string dir)//движение игрока
         {
-            float speed = 0.4f;
+            float speed = 0.45f;
             switch (dir)
             {
                 case "W":

@@ -67,3 +67,14 @@ C:\Users\Daria\Desktop\IGLA\Royal-Paintball-f47aedf2e113eafc615a9ed341e28d2c6c81
 C:\Users\Daria\Desktop\IGLA\Royal-Paintball-f47aedf2e113eafc615a9ed341e28d2c6c81d583\Server\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\Daria\Desktop\IGLA\Royal-Paintball-f47aedf2e113eafc615a9ed341e28d2c6c81d583\Server\Server\obj\Debug\Server.exe
 C:\Users\Daria\Desktop\IGLA\Royal-Paintball-f47aedf2e113eafc615a9ed341e28d2c6c81d583\Server\Server\obj\Debug\Server.pdb
+C:\Users\Daria\Desktop\Competiton\Server\Server\bin\Debug\Server.exe.config
+C:\Users\Daria\Desktop\Competiton\Server\Server\bin\Debug\Server.exe
+C:\Users\Daria\Desktop\Competiton\Server\Server\bin\Debug\Server.pdb
+C:\Users\Daria\Desktop\Competiton\Server\Server\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Daria\Desktop\Competiton\Server\Server\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\Daria\Desktop\Competiton\Server\Server\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Daria\Desktop\Competiton\Server\Server\obj\Debug\Server.csprojAssemblyReference.cache
+C:\Users\Daria\Desktop\Competiton\Server\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+C:\Users\Daria\Desktop\Competiton\Server\Server\obj\Debug\Server.csproj.CopyComplete
+C:\Users\Daria\Desktop\Competiton\Server\Server\obj\Debug\Server.exe
+C:\Users\Daria\Desktop\Competiton\Server\Server\obj\Debug\Server.pdb

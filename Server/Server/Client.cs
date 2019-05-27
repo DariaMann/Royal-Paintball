@@ -17,9 +17,8 @@ namespace Server
         private Thread thread;
         private volatile bool stopped;
 
-        public Client(TcpClient client)//, ConcurrentQueue<Player> que)
+        public Client(TcpClient client)
         {
-          //  this.queue = que;
             this.client = client;
             this.stopped = true;
             this.ConnectTime = DateTime.Now;
@@ -107,7 +106,7 @@ namespace Server
                 {
                     string message = ReadMessage(stream);
                     string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
-                    Console.WriteLine("CLIENT: " + command);
+                //    Console.WriteLine("CLIENT: " + command);
                     Player player;
                     try
                     {
@@ -122,6 +121,10 @@ namespace Server
                     }
                     if (queue.Count < 1)
                     { this.queue.Enqueue(player); }
+                    if(player.Death)
+                    {
+                        Stop();
+                    }
                 }
             }
         }

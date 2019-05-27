@@ -34,10 +34,8 @@ namespace Server
             }
         }
 
-        public void Send(string message, Client client)
+        public void Send(string message,NetworkStream stream)
         {
-            NetworkStream stream = null;
-            stream = client.client.GetStream();
             byte[] messageBytes = Encoding.ASCII.GetBytes(message); // a UTF-8 encoder would be 'better', as this is the standard for network communications
             int length = messageBytes.Length;// determine length of message
             byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
@@ -52,7 +50,7 @@ namespace Server
             }
             catch
             {
-
+                Console.WriteLine("MISTACEN");
             }
         }
 
@@ -60,9 +58,10 @@ namespace Server
         {
             while (!stopped)
             {
-                Thread.Sleep(50);
+                Thread.Sleep(20);
                 if (this.dataForSend.TryDequeue(out Field mess))
                 {
+                    Console.WriteLine("clients.Count  "+ clients.Count);
                     for (int i = 0; i < clients.Count; i++)
                     {
                         foreach (Player player in mess.Player.Values)
@@ -73,10 +72,34 @@ namespace Server
                             }
                             else player.Me = false;
                         }
-                        string meesage = JsonConvert.SerializeObject(mess, Formatting.Indented);
-                        Console.WriteLine(meesage);
-                        string msg = "%" + meesage + "&";
-                        Send(msg, clients[i]);
+                        try
+                        {
+                            NetworkStream stream = clients[i].client.GetStream();
+                            string meesage = JsonConvert.SerializeObject(mess, Formatting.Indented);
+                              Console.WriteLine(meesage);
+                            //Console.WriteLine("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL");
+                            string msg = "%" + meesage + "&";
+                            Send(msg, stream);
+                        }
+                        catch(System.InvalidOperationException e)
+                        {
+                            Console.WriteLine(e);
+                            clients.Remove(clients[i]);
+                        }
+                        //foreach (Player player in mess.Player.Values)
+                        //{
+                        //    if (player.Death)
+                        //    {
+                        //        for (int k = 0; k < clients.Count; k++)
+                        //        {
+                        //            if (player.ID == clients[k].ID)
+                        //            {
+                        //                clients.Remove(clients[k]);
+                        //            }
+                        //        }
+
+                        //    }
+                        //}
                     }
                 }
             }

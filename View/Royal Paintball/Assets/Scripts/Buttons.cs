@@ -8,8 +8,12 @@ public class Buttons : MonoBehaviour {
     }
     public void Exit()
     {
-        //SceneManager.UnloadScene();
         Application.Quit();
+    }
+
+    public void ExitInGame()
+    {
+        SceneManager.LoadScene("Play");
     }
    
 }

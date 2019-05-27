@@ -13,9 +13,9 @@ namespace Server
         Consumer consumer;
         Sender sender;
         List<Client> clients;
-
         public Game(List<Client> clients)
         {
+            Console.WriteLine(clients.Count);
             this.clients = clients;
             this.queue = new ConcurrentQueue<Player>();
             this.dataForSend = new ConcurrentQueue<Field>();
@@ -23,9 +23,8 @@ namespace Server
             this.f = new Field();
             for(int i=0;i<clients.Count;i++)
             {
-                f.Player.Add(clients[i].ID, new Player() { ID = clients[i].ID });
+                f.Player.Add(clients[i].ID, new Player() { ID = clients[i].ID, Color = f.ChooseColor() });
             }
-
             this.consumer = new Consumer(f, queue, dataForSend);
             this.sender = new Sender(dataForSend, clients);
         }

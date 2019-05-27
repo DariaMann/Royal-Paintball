@@ -90,7 +90,7 @@ public class Player
     public bool Me { get; set; }
     public float[] Start { get; set; }
     public float[] End { get; set; }
-
+    public bool Death { get; set; }
     public Weapons Weap { get; set; }
     public Pistol P { get; set; }
     public Shotgun S { get; set; }

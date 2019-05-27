@@ -26,7 +26,6 @@ namespace Server
 
         public void SendMessage(NetworkStream stream, string readyMess)
         {
-
             byte[] messageBytes = Encoding.ASCII.GetBytes(readyMess);
             int length = messageBytes.Length;// определение длины сообщения
             byte[] lengthBytes = System.BitConverter.GetBytes(length);// преобразование длины в байты с помощью BitConverter (закодировать)
@@ -78,7 +77,7 @@ namespace Server
                     }
                     var mess = JsonConvert.SerializeObject(countNamedClient, Formatting.Indented);
                     string readyMess = "%" + mess + "&";
-                    Console.WriteLine("Sender2: " + readyMess);
+                    Console.WriteLine("Sender2: " + readyMess +" to "+i +" Player");
                     SendMessage(stream, readyMess);
                 }
             }

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace Server
 {
-    public class Field : ICloneable
+    public class Field /*: ICloneable*/
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -84,86 +85,34 @@ namespace Server
             circle = new Circle();
             Colors = new List<string> { "blue", "red", "yellow", "orange", "pink", "green", "black", "white" };
         }
-        public float[] chek()
+        public string ChooseColor()
         {
             Random rn = new Random();
-            bool good = false;
-            float[] cord = new float[] { 0, 0 };
-            while (good != true)
-            {
-                float x = rn.Next(-40, 40);
-                float y = rn.Next(-40, 40);
-                for (int i = 0; i < Tree.Count; i++)
-                {
-                    float aX = Tree[i].X - Tree[i].Size[0];
-                    float aY = Tree[i].Y + Tree[i].Size[1];
-                    float bX = Tree[i].X + Tree[i].Size[0];
-                    float bY = Tree[i].Y + Tree[i].Size[1];
-                    float cX = Tree[i].X + Tree[i].Size[0];
-                    float cY = Tree[i].Y - Tree[i].Size[1];
-                    float dX = Tree[i].X - Tree[i].Size[0];
-                    float dY = Tree[i].Y - Tree[i].Size[1];
-                    if (x < aX || x > bX)
-                    {
-                        if (y < dY || y > aY)
-                        {
-                            good = true;
-                            cord = new float[] { x, y };
-                            return cord;
-                        }
-                        else { i = Tree.Count - 1; }
-                    }
-                    else
-                    {
-                        i = Tree.Count - 1;
-                    }
-                }
-            }
-            return cord;
-        }
-        public void AllKit()
-        {
-            float[] cord = new float[] { 0, 0 };
-            Item = new Dictionary<int, Item>();
-            for (int i = 0; i < 3; i++)
-            {
-                cord = chek();
-                Item.Add(Item.Count,
-                new Item("Kit", 5, cord[0], cord[1], Item.Count));
-                Console.WriteLine("x: " + cord[0]);
-                Console.WriteLine("y: " + cord[1]);
-            }
-        }
-        public void AllWalls()
-        {
-            float[] cord = new float[] { 0, 0 };
-            Wall = new List<Wall>();
-            for (int i = 0; i < 3; i++)
-            {
-                cord = chek();
-                Wall.Add(new Wall(cord[0], cord[1]));
-                Console.WriteLine("x: " + cord[0]);
-                Console.WriteLine("y: " + cord[1]);
-            }
-
+            int k = rn.Next(0, Colors.Count - 1);
+            string chosenColor = Colors[k];
+            Colors.Remove(chosenColor);
+            return chosenColor;
         }
 
-        public object Clone()
+        public Field Clone()
         {
+            //string meesage = JsonConvert.SerializeObject(this, Formatting.Indented);
+            //Field f = JsonConvert.DeserializeObject<Field>(meesage);
+            //return f;
             return new Field
             {
                 X = this.X,
-            Y = this.Y,
-            Size = this.Size,
-            Tree = new List<Tree>(this.Tree),
-            Wall = new List<Wall>(this.Wall),
-            Bullet = new List<Bullet>(this.Bullet),
-            Item = new Dictionary<int, Item>(this.Item),
-            Player = new Dictionary<int, Player>(this.Player),
-            circle = this.circle,
-            Colors = new List<string>(this.Colors),
-            time = this.time,
-            inpulse = this.inpulse
+                Y = this.Y,
+                Size = (int[])this.Size.Clone(),
+                Tree = new List<Tree>(this.Tree),
+                Wall = new List<Wall>(this.Wall),
+                Bullet = new List<Bullet>(this.Bullet),
+                Item = new Dictionary<int, Item>(this.Item),
+                Player = new Dictionary<int, Player>(this.Player),
+                circle = (Circle)this.circle.Clone(),
+                Colors = new List<string>(this.Colors),
+                time = this.time,
+                inpulse = this.inpulse
             };
         }
 

@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviour
 {
-
     private ClientTCP clientTCP = new ClientTCP();
     [SerializeField]
     public GameObject playerPref;
@@ -21,6 +20,7 @@ public class NetworkManager : MonoBehaviour
     public GameObject circlePref;
     public GameObject camera;
     public GameObject kitPref;
+    public GameObject explosion;
     public GameObject cur;
     public Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
     public Dictionary<int, GameObject> bulletList = new Dictionary<int, GameObject>();
@@ -38,8 +38,6 @@ public class NetworkManager : MonoBehaviour
     private Vector3 offset;
 
     static public bool IsItFirstMessage = true;
-    static public Dictionary<string, Dictionary<string, string>> dasha = new Dictionary<string, Dictionary<string, string>>();
-    static public Dictionary<string, string> clientData = new Dictionary<string, string>();
     string mess;
     public GameObject gun;
     public GameObject shotgun;
@@ -67,6 +65,9 @@ public class NetworkManager : MonoBehaviour
     public GameObject AudioTheEnd;
     public GameObject AudioShoot;
 
+    public GameObject End;
+    public Text textInTheEnd;
+
     void Start()
     {
         clientTCP.Connect();//коннект с сервером          
@@ -89,21 +90,21 @@ public class NetworkManager : MonoBehaviour
         }
         if (IsItFirstMessage && StartGame)
         {
-            Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-            field = jsonData1;
-            GameCanvas.SetActive(true);
-            WaitingCanvas.SetActive(false);
-            MyId();
-            InstantiatePlayer();//создание играков
-            InstantiateTree();
-            InstantiateWall();
-            InstantiateCircle();
+                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+                field = jsonData1;
+                GameCanvas.SetActive(true);
+                WaitingCanvas.SetActive(false);
+                MyId();
+                InstantiatePlayer();//создание играков
+                InstantiateTree();
+                InstantiateWall();
+                InstantiateCircle();
 
-            offset = camera.transform.position - playerList[my_ID].transform.position;
+                offset = camera.transform.position - playerList[my_ID].transform.position;
 
-            clientTCP.Send(field.Player[my_ID]);
-
-            IsItFirstMessage = false;
+                clientTCP.Send(field.Player[my_ID]);
+                Debug.Log("___________________________________");
+                IsItFirstMessage = false;
         }
 
 
@@ -117,8 +118,15 @@ public class NetworkManager : MonoBehaviour
 
                 Debug.Log(mess);
 
-                Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
-                field = jsonData1;
+                try
+                {
+                    Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
+                    field = jsonData1;
+                }
+                catch(ArgumentException e)
+                {
+                    Console.WriteLine(e);
+                }
             }
             CamMove();
             DelBull();
@@ -230,6 +238,10 @@ public class NetworkManager : MonoBehaviour
             while (field.Bullet.Count != bulletList.Count)
             {
                 GameObject bul = bulletList[bulletList.Count - 1];
+                if(bul.name == "Bomb")
+                {
+                    GameObject temp = Instantiate(explosion, bul.transform.position, bul.transform.rotation);
+                }
                 bulletList.Remove(bulletList.Count - 1);
                 Destroy(bul);
             }
@@ -255,9 +267,8 @@ public class NetworkManager : MonoBehaviour
                         {
                             AudioTheEnd.GetComponent<AudioSource>().Play();
                             clientTCP.Disconnect();
+                            Win("You Lose!");
                             Destroy(this);
-                            Debug.Log("I died");
-                            SceneManager.LoadScene("Play");
                         }
                     }
                 }
@@ -333,11 +344,14 @@ public class NetworkManager : MonoBehaviour
     }
     void OnMouseDown()//нажатие мыши для стрельбы
     {
-        if (field.Player[my_ID].Weap.CountBullets > 0)
+        if (StartGame)
         {
-            AudioShoot.GetComponent<AudioSource>().Play();
-            field.Player[my_ID].Shoot = true;
-            InstantiateBullet();
+            if (field.Player[my_ID].Weap.CountBullets > 0)
+            {
+                AudioShoot.GetComponent<AudioSource>().Play();
+                field.Player[my_ID].Shoot = true;
+                InstantiateBullet();
+            }
         }
 
     }
@@ -457,12 +471,15 @@ public class NetworkManager : MonoBehaviour
     }
     public void InstantiateBullet()
     {
-        Vector2 v = new Vector2(field.Player[my_ID].X, field.Player[my_ID].Y);
         var pos = Input.mousePosition;
         pos = Camera.main.ScreenToWorldPoint(pos);
-
         field.Player[my_ID].End = new float[2] { pos.x, pos.y };
-        field.Player[my_ID].Start = new float[2] { v.x, v.y };
+        field.Player[my_ID].Start = new float[2] { field.Player[my_ID].X, field.Player[my_ID].Y };
+    }
+    public void Win(string mess)
+    {
+        End.SetActive(true);
+        textInTheEnd.text = mess;
     }
     public void InBul()
     {
@@ -474,7 +491,7 @@ public class NetworkManager : MonoBehaviour
                 {
                     Vector2 v = new Vector2(field.Bullet[i].X, field.Bullet[i].Y);
                     cur = GameObject.Instantiate(bulletPref, v, bulletPref.transform.rotation) as GameObject;
-                    cur.name = Convert.ToString(i);
+                    cur.name = field.Bullet[i].Weapon;
                     Color(field.Bullet[i].Color, cur, "Bullet");
                     bulletList.Add(i, cur);
                 }
@@ -592,7 +609,6 @@ public class NetworkManager : MonoBehaviour
     {
         switch (color)
         {
-
             case "blue":
                 {
                     if (name == "Player")

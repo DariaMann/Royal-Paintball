@@ -29,7 +29,9 @@ public class ClientTCP
 
             connecting = true;
         }
-        catch { };
+        catch {
+            Debug.Log("not connect");
+        };
 
     }
     public void Disconnect()
@@ -41,7 +43,10 @@ public class ClientTCP
             playerSocket.Close();
             connecting = false;
         }
-        catch { };
+        catch {
+            Debug.Log("not disconnect");
+
+        };
 
     }
 

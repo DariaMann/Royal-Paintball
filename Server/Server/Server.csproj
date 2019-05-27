@@ -59,7 +59,7 @@
     <Compile Include="objects\Tree.cs" />
     <Compile Include="Sender.cs" />
     <Compile Include="Sender2.cs" />
-    <Compile Include="Waitering.cs" />
+    <Compile Include="Waiting.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Bomb.cs" />
     <Compile Include="Consumer.cs" />
