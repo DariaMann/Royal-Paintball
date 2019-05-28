@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Player : ICloneable
+    public class Player
     {
         public int Life { get; set; }
         public int ID { get; set; }
@@ -39,7 +39,8 @@ namespace Server
         public bool Win { get; set; }
 
         public Dictionary<string, string> StopIn { get; set; }
-        
+        public Dictionary<string, string> StopInWall { get; set; }
+
         public Player()
         {
             Death = false;
@@ -66,43 +67,9 @@ namespace Server
             Size = new int[] { 1, 1 };
             OutCircle = false;
             StopIn = new Dictionary<string, string>();
-
+            StopInWall = new Dictionary<string, string>();
         }
-        public object Clone()
-        {
-            return new Player
-            {
-                Life = this.Life,
-                ID = this.ID,
-                Direction = this.Direction,
-
-                X = this.X,
-                Y = this.Y,
-                XRot = this.XRot,
-                YRot = this.YRot,
-                Shoot = this.Shoot,
-                Reload = this.Reload,
-                LiftItem = this.LiftItem,
-                MousePos = (float[])this.MousePos.Clone(),
-                Size = (int[])this.Size.Clone(),
-
-                Start = (float[])this.Start.Clone(),
-                End = (float[])this.End.Clone(),
-
-                Weapon = this.Weapon,
-                Weap = this.Weap,
-                P = (Pistol)this.P.Clone(),
-                S = (Shotgun)this.S.Clone(),
-                G = (Gun)this.G.Clone(),
-                 B = (Bomb)this.B.Clone(),
-
-        Color = this.Color,
-         Me= this.Me,
-         OutCircle = this.OutCircle,
-        Death = this.Death,
-        Win = this.Win
-           };
-}
+       
 public void MovePlayer(string dir)//движение игрока
         {
             float speed = 0.45f;

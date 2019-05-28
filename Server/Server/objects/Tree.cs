@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Tree:ICloneable
+    public class Tree
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -18,17 +18,8 @@ namespace Server
             this.X = x;
             this.Y = y;
             this.Type = type;
-            Size = new int[2] { 4, 2 };
+            Size = new int[2] { 3, 1 };
         }
-        public object Clone()
-        {
-            return new Tree(1,1,"")
-            {
-                X = this.X,
-                Y = this.Y,
-                Size = (int[])this.Size.Clone(),
-                Type = this.Type
-            };
-        }
+       
     }
 }

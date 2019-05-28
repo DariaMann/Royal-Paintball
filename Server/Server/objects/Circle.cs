@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Circle : ICloneable
+    public class Circle 
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -89,23 +89,6 @@ namespace Server
             int y = rn.Next(-40, 40);//rn.Next(-4, 4);
             float speed = 0.3f;
             Move(x, y, speed);
-        }
-
-        public object Clone()
-        {
-            return new Circle
-            {
-                X = this.X,
-                Y = this.Y,
-                Size = (double[])this.Size.Clone(),
-                Radius = this.Radius,
-                StartTime = this.StartTime,
-                a = this.a,
-                b=this.b,
-                endX=this.endX,
-                endY = this.endY,
-                go = this.go
-            };
         }
     }
 }

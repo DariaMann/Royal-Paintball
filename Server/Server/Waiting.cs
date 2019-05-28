@@ -11,7 +11,7 @@ namespace Server
 {
     class Waiting
     {
-        private ConcurrentQueue<TcpClient> Waiters;
+        private ConcurrentQueue<Client> Waiters;
         private Thread thread;
         private volatile bool stopped;
         private int GamersCount = 2;
@@ -20,7 +20,7 @@ namespace Server
         public ConcurrentQueue<Client> ClientForSender;
         Sender sender;
 
-        public Waiting(ConcurrentQueue<TcpClient> Waiters)
+        public Waiting(ConcurrentQueue<Client> Waiters)
         {
             this.Waiters = Waiters;
             Games = new List<Game>();
@@ -77,12 +77,9 @@ namespace Server
                 }
                 else
                 {
-                    if (this.Waiters.TryDequeue(out TcpClient clientTcp))
+                    if (this.Waiters.TryDequeue(out Client client))
                     {
-                        Client client = new Client(clientTcp)
-                        {
-                            ID = CreateID()
-                        };
+                        client.ID = CreateID();
                         client.Start();
                         clients.Add(client);
                         ClientForSender.Enqueue(client);

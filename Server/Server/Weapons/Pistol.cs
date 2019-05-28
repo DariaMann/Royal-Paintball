@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Pistol : Weapons,ICloneable
+    public class Pistol : Weapons
     {
         public Pistol()
         {
@@ -17,23 +17,10 @@ namespace Server
             this.CamShot = true;
             this.time = new DateTime();
             time = DateTime.Now;
-            TimeFly = 5;
         }
         public override void Shoot()
         {
             this.CountBullets--;
-        }
-        public object Clone()
-        {
-            return new Pistol
-            {
-                CountBullets = this.CountBullets,
-                TakenLives = this.TakenLives,
-                CountMagazine = this.CountMagazine,
-                MaxCountMag = this.MaxCountMag,
-                CamShot = this.CamShot,
-                time = this.time
-            };
         }
     }
 }

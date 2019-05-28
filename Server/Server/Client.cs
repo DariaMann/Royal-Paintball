@@ -9,19 +9,17 @@ namespace Server
     public class Client
     {
         public TcpClient client { get; set; }
-        public string Name { get; set; }
         public int ID { get; set; }
-        DateTime ConnectTime { get; set; }
         public bool Game = false;
         public ConcurrentQueue<Player> queue;
         private Thread thread;
         private volatile bool stopped;
 
-        public Client(TcpClient client)
+        public Client(TcpClient client)//, ConcurrentQueue<Player> queue)
         {
+            //this.queue = queue;
             this.client = client;
             this.stopped = true;
-            this.ConnectTime = DateTime.Now;
         }
         public void Start()
         {

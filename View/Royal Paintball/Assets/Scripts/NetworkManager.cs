@@ -74,6 +74,7 @@ public class NetworkManager : MonoBehaviour
     }
     private void Update()
     {
+        Debug.Log("!!!!!!!!!!!!");
         if (!StartGame)
         {
             mess = clientTCP.GetPos();//данные с сервера  

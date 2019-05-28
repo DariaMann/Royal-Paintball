@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Bullet:ICloneable
+    public class Bullet
     {
         public int ID { get; set; }
         public string Weapon { get; set; }
@@ -21,17 +21,7 @@ namespace Server
         public float[] StartPos { get; set; }
 
         public string Color { get; set; }
-
-        public object Clone()
-        {
-            return new Bullet(this.EndPos[0], this.EndPos[1], this.X, this.Y, this.Weapon, this.ID, 0, this.Color)
-            {
-                time = this.time,
-                a = this.a,
-                b = this.b,
-                StartPos = (float[])this.StartPos.Clone()
-        };
-        }
+        
         public Bullet(float endX, float endY, float x, float y, string weapon, int id, float speed, string color)
         {
             Color = color;
