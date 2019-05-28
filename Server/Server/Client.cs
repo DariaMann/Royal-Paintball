@@ -61,7 +61,11 @@ namespace Server
                     }
                     readCount += r; // advance by however many bytes we read
                 }
-                catch { Stop(); }
+                catch {
+
+                    Console.WriteLine(")))))))))))))))))))))))))))))))))))))))))))");
+                    Stop();
+                }
             }
             return bytes;
         }
@@ -84,25 +88,8 @@ namespace Server
             NetworkStream stream = client.GetStream();
             while (!stopped)
             {
-                if (Game == false)
-                {
-                    //string message = ReadMessage(stream);
-
-                    //message = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
-                    //try
-                    //{
-                    //    string msg = JsonConvert.DeserializeObject<string>(message);
-
-                    //    Console.WriteLine("CLIENT: " + message);
-                    //    Name = msg;//message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
-                    //}
-                    //catch (Newtonsoft.Json.JsonReaderException e)
-                    //{
-                    //    Console.WriteLine(e);
-                    //    Game = true;
-                    //}
-                }
-                else
+                Console.WriteLine("Client " + ID);
+                if (Game)
                 {
                     string message = ReadMessage(stream);
                     string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
@@ -111,7 +98,6 @@ namespace Server
                     try
                     {
                         player = JsonConvert.DeserializeObject<Player>(command);
-
                     }
                     catch (Exception e)
                     {
@@ -121,7 +107,9 @@ namespace Server
                     }
                     if (queue.Count < 1)
                     { this.queue.Enqueue(player); }
-                    if(player.Death)
+
+                    Console.WriteLine("Death " + ID + ":" + player.Death);
+                    if (player.Death)
                     {
                         Stop();
                     }

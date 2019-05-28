@@ -18,7 +18,7 @@ namespace Server
         private List<Game> Games;
         private List<Client> clients;
         public ConcurrentQueue<Client> ClientForSender;
-        Sender2 sender;
+        Sender sender;
 
         public Waiting(ConcurrentQueue<TcpClient> Waiters)
         {
@@ -27,7 +27,7 @@ namespace Server
             clients = new List<Client>();
             this.stopped = true;
             ClientForSender = new ConcurrentQueue<Client>();
-            sender = new Sender2(ClientForSender);
+            sender = new Sender(ClientForSender);
             sender.Start();
         }
 
@@ -64,26 +64,35 @@ namespace Server
         {
             while (!stopped)
             {
+                //Console.WriteLine("Games: "+Games.Count);
                 if (clients.Count >= GamersCount)
                 {
                     List<Client> newList = new List<Client>(clients);
                     Game game = new Game(newList);
                     game.Process();
                     Games.Add(game);
-                    //foreach (Client c in newList)
-                    //{ sender.client.Remove(c); }
-                    sender.client.Clear();
+                    foreach (Client tcp in clients)
+                    { sender.client.Remove(tcp); }
                     clients.Clear();
                 }
                 else
                 {
                     if (this.Waiters.TryDequeue(out TcpClient clientTcp))
                     {
-                        Client client = new Client(clientTcp);
-                        client.ID = CreateID();
+                        Client client = new Client(clientTcp)
+                        {
+                            ID = CreateID()
+                        };
                         client.Start();
                         clients.Add(client);
                         ClientForSender.Enqueue(client);
+                    }
+                }
+                for(int i = 0;i<Games.Count;i++)
+                {
+                    if(Games[i].clients.Count<=0)
+                    {
+                        Games.Remove(Games[i]);
                     }
                 }
             }

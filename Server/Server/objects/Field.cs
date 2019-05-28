@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Server
 {
-    public class Field /*: ICloneable*/
+    public class Field : ICloneable
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -94,26 +94,48 @@ namespace Server
             return chosenColor;
         }
 
-        public Field Clone()
+        public object Clone()
         {
-            //string meesage = JsonConvert.SerializeObject(this, Formatting.Indented);
-            //Field f = JsonConvert.DeserializeObject<Field>(meesage);
-            //return f;
-            return new Field
+
+            Field f = new Field();
+
+            f.X = this.X;
+            f.Y = this.Y;
+            f.Size = (int[])this.Size.Clone();
+                for (int i = 0; i < this.Tree.Count; i++)
             {
-                X = this.X,
-                Y = this.Y,
-                Size = (int[])this.Size.Clone(),
-                Tree = new List<Tree>(this.Tree),
-                Wall = new List<Wall>(this.Wall),
-                Bullet = new List<Bullet>(this.Bullet),
-                Item = new Dictionary<int, Item>(this.Item),
-                Player = new Dictionary<int, Player>(this.Player),
-                circle = (Circle)this.circle.Clone(),
-                Colors = new List<string>(this.Colors),
-                time = this.time,
-                inpulse = this.inpulse
-            };
+                f.Tree[i] = (Tree)this.Tree[i].Clone();
+            }
+            Wall = new List<Wall>(this.Wall);
+            for (int i = 0; i < this.Bullet.Count; i++)
+            {
+                try
+                {
+                    f.Bullet[i] = (Bullet)this.Bullet[i].Clone();
+                }
+                catch
+                {
+                    f.Bullet.Add((Bullet)this.Bullet[i].Clone());
+                }
+            }
+            foreach (int i in this.Item.Keys)
+            {
+                try
+                {
+                    f.Item[i] = (Item)this.Item[i].Clone();
+                }
+                catch
+                {
+                    f.Item.Add(i,(Item)this.Item[i].Clone());
+                }
+            }
+            Player = new Dictionary<int, Player>(this.Player);
+
+            circle = (Circle)this.circle.Clone();
+            Colors = new List<string>(this.Colors);
+            time = this.time;
+            inpulse = this.inpulse;
+            return f;
         }
 
         public void PlayerOutOfCircle(Player player)

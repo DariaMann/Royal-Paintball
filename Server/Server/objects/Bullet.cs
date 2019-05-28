@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Bullet
+    public class Bullet:ICloneable
     {
         public int ID { get; set; }
         public string Weapon { get; set; }
@@ -22,6 +22,16 @@ namespace Server
 
         public string Color { get; set; }
 
+        public object Clone()
+        {
+            return new Bullet(this.EndPos[0], this.EndPos[1], this.X, this.Y, this.Weapon, this.ID, 0, this.Color)
+            {
+                time = this.time,
+                a = this.a,
+                b = this.b,
+                StartPos = (float[])this.StartPos.Clone()
+        };
+        }
         public Bullet(float endX, float endY, float x, float y, string weapon, int id, float speed, string color)
         {
             Color = color;
@@ -57,12 +67,11 @@ namespace Server
             this.time = new DateTime();
             time = DateTime.Now;
         }
-
-        public bool BulFlight()//направление полета пули
+        
+        public bool BulFlight(int timeFly)//направление полета пули
         {
             TimeSpan intervalBul = time - DateTime.Now;
-            Console.WriteLine(intervalBul.Negate().Seconds);
-            if (intervalBul.Negate().Seconds < 2)
+            if (intervalBul.Negate().Seconds < timeFly)
             {
                 X += a;
                 Y += b;

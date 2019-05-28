@@ -49,16 +49,14 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="objects\MedicineKit.cs" />
     <Compile Include="objects\Circle.cs" />
     <Compile Include="objects\Item.cs" />
     <Compile Include="objects\Bullet.cs" />
-    <Compile Include="Producer.cs" />
     <Compile Include="objects\Field.cs" />
     <Compile Include="objects\Wall.cs" />
     <Compile Include="objects\Tree.cs" />
+    <Compile Include="SenderGame.cs" />
     <Compile Include="Sender.cs" />
-    <Compile Include="Sender2.cs" />
     <Compile Include="Waiting.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Bomb.cs" />

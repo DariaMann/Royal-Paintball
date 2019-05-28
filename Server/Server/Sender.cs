@@ -1,25 +1,40 @@
 ﻿using System;
-using System.Threading;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Text;
+using System.Net.Sockets;
+using System.Threading;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 
 namespace Server
 {
-    class Sender
+    public class Sender
     {
-        private readonly ConcurrentQueue<Field> dataForSend;
+        public List<Client> client;
         private Thread thread;
         private volatile bool stopped;
-        public List<Client> clients;
+        private readonly ConcurrentQueue<Client> queue;
+        public bool Game;
 
-        public Sender(ConcurrentQueue<Field> dataForSend, List<Client> clients)
+        public Sender(ConcurrentQueue<Client> client)
         {
+            this.client = new List<Client>();
             this.stopped = true;
-            this.dataForSend = dataForSend;
-            this.clients = clients;
+            queue = client;
+            Game = false;
+        }
+
+        public void SendMessage(NetworkStream stream, string readyMess)
+        {
+            byte[] messageBytes = Encoding.ASCII.GetBytes(readyMess);
+            int length = messageBytes.Length;// определение длины сообщения
+            byte[] lengthBytes = System.BitConverter.GetBytes(length);// преобразование длины в байты с помощью BitConverter (закодировать)
+            if (System.BitConverter.IsLittleEndian)// переворот байтов, если это little-endian система с прямым порядком байтов: для этого обращаем байты в lengthBytes
+            {
+                Array.Reverse(lengthBytes);
+            }
+            stream.Write(lengthBytes, 0, lengthBytes.Length);//отправка длинны сообщения
+            stream.Write(messageBytes, 0, length);//отправка сообщения
         }
 
         public void Start()
@@ -34,23 +49,13 @@ namespace Server
             }
         }
 
-        public void Send(string message,NetworkStream stream)
+        public void Stop()
         {
-            byte[] messageBytes = Encoding.ASCII.GetBytes(message); // a UTF-8 encoder would be 'better', as this is the standard for network communications
-            int length = messageBytes.Length;// determine length of message
-            byte[] lengthBytes = System.BitConverter.GetBytes(length);// convert the length into bytes using BitConverter (encode)
-            if (System.BitConverter.IsLittleEndian)// flip the bytes if we are a little-endian system: reverse the bytes in lengthBytes to do so
+            if (!stopped)
             {
-                Array.Reverse(lengthBytes);
-            }
-            try
-            {
-                stream.Write(lengthBytes, 0, lengthBytes.Length);// send length
-                stream.Write(messageBytes, 0, length);// send message
-            }
-            catch
-            {
-                Console.WriteLine("MISTACEN");
+                this.stopped = true;
+
+                this.thread.Join();
             }
         }
 
@@ -58,49 +63,22 @@ namespace Server
         {
             while (!stopped)
             {
-                Thread.Sleep(20);
-                if (this.dataForSend.TryDequeue(out Field mess))
+                if (this.queue.TryDequeue(out Client clientTcp))
                 {
-                    Console.WriteLine("clients.Count  "+ clients.Count);
-                    for (int i = 0; i < clients.Count; i++)
+                    client.Add(clientTcp);
+                }
+                for (int i = 0; i < client.Count; i++)
+                {
+                    NetworkStream stream = client[i].client.GetStream();
+                    int countNamedClient = 0;
+                    for (int j = 0; j < client.Count; j++)
                     {
-                        foreach (Player player in mess.Player.Values)
-                        {
-                            if (player.ID == clients[i].ID)
-                            {
-                                player.Me = true;
-                            }
-                            else player.Me = false;
-                        }
-                        try
-                        {
-                            NetworkStream stream = clients[i].client.GetStream();
-                            string meesage = JsonConvert.SerializeObject(mess, Formatting.Indented);
-                              Console.WriteLine(meesage);
-                            //Console.WriteLine("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL");
-                            string msg = "%" + meesage + "&";
-                            Send(msg, stream);
-                        }
-                        catch(System.InvalidOperationException e)
-                        {
-                            Console.WriteLine(e);
-                            clients.Remove(clients[i]);
-                        }
-                        //foreach (Player player in mess.Player.Values)
-                        //{
-                        //    if (player.Death)
-                        //    {
-                        //        for (int k = 0; k < clients.Count; k++)
-                        //        {
-                        //            if (player.ID == clients[k].ID)
-                        //            {
-                        //                clients.Remove(clients[k]);
-                        //            }
-                        //        }
-
-                        //    }
-                        //}
+                            countNamedClient++;
                     }
+                    var mess = JsonConvert.SerializeObject(countNamedClient, Formatting.Indented);
+                    string readyMess = "%" + mess + "&";
+                    Console.WriteLine("Sender2: " + readyMess +" to "+i +" Player");
+                    SendMessage(stream, readyMess);
                 }
             }
         }

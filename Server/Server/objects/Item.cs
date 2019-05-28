@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Item
+    public class Item:ICloneable
     {
         public string Name { get; set; }
         public int Count { get; set; }
@@ -22,6 +22,10 @@ namespace Server
             this.Y = y;
             this.Index = i;
 
+        }
+        public object Clone()
+        {
+            return new Item(this.Name, this.Count, this.X, this.Y, this.Index);
         }
     }
 }

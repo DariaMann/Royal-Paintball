@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Shotgun : Weapons
+    public class Shotgun : Weapons,ICloneable
     {
         public Shotgun()
         {
@@ -18,10 +18,23 @@ namespace Server
             this.CamShot = true;
             this.time = new DateTime();
             time = DateTime.Now;
+            TimeFly = 4;
         }
         public override void Shoot()
         {
             this.CountBullets--;
+        }
+        public object Clone()
+        {
+            return new Shotgun
+            {
+                CountBullets = this.CountBullets,
+                TakenLives = this.TakenLives,
+                CountMagazine = this.CountMagazine,
+                MaxCountMag = this.MaxCountMag,
+                CamShot = this.CamShot,
+                time = this.time
+            };
         }
     }
 }

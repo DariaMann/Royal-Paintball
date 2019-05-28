@@ -106,9 +106,7 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log("___________________________________");
                 IsItFirstMessage = false;
         }
-
-
-
+        
         if (!IsItFirstMessage)
         {
             if (field.Player.ContainsKey(my_ID))
@@ -123,7 +121,7 @@ public class NetworkManager : MonoBehaviour
                     Field jsonData1 = JsonConvert.DeserializeObject<Field>(mess);
                     field = jsonData1;
                 }
-                catch(ArgumentException e)
+                catch(Exception e)
                 {
                     Console.WriteLine(e);
                 }
@@ -145,12 +143,7 @@ public class NetworkManager : MonoBehaviour
                 PlayerRotation();
                 ArrowRotation();
                 InstantiateMagazine();
-
-
-                if (field.Player.Count > 1)//для других играков
-                {
-                    InstantiateWeaponOther();
-                }
+                InstantiateWeaponOther();
             }
         }
     }
@@ -211,8 +204,21 @@ public class NetworkManager : MonoBehaviour
         }
         MousePos();
         SizeCircle();
+        if(field.Player[my_ID].Win)
+        {
+            Win("You won!");
+            clientTCP.Disconnect();
+            Destroy(this);
+        }
     }
-
+    public void Exit()
+    {
+        field.Player[my_ID].Death = true;
+        clientTCP.Send(field.Player[my_ID]);
+        clientTCP.Disconnect();
+        SceneManager.LoadScene("Play");
+        Destroy(this);
+    }
     public void PlayerRotation()
     {
         foreach (int c in field.Player.Keys)

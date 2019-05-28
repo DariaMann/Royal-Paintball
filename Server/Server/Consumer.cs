@@ -5,15 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Concurrent;
+using Newtonsoft.Json;
 
 namespace Server
 {
-    public class Consumer: IPlayController//Consumer
+    public class Consumer : IPlayController//Consumer
     {
         public Field field;//поле игры
 
         private readonly ConcurrentQueue<Player> queue;
-        private readonly ConcurrentQueue<Field> dataForSend;
+        private readonly ConcurrentQueue<string> dataForSend;
 
         DateTime StartTime;
         DateTime now;
@@ -22,7 +23,7 @@ namespace Server
         private Thread thread;
         private volatile bool stopped;
 
-        public Consumer(Field field, ConcurrentQueue<Player> queue, ConcurrentQueue<Field> dataForSend)
+        public Consumer(Field field, ConcurrentQueue<Player> queue, ConcurrentQueue<string> dataForSend)
         {
             this.dataForSend = dataForSend;
             this.queue = queue;
@@ -42,7 +43,7 @@ namespace Server
                 thread.Start();
             }
         }
-        public void Wound(Player player,int takenLifes)//ранение
+        public void Wound(Player player, int takenLifes)//ранение
         {
             if (player.Life > 0)
             {
@@ -63,7 +64,7 @@ namespace Server
                 foreach (int i in list)
                 {
                     bool result = field.Player[ID].LiftItemInGame(field.Item[i]);
-                    if(result)
+                    if (result)
                     {
                         field.Item.Remove(i);
                     }
@@ -116,7 +117,7 @@ namespace Server
 
             }
         }
-        
+
         private int WeapWound(string weapon, int ID)
         {
             int countLife = 0;
@@ -167,7 +168,7 @@ namespace Server
                             if (field.Player[c].X + 1 > bX)
                             {
                                 if (!field.Player[ID].StopIn.ContainsKey("A"))
-                                field.Player[ID].StopIn.Add("A", "A");
+                                    field.Player[ID].StopIn.Add("A", "A");
                                 Console.WriteLine("RIGHT");
                             }
                             else
@@ -441,8 +442,8 @@ namespace Server
             {
                 foreach (Wall c in field.Wall)
                 {
-                    if(field.Bullet[i].BulletInObject(c))
-                            DelBul(field.Bullet[i]);
+                    if (field.Bullet[i].BulletInObject(c))
+                        DelBul(field.Bullet[i]);
                 }
             }
             for (int i = 0; i < field.Bullet.Count; i++)
@@ -637,18 +638,30 @@ namespace Server
             field.Player.Remove(ID);
         }
 
-        private void Shoott(int ID, Player player)//стрельба
+        private void Shoott(Player player)//стрельба
         {
             float speed = 0.1f;
-            field.Bullet.Add(new Bullet(player.End[0], player.End[1], player.X,player.Y,/*player.Start[0], player.Start[1]*/ player.Weapon, ID, speed, player.Color));
-            field.Player[ID].Weap.Shoot();
+            field.Bullet.Add(new Bullet(player.End[0], player.End[1], player.X, player.Y, player.Weapon, player.ID, speed, player.Color));
+            field.Player[player.ID].Weap.Shoot();
+        }
+        private int TimeForFly(string weapon, int playerID)
+        {
+            int seconds = 0;
+            switch (weapon)
+            {
+                case "Pistol": seconds = field.Player[playerID].P.TimeFly; break;
+                case "Gun": seconds = field.Player[playerID].P.TimeFly; break;
+                case "Shotgun": seconds = field.Player[playerID].P.TimeFly; break;
+                case "Bomb": seconds = field.Player[playerID].P.TimeFly; break;
+            }
+            return seconds;
         }
 
         private void BulFlight()//направление полета пули
         {
             for (int i = 0; i < field.Bullet.Count; i++)
             {
-                bool result = field.Bullet[i].BulFlight();
+                bool result = field.Bullet[i].BulFlight(TimeForFly(field.Bullet[i].Weapon, field.Bullet[i].ID));
                 if (!result)
                 {
                     DelBul(field.Bullet[i]);
@@ -671,13 +684,24 @@ namespace Server
                 {
                     field.Player[player.ID].MovePlayer(player.Direction);
                 }
-                  ChangeWeapon(player.ID, player.Weapon);
+                ChangeWeapon(player.ID, player.Weapon);
                 //field.Player[player.ID].ChangeWeapon(player.Direction);
                 if (player.Shoot == true)//выстрел
                 {
-                    Shoott(player.ID, player);
+                    Shoott(player);
                 }
-                if(player.Death)
+                if (player.LiftItem == true)//поднятие вещей
+                {
+                    LiftItem(player.ID);
+                }
+                if (player.Reload == true)//перезарядка
+                {
+                    field.Player[player.ID].ReloadCall();//вызов перезарядки
+                }
+                field.Player[player.ID].ReloadWeapon();//перезарядка
+                BulFlight();
+                field.circle.SmallCircleMove();
+                if (player.Death)
                 {
                     FinishGame(player.ID);
                 }
@@ -687,17 +711,11 @@ namespace Server
                     {
                         field.Player[player.ID].Death = true;
                     }
-                    if (player.LiftItem == true)//поднятие вещей
-                    {
-                        LiftItem(player.ID);
-                    }
-                    if (player.Reload == true)//перезарядка
-                    {
-                        field.Player[player.ID].ReloadCall();//вызов перезарядки
-                    }
-                    field.Player[player.ID].ReloadWeapon();//перезарядка
-                    BulFlight();
-                    field.circle.SmallCircleMove();
+
+                    //if (field.Player.Count == 1)
+                    //{
+                    //    field.Player[player.ID].Win = true;
+                    //}
                 }
             }
         }
@@ -706,7 +724,7 @@ namespace Server
         {
             if (field.time.Seconds == 30)
             {
-               field.circle.SmallCircleCall();
+                field.circle.SmallCircleCall();
             }
             //if (player != null)
             //    Hit2(player.ID);
@@ -737,10 +755,14 @@ namespace Server
                 now = DateTime.Now;
                 interval = StartTime - now;
                 ReactionInTime(pl);
-                Field f = (Field)field.Clone();
-                
-                if (dataForSend.Count < 10)
-                { this.dataForSend.Enqueue(f); }
+                //  Field meesage = (Field)field.Clone();
+                string meesage = JsonConvert.SerializeObject(field, Formatting.Indented);
+                if (dataForSend.Count < 1)
+                { this.dataForSend.Enqueue(meesage); }
+                if (field.Player.Count <= 1)
+                {
+                    Stop();
+                }
             }
         }
     }

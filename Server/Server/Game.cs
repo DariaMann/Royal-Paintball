@@ -8,17 +8,17 @@ namespace Server
     class Game
     {
         private ConcurrentQueue<Player> queue;
-        ConcurrentQueue<Field> dataForSend;
+        ConcurrentQueue<string> dataForSend;
         Field f;
         Consumer consumer;
-        Sender sender;
-        List<Client> clients;
+        SenderGame sender;
+        public List<Client> clients;
         public Game(List<Client> clients)
         {
             Console.WriteLine(clients.Count);
             this.clients = clients;
             this.queue = new ConcurrentQueue<Player>();
-            this.dataForSend = new ConcurrentQueue<Field>();
+            this.dataForSend = new ConcurrentQueue<string>();
 
             this.f = new Field();
             for(int i=0;i<clients.Count;i++)
@@ -26,7 +26,7 @@ namespace Server
                 f.Player.Add(clients[i].ID, new Player() { ID = clients[i].ID, Color = f.ChooseColor() });
             }
             this.consumer = new Consumer(f, queue, dataForSend);
-            this.sender = new Sender(dataForSend, clients);
+            this.sender = new SenderGame(dataForSend, clients);
         }
         public void Process()
         {

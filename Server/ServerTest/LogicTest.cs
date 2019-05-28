@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using Server;
 using System;
 using System.Collections.Concurrent;
@@ -225,19 +226,30 @@ namespace ServerTest
     public class CommunicationTests
     {
         [TestMethod]
+        public void CloneTest_0()
+        {
+            Field f1 = new Field();
+            var mess = JsonConvert.SerializeObject(f1, Formatting.Indented);
+            f1.Player.Add(1,new Player());
+            Field f2 = JsonConvert.DeserializeObject<Field>(mess);
+            // Assert.AreNotSame(f2.Bullet, f1.Bullet);
+            Assert.AreNotEqual(f2.Player.Count, f1.Player.Count);
+        }
+        [TestMethod]
         public void CloneTest_1()
         {
             Field f1 = new Field();
-            Field f2 = f1.Clone();
-            Assert.AreNotSame(f2.Bullet, f1.Bullet);
-            Assert.AreNotSame(f2.Tree[0], f1.Tree[0]);
+            Field f2 = (Field)f1.Clone();
+           // Assert.AreNotSame(f2.Bullet, f1.Bullet);
+            Assert.AreNotSame(f2.Tree[1], f1.Tree[10]);
         }
         [TestMethod]
         public void CloneTest_2()
         {
             Field f1 = new Field();
+            f1.Player.Add(0, new Player() { Death = true });
             Field f2 = (Field)f1.Clone();
-            Assert.AreNotSame(f2.Player, f1.Player);
+            Assert.AreEqual(f2.Player[0], f1.Player[0]);
         }
         [TestMethod]
         public void CloneTest_3()
@@ -306,8 +318,10 @@ namespace ServerTest
         public void CloneTest_12()
         {
             Field f1 = new Field();
+            f1.Item.Add(20, new Item("a", 1, 1,1, 1));
+            f1.Item.Add(21, new Item("a", 1, 1, 1, 1));
             Field f2 = (Field)f1.Clone();
-            Assert.AreNotSame(f2.Item, f1.Item);
+            Assert.AreEqual(f2.Item[21].Name, f1.Item[21].Name);
         }
         [TestMethod]
         public void CloneTest_13()
@@ -315,6 +329,14 @@ namespace ServerTest
             Field f1 = new Field();
             Field f2 = (Field)f1.Clone();
             Assert.AreNotSame(f2.Tree, f1.Tree);
+        }
+        [TestMethod]
+        public void CloneTest_14()
+        {
+            Field f1 = new Field();
+            f1.Bullet.Add(new Bullet(1, 1, 1, 1, "a", 1, 1, "b"));
+            Field f2 = (Field)f1.Clone();
+            Assert.AreNotSame(f2.Bullet[0].a, f1.Bullet[0].a);
         }
         //[TestMethod]
         //public void SendTest_1()

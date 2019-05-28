@@ -15,6 +15,7 @@ namespace Server
         public int MaxCountMag { get; set; }
         public bool CamShot { get; set; }
         public DateTime time { get; set; }
+        public int TimeFly { get; set; }
 
         public void ChangeWeap(Field f, string weap, int ID)
         {
@@ -35,7 +36,7 @@ namespace Server
                 f.Player[ID].Weap = f.Player[ID].B;
             }
         }
-
+        
     }
 
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class Player
+    public class Player : ICloneable
     {
         public int Life { get; set; }
         public int ID { get; set; }
@@ -36,18 +36,20 @@ namespace Server
         public bool Me { get; set; }
         public bool OutCircle { get; set; }
         public bool Death { get; set; }
+        public bool Win { get; set; }
 
         public Dictionary<string, string> StopIn { get; set; }
-
+        
         public Player()
         {
             Death = false;
+            Win = false;
             Me = false;
             P = new Pistol();
             S = new Shotgun();
             G = new Gun();
             B = new Bomb();
-            Weap = B;
+            Weap = P;
             Random rn = new Random(); // объявление переменной для генерации чисел
             this.X = rn.Next(-2, 5);
             this.Y = rn.Next(-2, 5);
@@ -56,7 +58,7 @@ namespace Server
             Life = 10;
             Direction = "N";
             Shoot = false;
-            Weapon = "Bomb";
+            Weapon = "Pistol";
             LiftItem = false;
             Start = new float[2];
             End = new float[2];
@@ -66,8 +68,42 @@ namespace Server
             StopIn = new Dictionary<string, string>();
 
         }
+        public object Clone()
+        {
+            return new Player
+            {
+                Life = this.Life,
+                ID = this.ID,
+                Direction = this.Direction,
 
-        public void MovePlayer(string dir)//движение игрока
+                X = this.X,
+                Y = this.Y,
+                XRot = this.XRot,
+                YRot = this.YRot,
+                Shoot = this.Shoot,
+                Reload = this.Reload,
+                LiftItem = this.LiftItem,
+                MousePos = (float[])this.MousePos.Clone(),
+                Size = (int[])this.Size.Clone(),
+
+                Start = (float[])this.Start.Clone(),
+                End = (float[])this.End.Clone(),
+
+                Weapon = this.Weapon,
+                Weap = this.Weap,
+                P = (Pistol)this.P.Clone(),
+                S = (Shotgun)this.S.Clone(),
+                G = (Gun)this.G.Clone(),
+                 B = (Bomb)this.B.Clone(),
+
+        Color = this.Color,
+         Me= this.Me,
+         OutCircle = this.OutCircle,
+        Death = this.Death,
+        Win = this.Win
+           };
+}
+public void MovePlayer(string dir)//движение игрока
         {
             float speed = 0.45f;
             switch (dir)

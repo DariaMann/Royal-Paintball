@@ -96,6 +96,7 @@ public class Player
     public Shotgun S { get; set; }
     public Gun G { get; set; }
     public Bomb B { get; set; }
+    public bool Win { get; set; }
 
     public string Color { get; set; }
 
