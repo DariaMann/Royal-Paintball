@@ -71,7 +71,7 @@ namespace Server
                 Thread.Sleep(20);
                 if (this.dataForSend.TryDequeue(out Field field))
                 {
-                    Console.WriteLine("clients.Count  " + clients.Count);
+                    //Console.WriteLine("clients.Count  " + clients.Count);
                     for (int i = 0; i < clients.Count; i++)
                     {
                         foreach (Player player in field.Player.Values)
@@ -88,11 +88,14 @@ namespace Server
                             string message = JsonConvert.SerializeObject(field, Formatting.Indented);
                           //  Console.WriteLine(message);
                             string msg = "%" + message + "&";
+                            Console.WriteLine("clients.Count  " + clients.Count +" to " + clients[i].ID);
                             Send(msg, stream);
+                            Console.WriteLine("Have send to " + clients[i].ID);
                         }
                         catch (System.InvalidOperationException e)
                         {
                             Console.WriteLine(e);
+                            clients[i].Stop();
                             clients.Remove(clients[i]);
                          
                         }

@@ -167,7 +167,23 @@ namespace ServerTest
             Field f1 = new Field();
             var mess = JsonConvert.SerializeObject(f1, Formatting.Indented);
             Field f2 = JsonConvert.DeserializeObject<Field>(mess);
-            // Assert.AreNotSame(f2.Bullet, f1.Bullet);
+            Assert.AreSame(f2, f1);
+        }
+        [TestMethod]
+        public void CloneTest_1()
+        {
+            Field f1 = new Field();
+            Field f2  = f1.Clone(f1);
+            Assert.AreSame(f2, f1);
+        }
+        [TestMethod]
+        public void CloneTest_2()
+        {
+            Field f1 = new Field();
+               ConcurrentQueue<Player> queue = new ConcurrentQueue<Player>();
+         ConcurrentQueue<Field> dataForSend = new ConcurrentQueue<Field>();
+            Logic logic = new Logic(f1, queue, dataForSend);
+            Field f2 = logic.CloneField();
             Assert.AreNotSame(f2, f1);
         }
         //[TestMethod]

@@ -10,7 +10,7 @@ namespace Server
         private ConcurrentQueue<Player> queue;
         ConcurrentQueue<Field> dataForSend;
         Field f;
-        Consumer consumer;
+        Logic logic;
         GameSender sender;
         public List<Client> clients;
         public Game(List<Client> clients)
@@ -25,13 +25,13 @@ namespace Server
             {
                 f.Player.Add(clients[i].ID, new Player() { ID = clients[i].ID, Color = f.ChooseColor() });
             }
-            this.consumer = new Consumer(f, queue, dataForSend);
+            this.logic = new Logic(f, queue, dataForSend);
             this.sender = new GameSender(dataForSend, clients);
             Process();
         }
         public void Process()
         {
-            consumer.Start();
+            logic.Start();
             sender.Start();
             foreach (Client c in clients)
             {

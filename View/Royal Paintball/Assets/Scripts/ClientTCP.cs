@@ -25,11 +25,12 @@ public class ClientTCP
             playerSocket.SendBufferSize = 4096;//размер буфера отправки
             playerSocket.NoDelay = false;
             asyncBuff = new byte[8192];
-            playerSocket.Connect("127.0.0.1", 904);
+            playerSocket.Connect("192.168.31.163", 904);
 
             connecting = true;
         }
-        catch {
+        catch(Exception e) {
+            Debug.Log(e);
             Debug.Log("not connect");
         };
 

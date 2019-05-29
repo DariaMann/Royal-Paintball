@@ -82,9 +82,9 @@ namespace Server
             Colors = new List<string> { "blue", "red", "yellow", "orange", "pink", "green", "black", "white" };
         }
 
-        public Field Clone()
+        public Field Clone(Field f)
         {
-            string f1 = JsonConvert.SerializeObject(this, Formatting.Indented);
+            string f1 = JsonConvert.SerializeObject(f, Formatting.Indented);
             Field f2 = JsonConvert.DeserializeObject<Field>(f1);
             return f2;
         }

@@ -50,7 +50,6 @@
     <Compile Include="Client.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameSender.cs" />
-    <Compile Include="Logic.cs" />
     <Compile Include="objects\Circle.cs" />
     <Compile Include="objects\Item.cs" />
     <Compile Include="objects\Bullet.cs" />
@@ -61,7 +60,7 @@
     <Compile Include="Waiting.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\Bomb.cs" />
-    <Compile Include="Consumer.cs" />
+    <Compile Include="Logic.cs" />
     <Compile Include="objects\Player.cs" />
     <Compile Include="objects\Weapons.cs" />
     <Compile Include="Weapons\Pistol.cs" />

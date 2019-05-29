@@ -37,6 +37,15 @@ namespace Server
         {
             if (!stopped)
             {
+                try
+                {
+                    Player player = new Player() { ID = ID, Death = true };
+                    this.queue.Enqueue(player);
+                }
+                catch
+                {
+                    Console.WriteLine("try del client");
+                }
                 this.stopped = true;
 
                 this.thread.Join();
@@ -62,6 +71,8 @@ namespace Server
                 catch {
 
                     Console.WriteLine(")))))))))))))))))))))))))))))))))))))))))))");
+                    //Player player = new Player() { ID = ID, Death = true };
+                    //this.queue.Enqueue(player); 
                     Stop();
                 }
             }
@@ -86,7 +97,7 @@ namespace Server
             NetworkStream stream = client.GetStream();
             while (!stopped)
             {
-                Console.WriteLine("Client " + ID);
+                //Console.WriteLine("Client " + ID);
                 if (Game)
                 {
                     string message = ReadMessage(stream);
@@ -106,7 +117,7 @@ namespace Server
                     if (queue.Count < 1)
                     { this.queue.Enqueue(player); }
 
-                    Console.WriteLine("Death " + ID + ":" + player.Death);
+                    //Console.WriteLine("Death " + ID + ":" + player.Death);
                 }
             }
         }

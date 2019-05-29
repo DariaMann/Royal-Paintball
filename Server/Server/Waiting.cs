@@ -14,10 +14,10 @@ namespace Server
         private ConcurrentQueue<Client> Waiters;
         private Thread thread;
         private volatile bool stopped;
-        private int GamersCount = 2;
+        private ConcurrentQueue<Client> ForSender;
+        private int GamersCount = 3;
         private List<Game> Games;
         private List<Client> clients;
-        public ConcurrentQueue<Client> ClientForSender;
         Sender sender;
 
         public Waiting(ConcurrentQueue<Client> Waiters)
@@ -26,8 +26,9 @@ namespace Server
             Games = new List<Game>();
             clients = new List<Client>();
             this.stopped = true;
-            ClientForSender = new ConcurrentQueue<Client>();
-            sender = new Sender(ClientForSender);
+            ForSender = new ConcurrentQueue<Client>();
+            sender = new Sender(ForSender);
+           
             sender.Start();
         }
 
@@ -64,15 +65,15 @@ namespace Server
         {
             while (!stopped)
             {
-                Console.WriteLine("Games: "+Games.Count);
                 if (clients.Count >= GamersCount)
                 {
                     List<Client> newList = new List<Client>(clients);
                     Game game = new Game(newList);
                     game.Process();
                     Games.Add(game);
-                    foreach (Client tcp in clients)
-                    { sender.client.Remove(tcp); }
+                    //foreach (Client tcp in clients)
+                    //{ sender.clients.Remove(tcp); }
+                    sender.Game = true;
                     clients.Clear();
                 }
                 else
@@ -82,7 +83,7 @@ namespace Server
                         client.ID = CreateID();
                         client.Start();
                         clients.Add(client);
-                        ClientForSender.Enqueue(client);
+                        ForSender.Enqueue(client);
                     }
                 }
                 for(int i = 0;i<Games.Count;i++)

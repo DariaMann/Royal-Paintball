@@ -10,18 +10,19 @@ namespace Server
 {
     public class Sender
     {
-        public List<Client> client;
+        public List<Client> clients;
         private Thread thread;
         private volatile bool stopped;
-        private readonly ConcurrentQueue<Client> queue;
         public bool Game;
+        private readonly ConcurrentQueue<Client> ForSender;
 
-        public Sender(ConcurrentQueue<Client> client)
+        public Sender(ConcurrentQueue<Client> ForSender)
         {
-            this.client = new List<Client>();
+            this.clients = new List<Client>();
             this.stopped = true;
-            queue = client;
             Game = false;
+            this.ForSender = ForSender;
+
         }
 
         public void SendMessage(NetworkStream stream, string readyMess)
@@ -33,8 +34,15 @@ namespace Server
             {
                 Array.Reverse(lengthBytes);
             }
-            stream.Write(lengthBytes, 0, lengthBytes.Length);//отправка длинны сообщения
-            stream.Write(messageBytes, 0, length);//отправка сообщения
+            try
+            {
+                stream.Write(lengthBytes, 0, lengthBytes.Length);//отправка длинны сообщения
+                stream.Write(messageBytes, 0, length);//отправка сообщения
+            }
+            catch
+            {
+                Console.WriteLine("MISTACEN");
+            }
         }
 
         public void Start()
@@ -63,22 +71,37 @@ namespace Server
         {
             while (!stopped)
             {
-                if (this.queue.TryDequeue(out Client clientTcp))
+                if (this.ForSender.TryDequeue(out Client client))
                 {
-                    client.Add(clientTcp);
+                    clients.Add(client);
                 }
-                for (int i = 0; i < client.Count; i++)
+                Thread.Sleep(50);
+                for (int i = 0; i < clients.Count; i++)
                 {
-                    NetworkStream stream = client[i].client.GetStream();
-                    int countNamedClient = 0;
-                    for (int j = 0; j < client.Count; j++)
+                    try
                     {
+                        NetworkStream stream = clients[i].client.GetStream();
+                        int countNamedClient = 0;
+                        for (int j = 0; j < clients.Count; j++)
+                        {
                             countNamedClient++;
+                        }
+                        var mess = JsonConvert.SerializeObject(countNamedClient, Formatting.Indented);
+                        string readyMess = "%" + mess + "&";
+                        Console.WriteLine("Sender2: " + readyMess + " to " + i + " Player");
+                        SendMessage(stream, readyMess);
+                        if (Game)
+                        {
+                            clients.Clear();
+                            Game = false;
+                        }
                     }
-                    var mess = JsonConvert.SerializeObject(countNamedClient, Formatting.Indented);
-                    string readyMess = "%" + mess + "&";
-                    Console.WriteLine("Sender2: " + readyMess +" to "+i +" Player");
-                    SendMessage(stream, readyMess);
+                    catch (System.InvalidOperationException e)
+                    {
+                        Console.WriteLine(e);
+                        clients[i].Stop();
+                        clients.Remove(clients[i]);
+                    }
                 }
             }
         }
