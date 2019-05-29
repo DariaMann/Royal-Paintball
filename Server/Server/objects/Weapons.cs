@@ -16,27 +16,6 @@ namespace Server
         public bool CamShot { get; set; }
         public DateTime time { get; set; }
         public int TimeFly { get; set; }
-
-        public void ChangeWeap(Field f, string weap, int ID)
-        {
-            if (weap == "Pistol")
-            {
-                f.Player[ID].Weap = f.Player[ID].P;
-            }
-            if (weap == "Shotgun")
-            {
-                f.Player[ID].Weap = f.Player[ID].S;
-            }
-            if (weap == "Gun")
-            {
-                f.Player[ID].Weap = f.Player[ID].G;
-            }
-            if (weap == "Bumb")
-            {
-                f.Player[ID].Weap = f.Player[ID].B;
-            }
-        }
-        
     }
 
 }

@@ -11,7 +11,6 @@ namespace Server
         public int Life { get; set; }
         public int ID { get; set; }
         public string Direction { get; set; }
-
         public float X { get; set; }
         public float Y { get; set; }
         public float XRot { get; set; }
@@ -21,23 +20,19 @@ namespace Server
         public bool LiftItem { get; set; }
         public float[] MousePos { get; set; }
         public int[] Size { get; set; }
-
         public float[] Start { get; set; }
         public float[] End { get; set; }
-
         public string Weapon { get; set; }
         public Weapons Weap { get; set; }
         public Pistol P { get; set; }
         public Shotgun S { get; set; }
         public Gun G { get; set; }
         public Bomb B { get; set; }
-
         public string Color { get; set; }
         public bool Me { get; set; }
         public bool OutCircle { get; set; }
         public bool Death { get; set; }
         public bool Win { get; set; }
-
         public Dictionary<string, string> StopIn { get; set; }
         public Dictionary<string, string> StopInWall { get; set; }
 
@@ -70,32 +65,32 @@ namespace Server
             StopInWall = new Dictionary<string, string>();
         }
        
-public void MovePlayer(string dir)//движение игрока
+        public void MovePlayer(string dir)//движение игрока
         {
-            float speed = 0.45f;
+            float speed = 0.4f;
             switch (dir)
             {
                 case "W":
                     {
-                        if (!StopIn.ContainsKey("W"))
+                        if (!StopIn.ContainsKey("W") && !StopInWall.ContainsKey("W"))
                             Y += speed;
                         break;
                     }
                 case "S":
                     {
-                        if (!StopIn.ContainsKey("S"))
+                        if (!StopIn.ContainsKey("S") && !StopInWall.ContainsKey("S"))
                             Y -= speed;
                         break;
                     }
                 case "A":
                     {
-                        if (!StopIn.ContainsKey("A"))
+                        if (!StopIn.ContainsKey("A") && !StopInWall.ContainsKey("A"))
                             X -= speed;
                         break;
                     }
                 case "D":
                     {
-                        if (!StopIn.ContainsKey("D"))
+                        if (!StopIn.ContainsKey("D") && !StopInWall.ContainsKey("D"))
                             X += speed;
                         break;
                     }
@@ -238,28 +233,6 @@ public void MovePlayer(string dir)//движение игрока
                 }
             }
             return false;
-        }
-        
-        public void ChangeWeapon(string weapon)//смена оружия
-        {
-            if (weapon == "Pistol")
-            {
-                Weap = P;
-            }
-            if (weapon == "Shotgun")
-            {
-                Weap = S;
-            }
-            if (weapon == "Gun")
-            {
-                Weap = G;
-            }
-            if (weapon == "Bomb")
-            {
-               Weap = B;
-            }
-            Weapon = weapon;
-
         }
     }
 }

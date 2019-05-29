@@ -19,10 +19,8 @@ namespace Server
         public Dictionary<int, Item> Item { get; set; }
         public Dictionary<int, Player> Player { get; set; }
         public Circle circle { get; set; }
-
         public List<string> Colors { get; set; }
         public TimeSpan time { get; set; }
-
         public DateTime inpulse { get; set; }
 
         public Field()
@@ -41,21 +39,11 @@ namespace Server
                 float y = rn.Next(-40, 40);//rn.Next(-4, 4);
                 int tree = rn.Next(1, 3);
                 string type = "";
-                if (tree == 1)
-                {
-                    type = "Oak";
-                }
-                else
-                {
-                    if (tree == 2)
-                    {
-                        type = "Fir";
-                    }
-                    else
-                    {
-                        type = "Poplar";
-                    }
-                }
+                List<string> types = new List<string>();
+                types.Add("Oak");
+                types.Add("Fir");
+                types.Add("Poplar");
+                type = types[tree];
                 Tree.Add(new Tree(x, y, type));
             }
             Wall = new List<Wall>();
@@ -78,13 +66,29 @@ namespace Server
             {
                 float x = rn.Next(-40, 40); //rn.Next(-8, 8);
                 float y = rn.Next(-40, 40);//rn.Next(-4, 4);
-                Item.Add(Item.Count, new Item("Pistol", 5, x, y, Item.Count));
+                int weapon = rn.Next(1, 4);
+                string type = "";
+                List<string> types = new List<string>();
+                types.Add("Pistol");
+                types.Add("Shotgun");
+                types.Add("Gun");
+                types.Add("Bomb");
+                type = types[weapon];
+                Item.Add(Item.Count, new Item(type, 5, x, y, Item.Count));
             }
             this.time = new TimeSpan();
             Player = new Dictionary<int, Player>();
             circle = new Circle();
             Colors = new List<string> { "blue", "red", "yellow", "orange", "pink", "green", "black", "white" };
         }
+
+        public Field Clone()
+        {
+            string f1 = JsonConvert.SerializeObject(this, Formatting.Indented);
+            Field f2 = JsonConvert.DeserializeObject<Field>(f1);
+            return f2;
+        }
+
         public string ChooseColor()
         {
             Random rn = new Random();
@@ -137,96 +141,6 @@ namespace Server
                 }
             }
             inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, time.Minutes, second, time.Milliseconds);
-        }
-
-        public void PlayerInFrontOfObject(Player player)
-        {
-            float aX = X - Size[0];
-            float aY = Y + Size[1];
-            float bX = X + Size[0];
-            float bY = Y + Size[1];
-            float cX = X + Size[0];
-            float cY = Y - Size[1];
-            float dX = X - Size[0];
-            float dY = Y - Size[1];
-            if (player.X < aX || player.X > bX || player.Y < dY || player.Y > aY)
-            //{
-            //    if (player.X + 2 < bX)
-            //    {
-            //        if (!player.StopIn.ContainsKey("A"))
-            //            player.StopIn.Add("A", "A");
-            //    }
-            //    else
-            //    {
-            //        if (player.X + 1 > bX)
-            //        {
-            //            if (!player.StopIn.ContainsKey("D"))
-            //                player.StopIn.Add("D", "D");
-            //        }
-            //        else
-            //        {
-            //            if (player.Y + 1 < bY)
-            //            {
-            //                if (!player.StopIn.ContainsKey("S"))
-            //                    player.StopIn.Add("S", "S");
-            //            }
-            //            else
-            //            {
-            //                if (player.Y + 1 > bY)
-            //                {
-            //                    if (!player.StopIn.ContainsKey("W"))
-            //                        player.StopIn.Add("W", "W");
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    player.StopIn.Clear();
-            //}
-        
-            {
-                if (player.X + 2 < bX)
-                {
-                    if (!player.StopIn.ContainsKey("A"))
-
-                        player.StopIn.Add("A", "A");
-                    Console.WriteLine("RIGHT");
-                }
-                else
-                {
-                    if (player.X + 1 > bX)
-                    {
-                        if (!player.StopIn.ContainsKey("D"))
-
-                            player.StopIn.Add("D", "D");
-                        Console.WriteLine("LEFT");
-                    }
-                }
-
-                if (player.Y + 1 < bY)
-                {
-                    if (!player.StopIn.ContainsKey("S"))
-
-                        player.StopIn.Add("S", "S");
-                    Console.WriteLine("UP");
-                }
-                else
-                {
-                    if (player.Y + 1 > bY)
-                    {
-                        if (!player.StopIn.ContainsKey("W"))
-
-                            player.StopIn.Add("W", "W");
-
-                    }
-                }
-            }
-            else
-            {
-                player.StopIn.Clear();
-            }
         }
     }
 }

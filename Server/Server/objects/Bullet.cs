@@ -10,16 +10,13 @@ namespace Server
     {
         public int ID { get; set; }
         public string Weapon { get; set; }
-
         public float X { get; set; }
         public float Y { get; set; }
         public float a { get; set; }
         public float b { get; set; }
         public DateTime time { get; set; }
-
         public float[] EndPos { get; set; }
         public float[] StartPos { get; set; }
-
         public string Color { get; set; }
         
         public Bullet(float endX, float endY, float x, float y, string weapon, int id, float speed, string color)
@@ -71,63 +68,6 @@ namespace Server
             {
                 return false;
             }
-        }
-        public bool BulletInObject(Wall obj)
-        {
-            float aX = obj.X - obj.Size[0];
-            float aY = obj.Y + obj.Size[1];
-            float bX = obj.X + obj.Size[0];
-            float bY = obj.Y + obj.Size[1];
-            float cX = obj.X + obj.Size[0];
-            float cY = obj.Y - obj.Size[1];
-            float dX = obj.X - obj.Size[0];
-            float dY = obj.Y - obj.Size[1];
-            if (X > aX && X < bX)
-            {
-                if (Y > dY && Y < aY)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool BulletInObject(Tree obj)
-        {
-            float aX = obj.X - obj.Size[0];
-            float aY = obj.Y + obj.Size[1];
-            float bX = obj.X + obj.Size[0];
-            float bY = obj.Y + obj.Size[1];
-            float cX = obj.X + obj.Size[0];
-            float cY = obj.Y - obj.Size[1];
-            float dX = obj.X - obj.Size[0];
-            float dY = obj.Y - obj.Size[1];
-            if (X > aX && X < bX)
-            {
-                if (Y > dY && Y < aY)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool BulletInObject(Player obj)
-        {
-            float aX = obj.X - obj.Size[0];
-            float aY = obj.Y + obj.Size[1];
-            float bX = obj.X + obj.Size[0];
-            float bY = obj.Y + obj.Size[1];
-            float cX = obj.X + obj.Size[0];
-            float cY = obj.Y - obj.Size[1];
-            float dX = obj.X - obj.Size[0];
-            float dY = obj.Y - obj.Size[1];
-            if (X > aX && X < bX)
-            {
-                if (Y > dY && Y < aY)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

@@ -43,8 +43,6 @@ namespace Server
                 thread.Start();
             }
         }
-
-
         private void LiftItem(int ID)//поднятие вещей
         {
 
@@ -57,56 +55,77 @@ namespace Server
                 }
                 foreach (int i in list)
                 {
-                    float aX = field.Player[c].X - (field.Player[c].Size[0] + 2);
-                    float aY = field.Player[c].Y + (field.Player[c].Size[1] + 2);
-                    float bX = field.Player[c].X + (field.Player[c].Size[0] + 2);
-                    float bY = field.Player[c].Y + (field.Player[c].Size[1] + 2);
-                    float cX = field.Player[c].X + (field.Player[c].Size[0] + 2);
-                    float cY = field.Player[c].Y - (field.Player[c].Size[1] + 2);
-                    float dX = field.Player[c].X - (field.Player[c].Size[0] + 2);
-                    float dY = field.Player[c].Y - (field.Player[c].Size[1] + 2);
-                    if (field.Item[i].X > aX && field.Item[i].X < bX)
+                    bool result = field.Player[ID].LiftItemInGame(field.Item[i]);
+                    if (result)
                     {
-                        if (field.Item[i].Y > dY && field.Item[i].Y < aY)
-                        {
-                            switch (field.Item[i].Name)
-                            {
-                                case "Pistol":
-                                    {
-                                        field.Player[c].P.CountMagazine += field.Item[i].Count;
-
-                                        break;
-                                    }
-                                case "Shotgun":
-                                    {
-                                        field.Player[c].S.CountMagazine += field.Item[i].Count;
-                                        break;
-                                    }
-                                case "Gun":
-                                    {
-
-                                        field.Player[c].G.CountMagazine += field.Item[i].Count;
-                                        break;
-                                    }
-                                case "Bomb":
-                                    {
-                                        field.Player[c].B.CountMagazine += field.Item[i].Count;
-                                        break;
-                                    }
-                                case "Kit":
-                                    {
-                                        field.Player[c].Life += field.Item[i].Count;
-                                        break;
-                                    }
-                            }
-                            field.Item.Remove(i);
-                        }
+                        field.Item.Remove(i);
                     }
                 }
-
             }
         }
-        
+
+        //private void LiftItem(int ID)//поднятие вещей
+        //{
+
+        //    foreach (int c in field.Player.Keys)
+        //    {
+        //        List<int> list = new List<int>();
+        //        foreach (int i in field.Item.Keys)
+        //        {
+        //            list.Add(i);
+        //        }
+        //        foreach (int i in list)
+        //        {
+        //            float aX = field.Player[c].X - (field.Player[c].Size[0] + 2);
+        //            float aY = field.Player[c].Y + (field.Player[c].Size[1] + 2);
+        //            float bX = field.Player[c].X + (field.Player[c].Size[0] + 2);
+        //            float bY = field.Player[c].Y + (field.Player[c].Size[1] + 2);
+        //            float cX = field.Player[c].X + (field.Player[c].Size[0] + 2);
+        //            float cY = field.Player[c].Y - (field.Player[c].Size[1] + 2);
+        //            float dX = field.Player[c].X - (field.Player[c].Size[0] + 2);
+        //            float dY = field.Player[c].Y - (field.Player[c].Size[1] + 2);
+        //            if (field.Item[i].X > aX && field.Item[i].X < bX)
+        //            {
+        //                if (field.Item[i].Y > dY && field.Item[i].Y < aY)
+        //                {
+        //                    switch (field.Item[i].Name)
+        //                    {
+        //                        case "Pistol":
+        //                            {
+        //                                field.Player[c].P.CountMagazine += field.Item[i].Count;
+
+        //                                break;
+        //                            }
+        //                        case "Shotgun":
+        //                            {
+        //                                field.Player[c].S.CountMagazine += field.Item[i].Count;
+        //                                break;
+        //                            }
+        //                        case "Gun":
+        //                            {
+
+        //                                field.Player[c].G.CountMagazine += field.Item[i].Count;
+        //                                break;
+        //                            }
+        //                        case "Bomb":
+        //                            {
+        //                                field.Player[c].B.CountMagazine += field.Item[i].Count;
+        //                                break;
+        //                            }
+        //                        case "Kit":
+        //                            {
+        //                                field.Player[c].Life += field.Item[i].Count;
+        //                                break;
+        //                            }
+        //                    }
+        //                    field.Item.Remove(i);
+        //                }
+        //            }
+        //        }
+
+        //    }
+        //}
+
         private int WeapWound(string weapon, int ID)
         {
             int countLife = 0;
@@ -136,10 +155,8 @@ namespace Server
             return countLife;
         }
 
-        private void Woundd(int ID,int takenLifes)//ранение
+        private void Woundd(int ID, int takenLifes)//ранение
         {
-            
-
             if (field.Player[ID].Life > 0)
             {
                 field.Player[ID].Life -= takenLifes;
@@ -351,26 +368,13 @@ namespace Server
 
                 }
             }
-            //foreach (int c in field.Player.Keys)
-            //{
-            //    double a = Math.Abs(field.Player[c].X - field.circle.X);
-            //    double b = Math.Abs(field.Player[c].Y - field.circle.Y);
-            //    double gep = Math.Abs(Math.Sqrt(a * a + b * b));
-            //    if (gep > field.circle.Radius)
-            //    {
-            //        Woundd(c, 1);
-            //        field.Player[c].OutCircle = true;
-            //    }
-            //    else
-            //    { field.Player[c].OutCircle = false; }
-            //}
             foreach (Player player in field.Player.Values)
             {
                 field.PlayerOutOfCircle(player);
             }
         }
 
-        private void ChangeWeapon(int ID,string weapon)//смена оружия
+        private void ChangeWeapon(int ID, string weapon)//смена оружия
         {
             if (weapon == "Pistol")
             {
@@ -388,128 +392,8 @@ namespace Server
             {
                 field.Player[ID].Weap = field.Player[ID].B;
             }
-            field.Player[ID].Weapon =weapon;
-           
-        }
+            field.Player[ID].Weapon = weapon;
 
-        private void ReloadCall(int ID)
-        {
-            field.Player[ID].Weap.CamShot = false;
-            int second = now.Second;
-            {
-                if (now.Second == 59)
-                {
-                    second = 1;
-
-                }
-                else
-                {
-                    if (now.Second == 60)
-                    {
-                        second = 2;
-                    }
-                    else
-                    {
-                        second = now.Second + 2;
-                    }
-                }
-
-            }
-            DateTime dt = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, second, now.Millisecond);
-            field.Player[ID].Weap.time = dt;
-        }
-
-        private void SmallCircleCall()
-        {
-            field.circle.go = true;
-            Random rn = new Random(); // объявление переменной для генерации чисел
-            int x = rn.Next(-40, 40); //rn.Next(-8, 8);
-            int y = rn.Next(-40, 40);//rn.Next(-4, 4);
-            float speed = 0.3f;
-            field.circle.Move(x, y, speed);
-
-        }
-
-        private void SmallCircleMove()
-        {
-            if (field.circle.go == true)
-            {
-                if (Math.Abs(field.circle.X) < Math.Abs(field.circle.endX))
-                {
-                    field.circle.X += field.circle.a;
-                    field.circle.Y += field.circle.b;
-                    if (field.circle.Size[0] > 3)
-                    {
-                        double i = field.circle.Size[0];
-                        field.circle.Size[0] -= 0.01;
-                        field.circle.Size[1] -= 0.01;
-                        field.circle.Radius = Convert.ToSingle((field.circle.Radius * field.circle.Size[0]) / i);
-                    }
-                }
-                else
-                {
-                    field.circle.go = false;
-                }
-
-            }
-        }
-
-        private void Reload(int ID, Player player)//перезарядка
-        {
-            if (field.Player.ContainsKey(ID))
-            {
-                if (field.Player[ID].Weap.CamShot == false)
-                {
-                    if (now.Second == field.Player[ID].Weap.time.Second)
-                    {
-                        if (field.Player[ID].Weap.CountMagazine != 0)
-                        {
-                            if (field.Player[ID].Weap.CountBullets == 0)
-                            {
-                                if (field.Player[ID].Weap.CountMagazine == field.Player[ID].Weap.MaxCountMag)
-                                {
-                                    field.Player[ID].Weap.CountBullets = field.Player[ID].Weap.CountMagazine;
-                                    field.Player[ID].Weap.CountMagazine = field.Player[ID].Weap.CountMagazine - field.Player[ID].Weap.MaxCountMag;
-                                }
-                                else
-                                {
-                                    if (field.Player[ID].Weap.CountMagazine > field.Player[ID].Weap.MaxCountMag)
-                                    {
-                                        field.Player[ID].Weap.CountBullets = field.Player[ID].Weap.MaxCountMag;
-                                        field.Player[ID].Weap.CountMagazine = field.Player[ID].Weap.CountMagazine - field.Player[ID].Weap.MaxCountMag;
-                                    }
-                                    else
-                                    {
-                                        if (field.Player[ID].Weap.CountMagazine < field.Player[ID].Weap.MaxCountMag)
-                                        {
-                                            field.Player[ID].Weap.CountBullets = field.Player[ID].Weap.CountMagazine;
-                                            field.Player[ID].Weap.CountMagazine = 0;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (!(field.Player[ID].Weap.CountBullets == field.Player[ID].Weap.MaxCountMag))
-                                {
-                                    if (field.Player[ID].Weap.CountMagazine < (field.Player[ID].Weap.MaxCountMag - field.Player[ID].Weap.CountBullets))
-                                    {
-                                        field.Player[ID].Weap.CountBullets += field.Player[ID].Weap.CountMagazine;
-                                        field.Player[ID].Weap.CountMagazine = 0;
-                                    }
-                                    else
-                                    {
-                                        int i = field.Player[ID].Weap.MaxCountMag - field.Player[ID].Weap.CountBullets;
-                                        field.Player[ID].Weap.CountBullets = field.Player[ID].Weap.MaxCountMag;
-                                        field.Player[ID].Weap.CountMagazine -= i;
-                                    }
-                                }
-                            }
-                        }
-                        field.Player[ID].Weap.CamShot = true;
-                    }
-                }
-            }
         }
 
         private void FinishGame(int ID)//конец игры
@@ -562,26 +446,36 @@ namespace Server
 
             for (int i = 0; i < field.Bullet.Count; i++)
             {
+                TimeSpan intervalBul = field.Bullet[i].time - DateTime.Now;
+                if (intervalBul.Negate().Seconds < 2)
+                {
                     field.Bullet[i].X += field.Bullet[i].a;
                     field.Bullet[i].Y += field.Bullet[i].b;
-                    field.Bullet[i].time = now;
+                }
+                else
+                {
+                    DelBul(field.Bullet[i]);
+                }
             }
+        }
+
+        private int TimeForFly(string weapon, int playerID)
+        {
+            int seconds = 0;
+            switch (weapon)
+            {
+                case "Pistol": seconds = field.Player[playerID].P.TimeFly; break;
+                case "Gun": seconds = field.Player[playerID].P.TimeFly; break;
+                case "Shotgun": seconds = field.Player[playerID].P.TimeFly; break;
+                case "Bomb": seconds = field.Player[playerID].P.TimeFly; break;
+            }
+            return seconds;
         }
 
         private void DelBul(Bullet bul)
         {
             if (field.Bullet.Contains(bul))
                 field.Bullet.Remove(bul);
-        }
-
-        private void SmallCircle(bool i)
-        {
-            if (i)
-            {
-                field.circle.Size[0] -= 15;
-                field.circle.Size[1] -= 15;
-                i = false;
-            }
         }
 
         private void MovePlayer(int ID, string dir)//движение игрока
@@ -591,25 +485,25 @@ namespace Server
             {
                 case "W":
                     {
-                        if (!field.Player[ID].StopIn.ContainsKey("W")&& !field.Player[ID].StopInWall.ContainsKey("W"))
+                        if (!field.Player[ID].StopIn.ContainsKey("W") && !field.Player[ID].StopInWall.ContainsKey("W"))
                             field.Player[ID].Y += speed;
                         break;
                     }
                 case "S":
                     {
-                        if (!field.Player[ID].StopIn.ContainsKey("S")&& !field.Player[ID].StopInWall.ContainsKey("S"))
+                        if (!field.Player[ID].StopIn.ContainsKey("S") && !field.Player[ID].StopInWall.ContainsKey("S"))
                             field.Player[ID].Y -= speed;
                         break;
                     }
                 case "A":
                     {
-                        if (!field.Player[ID].StopIn.ContainsKey("A")&&!field.Player[ID].StopInWall.ContainsKey("A"))
+                        if (!field.Player[ID].StopIn.ContainsKey("A") && !field.Player[ID].StopInWall.ContainsKey("A"))
                             field.Player[ID].X -= speed;
                         break;
                     }
                 case "D":
                     {
-                        if (!field.Player[ID].StopIn.ContainsKey("D")&&!field.Player[ID].StopInWall.ContainsKey("D"))
+                        if (!field.Player[ID].StopIn.ContainsKey("D") && !field.Player[ID].StopInWall.ContainsKey("D"))
                             field.Player[ID].X += speed;
                         break;
                     }
@@ -623,9 +517,8 @@ namespace Server
                 Hit(player.ID);
                 if (!(player.Direction == "N"))//движение игрока
                 {
-                    MovePlayer(player.ID, player.Direction);
+                    field.Player[player.ID].MovePlayer(player.Direction);
                 }
-
                 ChangeWeapon(player.ID, player.Weapon);
                 if (player.Shoot == true)//выстрел
                 {
@@ -639,7 +532,6 @@ namespace Server
                 {
                     if (player.Life <= 0)
                     {
-                        //FinishGame(player.ID);
                         field.Player[player.ID].Death = true;
                     }
                     if (field.Player.Count == 1)//поднятие вещей
@@ -650,14 +542,13 @@ namespace Server
                     {
                         LiftItem(player.ID);
                     }
-                    Reload(player.ID, player);
                     if (player.Reload == true)//перезарядка
                     {
-                        ReloadCall(player.ID);
-
+                        field.Player[player.ID].ReloadCall();//вызов перезарядки
                     }
+                    field.Player[player.ID].ReloadWeapon();//перезарядка
                     BulFlight();
-                    SmallCircleMove();
+                    field.circle.SmallCircleMove();
                 }
             }
         }
@@ -666,7 +557,7 @@ namespace Server
         {
             if (field.time.Seconds == 30)
             {
-                SmallCircleCall();
+               field.circle.SmallCircleCall();
             }
             field.time = interval.Negate();
             field.DecreaseInLives();
@@ -680,7 +571,6 @@ namespace Server
 
                 this.thread.Join();
             }
-
         }
 
         public void Process()
@@ -695,7 +585,8 @@ namespace Server
                 interval = StartTime - now;
                 ReactionInTime(pl);
 
-                //string meesage = JsonConvert.SerializeObject(field, Formatting.Indented);
+                Field f = field.Clone();
+
                 if (dataForSend.Count < 100)
                 { this.dataForSend.Enqueue(field); }
             }
