@@ -86,7 +86,7 @@ namespace Server
                         {
                             NetworkStream stream = clients[i].client.GetStream();
                             string message = JsonConvert.SerializeObject(field, Formatting.Indented);
-                           // Console.WriteLine(message);
+                          //  Console.WriteLine(message);
                             string msg = "%" + message + "&";
                             Send(msg, stream);
                         }
@@ -94,24 +94,19 @@ namespace Server
                         {
                             Console.WriteLine(e);
                             clients.Remove(clients[i]);
+                         
                         }
-                        foreach (Player player in field.Player.Values)
+                        //foreach (Player player in field.Player.Values)
+                        //{
+                        //    if (player.Win)
+                        //    {
+                        //        Stop();
+                        //    }
+                        if (clients.Count == 0)
                         {
-                            if (player.Death)
-                            {
-                                for (int k = 0; k < clients.Count; k++)
-                                {
-                                    if (player.ID == clients[k].ID)
-                                    {
-                                        clients.Remove(clients[k]);
-                                    }
-                                }
-                            }
-                            if (player.Win)
-                            {
-                                Stop();
-                            }
+                            Stop();
                         }
+                        //}
                     }
                 }
             }

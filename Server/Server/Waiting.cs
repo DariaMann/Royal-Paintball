@@ -64,7 +64,7 @@ namespace Server
         {
             while (!stopped)
             {
-                //Console.WriteLine("Games: "+Games.Count);
+                Console.WriteLine("Games: "+Games.Count);
                 if (clients.Count >= GamersCount)
                 {
                     List<Client> newList = new List<Client>(clients);

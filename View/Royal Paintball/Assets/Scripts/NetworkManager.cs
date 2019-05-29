@@ -150,66 +150,68 @@ public class NetworkManager : MonoBehaviour
     }
     public void Actoin()//изменение данных, отправляемых на сервер при действии пользователя
     {
-
-        KeyMoveDown();
-        if (Input.GetKey(KeyCode.F))//поднятие предметов
+        if (field.Player.ContainsKey(my_ID))
         {
-            field.Player[my_ID].LiftItem = true;
-        }
-        if (Input.GetKey(KeyCode.R))//перезарядка оружия
-        {
-            field.Player[my_ID].Reload = true;
-            if (field.Player[my_ID].Weap.CountMagazine != 0 && field.Player[my_ID].Weap.CountBullets != field.Player[my_ID].Weap.MaxCountMag)
+            KeyMoveDown();
+            if (Input.GetKey(KeyCode.F))//поднятие предметов
             {
-                AudioReload.GetComponent<AudioSource>().Play();
+                field.Player[my_ID].LiftItem = true;
             }
-        }
-        else
-        {
-            field.Player[my_ID].Reload = false;
-        }
+            if (Input.GetKey(KeyCode.R))//перезарядка оружия
+            {
+                field.Player[my_ID].Reload = true;
+                if (field.Player[my_ID].Weap.CountMagazine != 0 && field.Player[my_ID].Weap.CountBullets != field.Player[my_ID].Weap.MaxCountMag)
+                {
+                    AudioReload.GetComponent<AudioSource>().Play();
+                }
+            }
+            else
+            {
+                field.Player[my_ID].Reload = false;
+            }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            field.Player[my_ID].Weapon = "Pistol";
-            InstantiateWeapon(pistol, field.Player[my_ID].Weapon);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            field.Player[my_ID].Weapon = "Shotgun";
-            InstantiateWeapon(shotgun, field.Player[my_ID].Weapon);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            field.Player[my_ID].Weapon = "Gun";
-            InstantiateWeapon(gun, field.Player[my_ID].Weapon);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            field.Player[my_ID].Weapon = "Bomb";
-            InstantiateWeapon(bomb, field.Player[my_ID].Weapon);
-        }
-        CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
-        Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
-        Lifes.text = Convert.ToString(field.Player[my_ID].Life);
-        Timer.text = field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                field.Player[my_ID].Weapon = "Pistol";
+                InstantiateWeapon(pistol, field.Player[my_ID].Weapon);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                field.Player[my_ID].Weapon = "Shotgun";
+                InstantiateWeapon(shotgun, field.Player[my_ID].Weapon);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                field.Player[my_ID].Weapon = "Gun";
+                InstantiateWeapon(gun, field.Player[my_ID].Weapon);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                field.Player[my_ID].Weapon = "Bomb";
+                InstantiateWeapon(bomb, field.Player[my_ID].Weapon);
+            }
+            CountBul.text = Convert.ToString(field.Player[my_ID].Weap.CountBullets);
+            Magazine.text = Convert.ToString(field.Player[my_ID].Weap.CountMagazine);
+            Lifes.text = Convert.ToString(field.Player[my_ID].Life);
+            Timer.text = field.time.Minutes.ToString() + ":" + field.time.Seconds.ToString();
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            field.Player[my_ID].LiftItem = true;
-        }
-        else { field.Player[my_ID].LiftItem = false; }
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
-        MousePos();
-        SizeCircle();
-        if(field.Player[my_ID].Win)
-        {
-            Win("You won!");
-            clientTCP.Disconnect();
-            Destroy(this);
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                field.Player[my_ID].LiftItem = true;
+            }
+            else { field.Player[my_ID].LiftItem = false; }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Application.Quit();
+            }
+            MousePos();
+            SizeCircle();
+            if (field.Player[my_ID].Win)
+            {
+                Win("You won!");
+                clientTCP.Disconnect();
+                Destroy(this);
+            }
         }
     }
     public void Exit()

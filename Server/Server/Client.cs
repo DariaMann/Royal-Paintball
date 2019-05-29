@@ -107,10 +107,6 @@ namespace Server
                     { this.queue.Enqueue(player); }
 
                     Console.WriteLine("Death " + ID + ":" + player.Death);
-                    if (player.Death)
-                    {
-                        Stop();
-                    }
                 }
             }
         }

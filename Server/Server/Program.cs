@@ -16,59 +16,59 @@ namespace Server
         static void Main(string[] args)
         {
 
+            //    server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+
+            //    // запуск слушателя
+            //    server.Start();
+            //    Console.WriteLine("Ожидание подключений... ");
+
+            //    List<Client> clients = new List<Client>();//data from server
+
+            //    while /*(true)//*/(clients.Count != 3)//поправить
+            //    {
+            //        TcpClient client = server.AcceptTcpClient();
+
+            //        Console.WriteLine("Подключен клиент. Выполнение запроса...");
+
+            //        Client cl = new Client(client);
+            //        cl.ID = clients.Count;
+
+            //        cl.Game = true;
+            //        cl.Start();
+
+            //        clients.Add(cl);
+
+
+
+            //    }
+            //Game game = new Game(clients);
+
+
+
             server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
 
             // запуск слушателя
             server.Start();
             Console.WriteLine("Ожидание подключений... ");
 
-            List<Client> clients = new List<Client>();//data from server
+            ConcurrentQueue<Client> queueTCP = new ConcurrentQueue<Client>();//очередь подключений клиентов
 
-            while (true)//(clients.Count != 1)//поправить
+            Waiting waiting = new Waiting(queueTCP);
+
+            waiting.Start();
+
+
+            while (true)//поправить
             {
+                // Получаем входящее подключение
                 TcpClient client = server.AcceptTcpClient();
 
                 Console.WriteLine("Подключен клиент. Выполнение запроса...");
 
                 Client cl = new Client(client);
-                cl.ID = clients.Count;
 
-                cl.Game = true;
-                cl.Start();
-
-                clients.Add(cl);
-
-                Game game = new Game(clients);
-
+                queueTCP.Enqueue(cl);
             }
-
-
-
-
-            //server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
-
-            //// запуск слушателя
-            //server.Start();
-            //Console.WriteLine("Ожидание подключений... ");
-
-            //ConcurrentQueue<Client> queueTCP = new ConcurrentQueue<Client>();//очередь подключений клиентов
-
-            //Waiting waiting = new Waiting(queueTCP);
-
-            //waiting.Start();
-
-
-            //while (true)//поправить
-            //{
-            //    // Получаем входящее подключение
-            //    TcpClient client = server.AcceptTcpClient();
-                
-            //    Console.WriteLine("Подключен клиент. Выполнение запроса...");
-
-            //    Client cl = new Client(client);
-
-            //    queueTCP.Enqueue(cl);
-            //}
         }
     }
 }

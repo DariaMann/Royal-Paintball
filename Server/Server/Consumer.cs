@@ -631,23 +631,34 @@ namespace Server
                 {
                     Shoott(player.ID, player);
                 }
-
-                if (player.Life <= 0)
+                if (player.Death)
                 {
                     FinishGame(player.ID);
                 }
-                if (player.LiftItem == true)//поднятие вещей
+                if (field.Player.ContainsKey(player.ID))
                 {
-                    LiftItem(player.ID);
-                }
-                Reload(player.ID, player);
-                if (player.Reload == true)//перезарядка
-                {
-                    ReloadCall(player.ID);
+                    if (player.Life <= 0)
+                    {
+                        //FinishGame(player.ID);
+                        field.Player[player.ID].Death = true;
+                    }
+                    if (field.Player.Count == 1)//поднятие вещей
+                    {
+                        field.Player[player.ID].Win = true;
+                    }
+                    if (player.LiftItem == true)//поднятие вещей
+                    {
+                        LiftItem(player.ID);
+                    }
+                    Reload(player.ID, player);
+                    if (player.Reload == true)//перезарядка
+                    {
+                        ReloadCall(player.ID);
 
+                    }
+                    BulFlight();
+                    SmallCircleMove();
                 }
-                BulFlight();
-                SmallCircleMove();
             }
         }
 
