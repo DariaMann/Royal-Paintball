@@ -115,16 +115,6 @@ namespace ServerTest
             Assert.AreEqual(expected, player.Weap.CountMagazine);
         }
         [TestMethod]
-        public void LiftItemInGameTest_1()
-        {
-            Player player = new Player() { X = 0, Y = 0 };
-            Item item = new Item("Kit", 5, 0, 0, 0);
-            bool actual = player.LiftItemInGame(item);
-            bool expected = true;
-            Assert.AreEqual(expected, actual);
-            Assert.AreEqual(55, player.Life);
-        }
-        [TestMethod]
         public void LiftItemInGameTest_2()
         {
             Player player = new Player() { X = 5, Y = 5 };
@@ -133,76 +123,24 @@ namespace ServerTest
             bool expected = false;
             Assert.AreEqual(expected, actual);
         }
-        [TestMethod]
-        public void LifeTest_1()
-        {
-            Player player = new Player() { ID = 0, X = 5, Y = 5, Life = 1 };
-            Field f = new Field();
-            f.Player.Add(0, player);
-            f.time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            f.inpulse = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            f.DecreaseInLives();
-            int actual = f.Player[player.ID].Life;
-            int expected = 0;
-            Assert.AreEqual(f.time.Seconds, f.inpulse.Second - 1);
-            Assert.AreEqual(expected, actual);
-        }
-        [TestMethod]
-        public void WoundTest_1()
-        {
-            Player player = new Player();
-            player.Wound(5);
-            int actual = player.Life;
-            float expected = 45;
-            Assert.AreEqual(expected, actual);
-        }
     }
 
     [TestClass]
     public class CommunicationTests
     {
         [TestMethod]
-        public void CloneTest_0()
-        {
-            Field f1 = new Field();
-            var mess = JsonConvert.SerializeObject(f1, Formatting.Indented);
-            Field f2 = JsonConvert.DeserializeObject<Field>(mess);
-            Assert.AreSame(f2, f1);
-        }
-        [TestMethod]
-        public void CloneTest_1()
-        {
-            Field f1 = new Field();
-            Field f2  = f1.Clone(f1);
-            Assert.AreSame(f2, f1);
-        }
-        [TestMethod]
-        public void CloneTest_2()
-        {
-            Field f1 = new Field();
-               ConcurrentQueue<Player> queue = new ConcurrentQueue<Player>();
-         ConcurrentQueue<Field> dataForSend = new ConcurrentQueue<Field>();
-            Logic logic = new Logic(f1, queue, dataForSend);
-            Field f2 = logic.CloneField();
-            Assert.AreNotSame(f2, f1);
-        }
-        //[TestMethod]
-        //public void SendTest_1()
-        //{
-        //    int port = 904; // порт для прослушивания подключений
-        //    TcpListener server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
-        //    server.Start();
-        //    TcpClient tcpClient = server.AcceptTcpClient();
-        //    Client client = new Client(tcpClient);
-        //    ConcurrentQueue<Client> queue = new ConcurrentQueue<Client>();
-        //    queue.Enqueue(client);
-        //    Sender2 sender = new Sender2(queue);
-        //}
-        [TestMethod]
         public void ConnectTest()
         {
             int port = 904; // порт для прослушивания подключений
             TcpListener server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            server.Start();
+            TcpClient tcpClient = server.AcceptTcpClient();
+        }
+        [TestMethod]
+        public void ConnectTest_1()
+        {
+            int port = 904; // порт для прослушивания подключений
+            TcpListener server = new TcpListener(IPAddress.Parse("192.168.31.163"), port);
             server.Start();
             TcpClient tcpClient = server.AcceptTcpClient();
         }

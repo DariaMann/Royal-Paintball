@@ -68,13 +68,20 @@ public class NetworkManager : MonoBehaviour
     public GameObject End;
     public Text textInTheEnd;
 
+    public GameObject IP;
+
     void Start()
     {
-        clientTCP.Connect();//коннект с сервером          
+        IP = GameObject.FindGameObjectWithTag("IP");
+        string ip = IP.name;
+        if(ip == "")
+        {
+            ip = "127.0.0.1";
+        }
+        clientTCP.Connect(ip);//коннект с сервером          
     }
     private void Update()
     {
-        Debug.Log("!!!!!!!!!!!!");
         if (!StartGame)
         {
             mess = clientTCP.GetPos();//данные с сервера  
@@ -104,7 +111,6 @@ public class NetworkManager : MonoBehaviour
                 offset = camera.transform.position - playerList[my_ID].transform.position;
 
                 clientTCP.Send(field.Player[my_ID]);
-                Debug.Log("___________________________________");
                 IsItFirstMessage = false;
         }
         
@@ -125,6 +131,7 @@ public class NetworkManager : MonoBehaviour
                 catch(Exception e)
                 {
                     Console.WriteLine(e);
+                    Console.WriteLine("(((((((((((((((((((((((((");
                 }
             }
             CamMove();
@@ -208,8 +215,10 @@ public class NetworkManager : MonoBehaviour
             SizeCircle();
             if (field.Player[my_ID].Win)
             {
-                Win("You won!");
+                Win("You win!");
                 clientTCP.Disconnect();
+                IsItFirstMessage = true;
+                StartGame = false;
                 Destroy(this);
             }
         }
@@ -220,6 +229,8 @@ public class NetworkManager : MonoBehaviour
         clientTCP.Send(field.Player[my_ID]);
         clientTCP.Disconnect();
         SceneManager.LoadScene("Play");
+        IsItFirstMessage = true;
+        StartGame = false;
         Destroy(this);
     }
     public void PlayerRotation()
@@ -235,9 +246,11 @@ public class NetworkManager : MonoBehaviour
     }
     public void ArrowRotation()
     {
-        Vector3 circlePos = new Vector3(field.circle.X, field.circle.Y, 0);
+        if(playerList.ContainsKey(my_ID))
+        { Vector3 circlePos = new Vector3(field.circle.X, field.circle.Y, 0);
         var angle = Vector2.Angle(Vector2.left, circlePos - playerList[my_ID].transform.position);//угол между вектором от объекта 
         arrow.transform.eulerAngles = new Vector3(0f, 0f, playerList[my_ID].transform.position.y > circlePos.y ? angle : -angle);//немного магии на последок
+        }
     }
 
     public void DelBull()
@@ -275,8 +288,10 @@ public class NetworkManager : MonoBehaviour
                         if (name == my_ID)
                         {
                             AudioTheEnd.GetComponent<AudioSource>().Play();
-                            clientTCP.Disconnect();
                             Win("You Lose!");
+                            clientTCP.Disconnect();
+                            IsItFirstMessage = true;
+                            StartGame = false;
                             Destroy(this);
                         }
                     }
@@ -380,7 +395,8 @@ public class NetworkManager : MonoBehaviour
         weaponPref = w.gameObject;
         Vector2 v = w.position;
         Destroy(weaponPref);
-        weaponPref = Instantiate(weap, v, Quaternion.identity);
+        weaponPref = Instantiate(weap, v,Quaternion.identity);
+        weaponPref.transform.rotation = Quaternion.Euler(-90,0,0);
         weaponPref.name = "Weapon";
         weapon = nameWeap;
         weaponPref.transform.parent = GameObject.Find(Convert.ToString(my_ID)).transform;
@@ -426,6 +442,7 @@ public class NetworkManager : MonoBehaviour
                 Vector2 v = weaponPref.transform.position;
                 Destroy(weaponPref);
                 weaponPref = Instantiate(weap, v, Quaternion.identity);
+                weaponPref.transform.rotation = Quaternion.Euler(-90, 0, 0);
                 weaponPref.name = "Weapon";
                 weapon = nameWeap;
                 weaponPref.transform.parent = GameObject.Find(Convert.ToString(field.Player[c].ID)).transform;
@@ -522,7 +539,6 @@ public class NetworkManager : MonoBehaviour
                                 // Vector2 v = new Vector2(player.X, player.Y + 1.5f);
                                 Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
                                 GameObject temp = Instantiate(magazineP, v, Quaternion.identity);
-                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                                 temp.name = field.Item[i].Name;
                                 itemList.Add(i, temp);
                                 break;
@@ -531,7 +547,6 @@ public class NetworkManager : MonoBehaviour
                             {
                                 Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
                                 GameObject temp = Instantiate(magazineS, v, Quaternion.identity);
-                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                                 temp.name = field.Item[i].Name;
                                 itemList.Add(i, temp);
                                 break;
@@ -540,7 +555,6 @@ public class NetworkManager : MonoBehaviour
                             {
                                 Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
                                 GameObject temp = Instantiate(magazineG, v, Quaternion.identity);
-                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                                 temp.name = field.Item[i].Name;
                                 itemList.Add(i, temp);
                                 break;
@@ -549,7 +563,7 @@ public class NetworkManager : MonoBehaviour
                             {
                                 Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
                                 GameObject temp = Instantiate(magazineB, v, Quaternion.identity);
-                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
+                               /// temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                                 temp.name = field.Item[i].Name;
                                 itemList.Add(i, temp);
                                 break;
@@ -559,7 +573,6 @@ public class NetworkManager : MonoBehaviour
                                 // Vector2 v = new Vector2(player.X, player.Y + 1.5f);
                                 Vector2 v = new Vector2(field.Item[i].X, field.Item[i].Y);
                                 GameObject temp = Instantiate(kitPref, v, Quaternion.identity);
-                                temp.transform.rotation = Quaternion.Euler(player.XRot, player.YRot, 0);
                                 temp.name = field.Item[i].Name;
                                 itemList.Add(i, temp);
                                 break;
@@ -573,7 +586,7 @@ public class NetworkManager : MonoBehaviour
     }
     public void InstantiateCircle()//Создание 
     {
-        Vector2 v = new Vector2(field.circle.X, field.circle.Y);
+        Vector3 v = new Vector3(field.circle.X, field.circle.Y,-5);
         GameObject temp = Instantiate(circlePref, v, Quaternion.identity);
 
         temp.transform.rotation = Quaternion.Euler(90, 180, 0);

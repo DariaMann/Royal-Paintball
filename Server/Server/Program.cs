@@ -43,10 +43,14 @@ namespace Server
 
 
 
-            // server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
-           
-                server = new TcpListener(IPAddress.Parse("192.168.31.163"), port);
+            // server = new TcpListener(IPAddress.Parse("127.0.0.1"), port);//"192.168.31.163"
+            Console.Write("Введите IP адрес: ");
+            string IP = Console.ReadLine();
+            if (IP == "")
+                IP = "127.0.0.1";
 
+            server = new TcpListener(IPAddress.Parse(IP), port);
+            Console.WriteLine(IP);
             // запуск слушателя
             server.Start();
             Console.WriteLine("Ожидание подключений... ");

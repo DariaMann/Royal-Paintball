@@ -8,24 +8,24 @@ using System;
 
 public class ClientTCP
 {
-
     public TcpClient playerSocket;
     private bool connecting;
     private bool connected;
     public static NetworkStream myStream;
     private byte[] asyncBuff;
+    string command;
 
-    public void Connect()
+    public void Connect(string IP)
     {
         try
         {
-            Debug.Log("connect");
+            Debug.Log("connect"); Debug.Log("IP: " + IP);
             playerSocket = new TcpClient();
             playerSocket.ReceiveBufferSize = 4096;//размер буфера приема
             playerSocket.SendBufferSize = 4096;//размер буфера отправки
             playerSocket.NoDelay = false;
             asyncBuff = new byte[8192];
-            playerSocket.Connect("192.168.31.163", 904);
+            playerSocket.Connect(IP, 904);//"192.168.31.163"     "127.0.0.1"
 
             connecting = true;
         }
@@ -33,8 +33,8 @@ public class ClientTCP
             Debug.Log(e);
             Debug.Log("not connect");
         };
-
     }
+
     public void Disconnect()
     {
         try
@@ -46,28 +46,36 @@ public class ClientTCP
         }
         catch {
             Debug.Log("not disconnect");
-
-        };
+        }
 
     }
 
     private byte[] ReadBytes(int count)
     {
         myStream = playerSocket.GetStream();
-
-        byte[] bytes = new byte[count]; // buffer to fill (and later return)
-        int readCount = 0; // bytes is empty at the start
-        while (readCount < count)// while the buffer is not full
+        try
         {
-            int left = count - readCount;// ask for no-more than the number of bytes left to fill our byte[] // we will ask for `left` bytes
-            int r = myStream.Read(bytes, readCount, left); // but we are given `r` bytes (`r` <= `left`)
-            if (r == 0)
+            byte[] bytes = new byte[count]; // buffer to fill (and later return)
+            int readCount = 0; // bytes is empty at the start
+            while (readCount < count)// while the buffer is not full
             {
-                throw new Exception("Lost Connection during read");// I lied, in the default configuration, a read of 0 can be taken to indicate a lost connection
+                int left = count - readCount;// ask for no-more than the number of bytes left to fill our byte[] // we will ask for `left` bytes
+                int r = myStream.Read(bytes, readCount, left); // but we are given `r` bytes (`r` <= `left`)
+                if (r == 0)
+                {
+                    throw new Exception("Lost Connection during read");// I lied, in the default configuration, a read of 0 can be taken to indicate a lost connection
+                }
+                readCount += r; // advance by however many bytes we read
             }
-            readCount += r; // advance by however many bytes we read
+           return bytes;
         }
-        return bytes;
+        catch (Exception e)
+        {
+            Debug.Log(e);
+            byte[] bytes = new byte[0];
+            return bytes;
+        }
+
     }
 
     private string ReadMessage()
@@ -86,9 +94,16 @@ public class ClientTCP
 
     public string GetPos()//получение данных с сервера
     {
-        string message = ReadMessage();
-        string command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
-        Debug.Log(command);
+        try
+        {
+            string message = ReadMessage();
+            if(message!="")
+                command = message.Substring((message.IndexOf("%") + 1), (message.IndexOf("&") - 1));
+        }
+        catch(ArgumentOutOfRangeException e)
+        {
+            Debug.Log(e);
+        }
         return command;
     }
 
@@ -116,7 +131,6 @@ public class ClientTCP
         }
     }
 
-
     public void SendFirstMessage(Player clientData)//отправка сообщения со всеми данными
     {
         try
@@ -133,22 +147,4 @@ public class ClientTCP
             SceneManager.LoadScene("Play");
         }
     }
-    //    public void Send(Player player)//отправка сообщения со всеми данными
-    //    {
-    //        string message = JsonConvert.SerializeObject(player, Formatting.Indented);
-    //        byte[] buffer = Encoding.ASCII.GetBytes(message);
-    //        try
-    //        {
-    //            myStream.Write(buffer, 0, buffer.Length);
-    //        }
-    //        catch
-    //        {
-    //            Debug.Log("Лег сервер");
-    //            Disconnect();
-    //            SceneManager.LoadScene("Play");
-    //        }
-    //    }
-    //}
-
-
 }

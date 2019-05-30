@@ -88,7 +88,7 @@ namespace Server
                         }
                         var mess = JsonConvert.SerializeObject(countNamedClient, Formatting.Indented);
                         string readyMess = "%" + mess + "&";
-                        Console.WriteLine("Sender2: " + readyMess + " to " + i + " Player");
+                        //Console.WriteLine("Sender2: " + readyMess + " to " + i + " Player");
                         SendMessage(stream, readyMess);
                         if (Game)
                         {

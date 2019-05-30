@@ -337,25 +337,38 @@ namespace Server
             int pistol = field.Player[ID].P.CountBullets + field.Player[ID].P.CountMagazine;
             if (pistol != 0)
             {
-                lastID += 1;
+                
+                while (field.Item.ContainsKey(lastID))
+                {
+                    lastID += 1;
+                }
                 field.Item.Add(lastID, new Item("Pistol", pistol, field.Player[ID].X, field.Player[ID].Y + 1.5f, field.Item.Count));
             }
             int shotgun = field.Player[ID].S.CountBullets + field.Player[ID].S.CountMagazine;
             if (shotgun != 0)
             {
-                lastID += 1;
+                while (field.Item.ContainsKey(lastID))
+                {
+                    lastID += 1;
+                }
                 field.Item.Add(lastID, new Item("Shotgun", shotgun, field.Player[ID].X, field.Player[ID].Y - 1.5f, field.Item.Count));
             }
             int gun = field.Player[ID].G.CountBullets + field.Player[ID].G.CountMagazine;
             if (gun != 0)
             {
-                lastID += 1;
+                while (field.Item.ContainsKey(lastID))
+                {
+                    lastID += 1;
+                }
                 field.Item.Add(lastID, new Item("Gun", gun, field.Player[ID].X - 1.5f, field.Player[ID].Y, field.Item.Count));
             }
             int bomb = field.Player[ID].B.CountBullets + field.Player[ID].B.CountMagazine;
             if (bomb != 0)
             {
-                lastID += 1;
+                while (field.Item.ContainsKey(lastID))
+                {
+                    lastID += 1;
+                }
                 field.Item.Add(lastID, new Item("Bomb", bomb, field.Player[ID].X + 1.5f, field.Player[ID].Y, field.Item.Count));
             }
             field.Player[ID].P.CountBullets = 0; field.Player[ID].P.CountMagazine = 0;
@@ -491,10 +504,8 @@ namespace Server
                 now = DateTime.Now;
                 interval = StartTime - now;
                 ReactionInTime(pl);
-
-                Field f = field.Clone(field);
-
-                if (dataForSend.Count < 100)
+                
+                if (dataForSend.Count < 1)
                 { this.dataForSend.Enqueue(field); }
             }
         }

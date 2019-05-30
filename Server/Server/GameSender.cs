@@ -71,7 +71,6 @@ namespace Server
                 Thread.Sleep(20);
                 if (this.dataForSend.TryDequeue(out Field field))
                 {
-                    //Console.WriteLine("clients.Count  " + clients.Count);
                     for (int i = 0; i < clients.Count; i++)
                     {
                         foreach (Player player in field.Player.Values)
@@ -85,12 +84,11 @@ namespace Server
                         try
                         {
                             NetworkStream stream = clients[i].client.GetStream();
-                            string message = JsonConvert.SerializeObject(field, Formatting.Indented);
-                          //  Console.WriteLine(message);
+                           string message = JsonConvert.SerializeObject(field, Formatting.Indented);
                             string msg = "%" + message + "&";
-                            Console.WriteLine("clients.Count  " + clients.Count +" to " + clients[i].ID);
+                           // Console.WriteLine("clients.Count  " + clients.Count +" to " + clients[i].ID);
                             Send(msg, stream);
-                            Console.WriteLine("Have send to " + clients[i].ID);
+                           // Console.WriteLine("Have send to " + clients[i].ID);
                         }
                         catch (System.InvalidOperationException e)
                         {
@@ -99,17 +97,10 @@ namespace Server
                             clients.Remove(clients[i]);
                          
                         }
-                        //foreach (Player player in field.Player.Values)
-                        //{
-                        //    if (player.Win)
-                        //    {
-                        //        Stop();
-                        //    }
                         if (clients.Count == 0)
                         {
                             Stop();
                         }
-                        //}
                     }
                 }
             }

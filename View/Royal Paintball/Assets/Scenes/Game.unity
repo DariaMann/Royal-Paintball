@@ -3247,7 +3247,7 @@ MonoBehaviour:
   wallPref: {fileID: 1458996902082396, guid: e0083757fe5420f478711a7d20ff2943, type: 2}
   circlePref: {fileID: 1028776412816792, guid: dc32265837c79c84ca21520371d53ec7, type: 2}
   camera: {fileID: 2025280851}
-  kitPref: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}
+  kitPref: {fileID: 1914009073847634, guid: 639c32df823d66343b40e860f6ec056d, type: 2}
   explosion: {fileID: 1000010608846784, guid: 6747b1742d70743a8aff8594e708b2f7, type: 2}
   cur: {fileID: 0}
   Lifes: {fileID: 1881997191}
@@ -3256,15 +3256,15 @@ MonoBehaviour:
   Timer: {fileID: 1575821649}
   my_ID: 0
   weapon: Pistol
-  gun: {fileID: 1768196200222138, guid: 3f09cdc7bf43f874fa093056af1afc62, type: 2}
-  shotgun: {fileID: 1700715487831334, guid: ce7eb5aec97cd8d458d7d3eb28130550, type: 2}
+  gun: {fileID: 1447888885532940, guid: 81d1a1cbbf1ad024aace650dde5954e4, type: 2}
+  shotgun: {fileID: 1212030729890202, guid: 43bc1a7cd06465c4b994f7472f94c57a, type: 2}
   bomb: {fileID: 1384556360322528, guid: f9b238509b9e09d4b8e2b1c584021eb7, type: 2}
-  pistol: {fileID: 1548651009950344, guid: 561101a97ec638f41a2c36bc54fe5d2a, type: 2}
+  pistol: {fileID: 1281134517918036, guid: 0119dc7c41fbd7b4ba2005d3004e3620, type: 2}
   wall: {fileID: 1458996902082396, guid: e0083757fe5420f478711a7d20ff2943, type: 2}
-  magazineP: {fileID: 1359481999021002, guid: 07f70791be1c80243ae01a0c6594fecd, type: 2}
-  magazineS: {fileID: 1359481999021002, guid: 07f70791be1c80243ae01a0c6594fecd, type: 2}
-  magazineG: {fileID: 1359481999021002, guid: 07f70791be1c80243ae01a0c6594fecd, type: 2}
-  magazineB: {fileID: 1359481999021002, guid: 07f70791be1c80243ae01a0c6594fecd, type: 2}
+  magazineP: {fileID: 1101212951373546, guid: 69578bba39a13ed4facd946fa23823da, type: 2}
+  magazineS: {fileID: 1175295588200260, guid: 6123ae61c774f7144be6ac2294c83b20, type: 2}
+  magazineG: {fileID: 1944316762171930, guid: dd6b3812046450f4694364c4a34dc70e, type: 2}
+  magazineB: {fileID: 1532498842004670, guid: a3cc67cacc1a30c4ab383a57dedfeb1d, type: 2}
   arrow: {fileID: 1332267039}
   Colors:
   - {r: 0, g: 0.22655034, b: 1, a: 0}
@@ -3284,6 +3284,7 @@ MonoBehaviour:
   AudioShoot: {fileID: 1807296475}
   End: {fileID: 1884269116}
   textInTheEnd: {fileID: 847954938}
+  IP: {fileID: 0}
 --- !u!4 &2129279430
 Transform:
   m_ObjectHideFlags: 0
@@ -3291,7 +3292,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2129279428}
   m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
-  m_LocalPosition: {x: 6, y: -0, z: -1.4}
+  m_LocalPosition: {x: 2.5, y: -0, z: -1.4}
   m_LocalScale: {x: 10.0467, y: 1, z: 9.90396}
   m_Children: []
   m_Father: {fileID: 0}

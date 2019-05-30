@@ -15,13 +15,15 @@ namespace Server
         private Thread thread;
         private volatile bool stopped;
         private ConcurrentQueue<Client> ForSender;
-        private int GamersCount = 3;
+        private int GamersCount = 2;
         private List<Game> Games;
         private List<Client> clients;
         Sender sender;
 
         public Waiting(ConcurrentQueue<Client> Waiters)
         {
+            Console.Write("Введие количество игроков: ");
+            GamersCount = Convert.ToInt32(Console.ReadLine());
             this.Waiters = Waiters;
             Games = new List<Game>();
             clients = new List<Client>();
@@ -73,8 +75,10 @@ namespace Server
                     Games.Add(game);
                     //foreach (Client tcp in clients)
                     //{ sender.clients.Remove(tcp); }
-                    sender.Game = true;
                     clients.Clear();
+                    Thread.Sleep(100);
+                    sender.Game = true;
+                    
                 }
                 else
                 {
